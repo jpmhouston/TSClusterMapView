@@ -11,4 +11,6 @@
 
 @interface CDToiletsMapViewController : CDMapViewController
 
+@property (strong, nonatomic) NSMutableArray *otherAnnotations;
+
 @end

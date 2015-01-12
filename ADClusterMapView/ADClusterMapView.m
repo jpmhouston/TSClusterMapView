@@ -83,7 +83,7 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
 
 - (void)setDefaults {
     
-    self.clustersOnScreen = 32;
+    self.clustersOnScreen = 20;
     self.clusterDiscriminationPower = 1.0;
     self.clusterShouldShowSubtitle = YES;
     self.clusterEdgeBufferSize = ADClusterBufferMedium;
@@ -113,6 +113,8 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
     [self addGestureRecognizer:panRecognizer];
 }
 
+
+#pragma mark - Add/Remove Annotations
 
 - (void)addClusteredAnnotation:(id<MKAnnotation>)annotation {
     
@@ -169,16 +171,9 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
     [super removeAnnotations:annotations];
 }
 
-- (void)selectAnnotation:(id<MKAnnotation>)annotation animated:(BOOL)animated {
-    
-    [super selectAnnotation:annotation animated:animated];
-}
+#pragma mark - Annotations
 
-- (void)selectClusterAnnotation:(ADClusterAnnotation *)annotation animated:(BOOL)animated {
-    [super selectAnnotation:annotation animated:animated];
-}
-
-- (NSArray *)displayedAnnotations {
+- (NSArray *)visibleClusterAnnotations {
     NSMutableArray * displayedAnnotations = [[NSMutableArray alloc] init];
     for (ADClusterAnnotation * annotation in [_singleAnnotationsPool setByAddingObjectsFromSet:_clusterAnnotationsPool]) {
         NSAssert([annotation isKindOfClass:[ADClusterAnnotation class]], @"Unexpected annotation!");
@@ -190,11 +185,7 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
     return displayedAnnotations;
 }
 
-// careful, the implementation of the following method is slow
 - (NSArray *)annotations {
-    //    NSArray * otherAnnotations = [[super annotations] filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
-    //        return  ![evaluatedObject isKindOfClass: [ADClusterAnnotation class]];
-    //    }]];
     
     NSMutableSet *set = [NSMutableSet setWithArray:[super annotations]];
     [set minusSet:_clusterAnnotations];
@@ -333,7 +324,7 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
     }
     if (_shouldReselectAnnotation) {
         _shouldReselectAnnotation = NO;
-        [self selectClusterAnnotation:_previouslySelectedAnnotation animated:YES];
+        [self selectAnnotation:_previouslySelectedAnnotation animated:YES];
         _previouslySelectedAnnotation = nil;
     }
     
@@ -368,7 +359,7 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
 
 - (ADClusterAnnotation *)clusterAnnotationForOriginalAnnotation:(id<MKAnnotation>)annotation {
     NSAssert(![annotation isKindOfClass:[ADClusterAnnotation class]], @"Unexpected annotation!");
-    for (ADClusterAnnotation * clusterAnnotation in self.displayedAnnotations) {
+    for (ADClusterAnnotation * clusterAnnotation in self.visibleClusterAnnotations) {
         if ([clusterAnnotation.cluster isRootClusterForAnnotation:annotation]) {
             return clusterAnnotation;
         }

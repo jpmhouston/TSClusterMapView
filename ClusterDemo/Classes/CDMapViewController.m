@@ -23,7 +23,6 @@
 
     self.mapView.visibleMapRect = MKMapRectMake(135888858.533591, 92250098.902419, 190858.927912, 145995.678292);
     _mapView.clusterDiscriminationPower = 1.8;
-    _mapView.clusterEdgeBufferSize = ADClusterBufferMedium;
     
     NSLog(@"Loading data…");
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{

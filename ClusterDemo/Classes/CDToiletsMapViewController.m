@@ -7,8 +7,44 @@
 //
 
 #import "CDToiletsMapViewController.h"
+#import "ADClusterableAnnotation.h"
 
 @implementation CDToiletsMapViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    [self removeOtherAnnotationsFromMap];
+}
+
+- (void)addOtherAnnotations {
+    
+    _otherAnnotations = [[NSMutableArray alloc] init];
+    
+    NSLog(@"Loading other data…");
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        NSData * JSONData = [NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"CDStreetlights" ofType:@"json"]];
+        
+        for (NSDictionary * annotationDictionary in [NSJSONSerialization JSONObjectWithData:JSONData options:kNilOptions error:NULL]) {
+            ADClusterableAnnotation * annotation = [[ADClusterableAnnotation alloc] initWithDictionary:annotationDictionary];
+            [_otherAnnotations addObject:annotation];
+        }
+        
+        [self.mapView addClusteredAnnotations:_otherAnnotations];
+        
+    });
+    
+    [self performSelector:@selector(removeOtherAnnotationsFromMap) withObject:nil afterDelay:30];
+}
+
+- (void)removeOtherAnnotationsFromMap {
+    
+    NSLog(@"Removing other data…");
+    [self.mapView removeAnnotations:self.otherAnnotations];
+    
+    [self performSelector:@selector(addOtherAnnotations) withObject:nil afterDelay:15];
+}
+
 - (NSString *)seedFileName {
     return @"CDToilets";
 }
