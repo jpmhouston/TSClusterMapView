@@ -20,17 +20,22 @@
 @property (weak, nonatomic) ADClusterMapView *mapView;
 @property (strong, nonatomic) ADMapCluster *rootMapCluster;
 
+@property (assign, nonatomic) NSUInteger numberOfClusters;
+@property (nonatomic, strong) NSSet *clusterAnnotations;
+
 @end
 
 @implementation TSClusterOperation
 
-- (instancetype)initWithMapView:(ADClusterMapView *)mapView rootCluster:(ADMapCluster *)rootCluster completion:(ClusterOperationCompletionBlock)completion
+- (instancetype)initWithMapView:(ADClusterMapView *)mapView rootCluster:(ADMapCluster *)rootCluster showNumberOfClusters:(NSUInteger)numberOfClusters clusterAnnotations:(NSSet *)clusterAnnotations completion:(ClusterOperationCompletionBlock)completion
 {
     self = [super init];
     if (self) {
         self.mapView = mapView;
         self.rootMapCluster = rootCluster;
         self.finishedBlock = completion;
+        self.clusterAnnotations = [clusterAnnotations copy];
+        self.numberOfClusters = numberOfClusters;
     }
     return self;
 }
@@ -51,31 +56,51 @@ int nearestEvenInt(int to) {
     
     NSLog(@"Begin Clustering");
     
-    //Create buffer room for map drag outside visible rect before next regionDidChange
-    MKMapRect rect = [self visibleMapRectWithBuffer];
     
+    MKMapRect rect;
+    NSUInteger gridAcross;
+    
+    if (_mapView.clusterEdgeBuffer) {
+        //Create buffer room for map drag outside visible rect before next regionDidChange
+        rect = [self visibleMapRectWithBuffer];
+        gridAcross = 15;
+    }
+    else {
+        rect = _mapView.visibleMapRect;
+        gridAcross = 5;
+    }
+    
+    //Create grid to estimate number of clusters needed based on the spread of annotations across map rect
+    //This helps distribute clusters more evenly and will ensure you don't end up with 30 clusters in one little area.
+    //Zooming all the way out can cluster down to one single annotation if needed.
     NSUInteger numberOnScreen;
-    
-    if (_mapView.region.span.longitudeDelta > .005) {
-        //create grid to estimate number of clusters needed based on the spread of annotations across map rect
-        NSSet *mapRects = [self mapRectsFromNumberOfClustersAcross:15 mapRect:rect];
+    if (_mapView.region.span.longitudeDelta > _mapView.clusterMinimumLongitudeDelta) {
+        
+        NSSet *mapRects = [self mapRectsFromNumberOfClustersAcross:gridAcross mapRect:rect];
         
         //number of map rects that contain at least one annotation
         numberOnScreen = [_rootMapCluster numberOfMapRectsContainingChildren:mapRects];
-        numberOnScreen = numberOnScreen * _mapView.numberOfClusters/mapRects.count;
-        numberOnScreen = nearestEvenInt((int)numberOnScreen);
-        
-        if (_mapView.region.span.longitudeDelta < .1) {
-            //if we are at a small enough span lets take into account and not over cluster
-            if (numberOnScreen < _mapView.numberOfClusters/9) {
-                numberOnScreen = _mapView.numberOfClusters/9;
+        numberOnScreen = numberOnScreen * _numberOfClusters/mapRects.count;
+        if (numberOnScreen > 1) {
+            numberOnScreen = nearestEvenInt((int)numberOnScreen);
+            if (numberOnScreen > _numberOfClusters) {
+                numberOnScreen = _numberOfClusters;
             }
         }
+        
+//        if (_mapView.region.span.longitudeDelta < .1) {
+//            //if we are at a small enough span lets take into account and not over cluster
+//            if (numberOnScreen < _numberOfClusters/9) {
+//                numberOnScreen = _numberOfClusters/9;
+//            }
+//        }
     }
     else {
-        //Really close lets just show as many single annotations as we can
-        numberOnScreen = _mapView.numberOfClusters;
+        //Show maximum number of clusters
+        numberOnScreen = _numberOfClusters;
     }
+    
+    
     if (self.isCancelled) {
         return;
     }
@@ -87,7 +112,7 @@ int nearestEvenInt(int to) {
     NSMutableSet * availableClusterAnnotations = [[NSMutableSet alloc] init];
     NSMutableSet * selfDividingSingleAnnotations = [[NSMutableSet alloc] init];
     NSMutableSet * selfDividingClusterAnnotations = [[NSMutableSet alloc] init];
-    for (ADClusterAnnotation * annotation in _mapView.clusterAnnotations) {
+    for (ADClusterAnnotation * annotation in _clusterAnnotations) {
         BOOL isAncestor = NO;
         if (annotation.cluster) { // if there is a cluster associated to the current annotation
             for (ADMapCluster * cluster in clustersToShowOnMap) { // is the current annotation cluster an ancestor of one of the clustersToShowOnMap?
@@ -165,7 +190,7 @@ int nearestEvenInt(int to) {
     // Converge annotations to ancestor clusters
     for (ADMapCluster * cluster in clustersToShowOnMap) {
         BOOL didAlreadyFindAChild = NO;
-        for (__strong ADClusterAnnotation * annotation in _mapView.clusterAnnotations) {
+        for (__strong ADClusterAnnotation * annotation in _clusterAnnotations) {
             if (![annotation isKindOfClass:[MKUserLocation class]]) {
                 if (annotation.cluster && ![annotation isKindOfClass:[MKUserLocation class]]) {
                     if ([cluster isAncestorOf:annotation.cluster]) {
@@ -215,7 +240,8 @@ int nearestEvenInt(int to) {
         return;
     }
     
-    [TSClusterOperation mutateCoordinatesOfClashingAnnotations:_mapView.clusterAnnotations];
+    //Create a circle around coordinate to display all single annotations that overlap
+    [TSClusterOperation mutateCoordinatesOfClashingAnnotations:_clusterAnnotations];
     if (self.isCancelled) {
         return;
     }
@@ -223,7 +249,7 @@ int nearestEvenInt(int to) {
     // Add not-yet-annotated clusters
     for (ADMapCluster * cluster in clustersToShowOnMap) {
         BOOL isAlreadyAnnotated = NO;
-        for (ADClusterAnnotation * annotation in _mapView.clusterAnnotations) {
+        for (ADClusterAnnotation * annotation in _clusterAnnotations) {
             if (![annotation isKindOfClass:[MKUserLocation class]]) {
                 if ([cluster isEqual:annotation.cluster]) {
                     isAlreadyAnnotated = YES;
@@ -296,7 +322,7 @@ int nearestEvenInt(int to) {
         [UIView setAnimationDelegate:_mapView];
         [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
         [UIView setAnimationDuration:0.3f];
-        for (ADClusterAnnotation * annotation in _mapView.clusterAnnotations) {
+        for (ADClusterAnnotation * annotation in _clusterAnnotations) {
             if (![annotation isKindOfClass:[MKUserLocation class]] && annotation.cluster) {
                 annotation.coordinate = annotation.cluster.clusterCoordinate;
             }
@@ -316,7 +342,7 @@ int nearestEvenInt(int to) {
         }
         
         NSLog(@"Refreshing Annotation Views");
-        for (ADClusterAnnotation * annotation in _mapView.clusterAnnotations) {
+        for (ADClusterAnnotation * annotation in _clusterAnnotations) {
             if (![annotation isKindOfClass:[MKUserLocation class]] && annotation.cluster) {
                 [annotation.annotationView refreshView];
             }
@@ -415,7 +441,7 @@ int nearestEvenInt(int to) {
     return result;
 }
 
-- (NSSet *)mapRectsFromNumberOfClustersAcross:(int)amount mapRect:(MKMapRect)rect {
+- (NSSet *)mapRectsFromNumberOfClustersAcross:(NSUInteger)amount mapRect:(MKMapRect)rect {
     
     if (amount == 0) {
         return [NSSet setWithObject:[NSDictionary dictionaryFromMapRect:rect]];
@@ -428,8 +454,8 @@ int nearestEvenInt(int to) {
     
     //create basic cluster grid
     double clusterWidth = width/amount;
-    int horizontalClusters = amount;
-    int verticalClusters = round(height/clusterWidth);
+    NSUInteger horizontalClusters = amount;
+    NSUInteger verticalClusters = round(height/clusterWidth);
     double clusterHeight = height/verticalClusters;
     
     //build array of MKMapRects

@@ -57,4 +57,13 @@ BOOL ADClusterCoordinate2DIsOffscreen(CLLocationCoordinate2D coord) {
     NSAssert(self.cluster != nil, @"This annotation should have a cluster assigned!");
     return self.cluster.originalAnnotations;
 }
+
+- (void)setCoordinate:(CLLocationCoordinate2D)coordinate {
+    
+    _coordinate = coordinate;
+    
+    if (coordinate.latitude == 0) {
+        NSLog(@"%f, %f", coordinate.latitude, coordinate.longitude);
+    }
+}
 @end

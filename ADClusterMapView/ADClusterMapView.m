@@ -21,26 +21,35 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
 @interface ADClusterMapView ()
 
 @property (nonatomic, weak) id <ADClusterMapViewDelegate>  secondaryDelegate;
+
+@property (nonatomic, strong) NSSet *annotationsToBeSet;
+@property (nonatomic, strong) NSMutableSet *originalAnnotations;
+
+@property (nonatomic, assign) BOOL shouldRefreshMap;
+@property (nonatomic, assign) BOOL shouldReselectAnnotation;
+
+@property (nonatomic, strong) id<MKAnnotation> previouslySelectedAnnotation;
+
+//Clustering
 @property (nonatomic, strong) ADMapCluster *rootMapCluster;
-@property (nonatomic, assign) BOOL isAnimatingClusters;
-@property (nonatomic, assign) BOOL isSettingAnnotations;
+
 @property (nonatomic, strong) NSMutableSet *singleAnnotationsPool;
 @property (nonatomic, strong) NSMutableSet *clusterAnnotationsPool;
 @property (nonatomic, strong) NSMutableSet *clusterableAnnotationsAdded;
-@property (nonatomic, strong) NSSet *annotationsToBeSet;
-@property (nonatomic, strong) NSMutableSet *originalAnnotations;
-@property (nonatomic, strong) id<MKAnnotation> previouslySelectedAnnotation;
-@property (nonatomic) BOOL shouldReselectAnnotation;
+
+@property (nonatomic, assign) BOOL isAnimatingClusters;
+@property (nonatomic, assign) BOOL isSettingAnnotations;
+
+@property (nonatomic,assign) MKMapRect previousVisibleMapRectClustered;
+
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
+
 @property (nonatomic, strong) NSDate *lastAnnotationSet;
-@property (nonatomic, strong) UIActivityIndicatorView *indicatorView;
-@property (nonatomic, assign) BOOL shouldRefreshMap;
-@property (assign) MKMapRect previousVisibleMapRectClustered;
 
-@end
+@property (nonatomic, strong) NSSet *clusterAnnotations;
 
-@interface ADClusterMapView (Private)
-- (void)_clusterInMapRect:(MKMapRect)rect newRootCluster:(BOOL)isNewCluster;
+@property (nonatomic, strong) TSClusterOperation *clusterOperation;
+
 @end
 
 @implementation ADClusterMapView
@@ -72,7 +81,18 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
     }
 }
 
+- (void)setDefaults {
+    
+    self.clustersOnScreen = 32;
+    self.clusterDiscriminationPower = 1.0;
+    self.clusterShouldShowSubtitle = YES;
+    self.clusterEdgeBuffer = YES;
+    self.clusterMinimumLongitudeDelta = 0.005;
+}
+
 - (void)initHelpers {
+    
+    [self setDefaults];
     
     self.operationQueue = [[NSOperationQueue alloc] init];
     [self.operationQueue setMaxConcurrentOperationCount:1];
@@ -84,125 +104,6 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
     [self addGestureRecognizer:panRecognizer];
 }
 
-- (void)initAnnotationPools:(NSUInteger)numberOfAnnotationsInPool {
-    
-    [super removeAnnotations:_clusterAnnotations.allObjects];
-    _singleAnnotationsPool = [[NSMutableSet alloc] initWithCapacity: numberOfAnnotationsInPool];
-    _clusterAnnotationsPool = [[NSMutableSet alloc] initWithCapacity: numberOfAnnotationsInPool];
-    for (int i = 0; i < numberOfAnnotationsInPool; i++) {
-        ADClusterAnnotation * annotation = [[ADClusterAnnotation alloc] init];
-        annotation.type = ADClusterAnnotationTypeLeaf;
-        [_singleAnnotationsPool addObject:annotation];
-        annotation = [[ADClusterAnnotation alloc] init];
-        annotation.type = ADClusterAnnotationTypeCluster;
-        [_clusterAnnotationsPool addObject:annotation];
-    }
-    [super addAnnotations:_singleAnnotationsPool.allObjects];
-    [super addAnnotations:_clusterAnnotationsPool.allObjects];
-    _clusterAnnotations = [_singleAnnotationsPool setByAddingObjectsFromSet:_clusterAnnotationsPool];
-}
-
-- (void)setClusterableAnnotations:(NSSet *)annotations {
-    
-    if (!annotations) {
-        return;
-    }
-    
-    if (!_lastAnnotationSet) {
-        _lastAnnotationSet = [NSDate dateWithTimeIntervalSince1970:0];
-    }
-    
-    BOOL shouldShowIndicator = YES;
-    BOOL shouldContinue = NO;
-    if ([[NSDate date] timeIntervalSinceDate:_lastAnnotationSet] >= 5 || _shouldRefreshMap) {
-        shouldContinue = YES;
-    }
-    else {
-        shouldShowIndicator = NO;
-    }
-    
-    if (_originalAnnotations.count > annotations.count) {
-        shouldContinue = YES;
-        shouldShowIndicator = NO;
-    }
-    
-    if (!_originalAnnotations.count) {
-        shouldContinue = YES;
-        shouldShowIndicator = NO;
-    }
-    
-    if (!_isSettingAnnotations && !_isAnimatingClusters && ! _operationQueue.operationCount && shouldContinue) {
-        _isSettingAnnotations = YES;
-        _shouldRefreshMap = NO;
-        _lastAnnotationSet = [NSDate date];
-        NSLog(@"isSettingAnnoatations");
-        
-        if (shouldShowIndicator) {
-            [self insertSubview:_indicatorView atIndex:1];
-            [_indicatorView startAnimating];
-        }
-        
-        if (!_indicatorView) {
-            _indicatorView = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
-            _indicatorView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.2];
-            _indicatorView.layer.cornerRadius = 5;
-            _indicatorView.center = self.center;
-            [_indicatorView setActivityIndicatorViewStyle:UIActivityIndicatorViewStyleWhiteLarge];
-        }
-        
-        _originalAnnotations = [[NSMutableSet alloc] initWithSet:annotations];
-    
-        NSInteger numberOfAnnotationsInPool = 2 * [self numberOfClusters]; //We manage a pool of annotations. In case we have N splits and N joins in a single animation we have to double up the actual number of annotations that belongs to the pool.
-        if (_clusterAnnotations.count != numberOfAnnotationsInPool * 2) {
-            [self initAnnotationPools:numberOfAnnotationsInPool];
-        }
-
-        double gamma = 1.0; // default value
-        if ([_secondaryDelegate respondsToSelector:@selector(clusterDiscriminationPowerForMapView:)]) {
-            gamma = [_secondaryDelegate clusterDiscriminationPowerForMapView:self];
-        }
-
-        NSString * clusterTitle = @"%d elements";
-        if ([_secondaryDelegate respondsToSelector:@selector(clusterTitleForMapView:)]) {
-            clusterTitle = [_secondaryDelegate clusterTitleForMapView:self];
-        }
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-            // use wrapper annotations that expose a MKMapPoint property instead of a CLLocationCoordinate2D property
-            NSMutableSet * mapPointAnnotations = [[NSMutableSet alloc] initWithCapacity:annotations.count];
-            for (id<MKAnnotation> annotation in annotations) {
-                ADMapPointAnnotation * mapPointAnnotation = [[ADMapPointAnnotation alloc] initWithAnnotation:annotation];
-                [mapPointAnnotations addObject:mapPointAnnotation];
-            }
-
-            // Setting visibility of cluster annotations subtitle (defaults to YES)
-            BOOL shouldShowSubtitle = YES;
-            if ([_secondaryDelegate respondsToSelector:@selector(shouldShowSubtitleForClusterAnnotationsInMapView:)]) {
-                shouldShowSubtitle = [_secondaryDelegate shouldShowSubtitleForClusterAnnotationsInMapView:self];
-            }
-
-            _rootMapCluster = [ADMapCluster rootClusterForAnnotations:mapPointAnnotations
-                                                                gamma:gamma
-                                                         clusterTitle:clusterTitle
-                                                         showSubtitle:shouldShowSubtitle];
-
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (!self.superview) {
-                    return;
-                }
-                [self _clusterInMapRect:self.visibleMapRect newRootCluster:YES];
-                if ([_secondaryDelegate respondsToSelector:@selector(mapViewDidFinishClustering:)]) {
-                    [_secondaryDelegate mapViewDidFinishClustering:self];
-                }
-                _isSettingAnnotations = NO;
-                [self checkAnnotationsToBeSet];
-            });
-        });
-    } else {
-        // keep the annotations for setting them later
-        _annotationsToBeSet = annotations;
-        [self checkAnnotationsToBeSet];
-    }
-}
 
 - (void)addClusteredAnnotation:(id<MKAnnotation>)annotation {
     
@@ -234,15 +135,6 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
     }
     
     [self setClusterableAnnotations:[NSSet setWithSet:_clusterableAnnotationsAdded]];
-}
-
-- (void)addAnnotation:(id<MKAnnotation>)annotation {
-    [self addNonClusteredAnnotation:annotation];
-}
-
-- (void)addAnnotations:(NSArray *)annotations {
-    
-    [self addNonClusteredAnnotations:annotations];
 }
 
 - (void)removeAnnotation:(id<MKAnnotation>)annotation {
@@ -291,9 +183,9 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
 
 // careful, the implementation of the following method is slow
 - (NSArray *)annotations {
-//    NSArray * otherAnnotations = [[super annotations] filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
-//        return  ![evaluatedObject isKindOfClass: [ADClusterAnnotation class]];
-//    }]];
+    //    NSArray * otherAnnotations = [[super annotations] filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
+    //        return  ![evaluatedObject isKindOfClass: [ADClusterAnnotation class]];
+    //    }]];
     
     NSMutableSet *set = [NSMutableSet setWithArray:[super annotations]];
     [set minusSet:_clusterAnnotations];
@@ -301,21 +193,6 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
     return [_originalAnnotations.allObjects arrayByAddingObjectsFromArray:set.allObjects];
 }
 
-- (void)addNonClusteredAnnotation:(id<MKAnnotation>)annotation {
-    [super addAnnotation:annotation];
-}
-
-- (void)addNonClusteredAnnotations:(NSArray *)annotations {
-    [super addAnnotations:annotations];
-}
-
-- (void)removeNonClusteredAnnotation:(id<MKAnnotation>)annotation {
-    [super removeAnnotation:annotation];
-}
-
-- (void)removeNonClusteredAnnotations:(NSArray *)annotations {
-    [super removeAnnotations:annotations];
-}
 
 #pragma mark - UIGestureRecognizerDelegate methods
 
@@ -377,10 +254,6 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
     _isAnimatingClusters = NO;
     [self checkAnnotationsToBeSet];
     
-    if ([_secondaryDelegate respondsToSelector:@selector(clusterAnimationDidStopForMapView:)]) {
-        [_secondaryDelegate clusterAnimationDidStopForMapView:self];
-    }
-    
     NSLog(@"Finished Animating");
 }
 
@@ -421,7 +294,7 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
         } else {
             return nil;
         }
-	}
+    }
     // only leaf clusters have annotations
     if (((ADClusterAnnotation *)annotation).type == ADClusterAnnotationTypeLeaf || ![_secondaryDelegate respondsToSelector:@selector(mapView:viewForClusterAnnotation:)]) {
         if ([_secondaryDelegate respondsToSelector:@selector(mapView:viewForAnnotation:)]) {
@@ -453,7 +326,7 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
     }
     
     if (!_isSettingAnnotations){
-        [self _clusterInMapRect:self.visibleMapRect newRootCluster:NO];
+        [self clusterInMapRect:self.visibleMapRect newRootCluster:NO];
     }
     if (_previouslySelectedAnnotation) {
         _shouldReselectAnnotation = YES;
@@ -510,21 +383,117 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
 }
 
 
+#pragma mark - Clustering
+
+
 - (NSUInteger)numberOfClusters {
-    NSUInteger numberOfClusters = 32; // default value
-    if ([_secondaryDelegate respondsToSelector:@selector(numberOfClustersInMapView:)]) {
-        numberOfClusters = [_secondaryDelegate numberOfClustersInMapView:self];
-    }
     //multiply by 9 for the visible rect plus 8 directions of possible screen travel (up, down, up-left, down-left, etc.)
-    return numberOfClusters * 9;
+    if (_clusterEdgeBuffer) {
+        return _clustersOnScreen * 9;
+    }
+    return _clustersOnScreen;
 }
 
-@end
 
-@implementation ADClusterMapView (Private)
+- (void)initAnnotationPools:(NSUInteger)numberOfAnnotationsInPool {
+    
+    NSArray *toRemove = _clusterAnnotations.allObjects;
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [super removeAnnotations:toRemove];
+    }];
+    
+    _singleAnnotationsPool = [[NSMutableSet alloc] initWithCapacity: numberOfAnnotationsInPool];
+    _clusterAnnotationsPool = [[NSMutableSet alloc] initWithCapacity: numberOfAnnotationsInPool];
+    for (int i = 0; i < numberOfAnnotationsInPool; i++) {
+        ADClusterAnnotation * annotation = [[ADClusterAnnotation alloc] init];
+        annotation.type = ADClusterAnnotationTypeLeaf;
+        [_singleAnnotationsPool addObject:annotation];
+        annotation = [[ADClusterAnnotation alloc] init];
+        annotation.type = ADClusterAnnotationTypeCluster;
+        [_clusterAnnotationsPool addObject:annotation];
+    }
+    
+    _clusterAnnotations = [_singleAnnotationsPool setByAddingObjectsFromSet:_clusterAnnotationsPool];
+    
+    NSArray *toAdd = _clusterAnnotations.allObjects;
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [super addAnnotations:toAdd];
+    }];
+}
+
+- (void)setClusterableAnnotations:(NSSet *)annotations {
+    
+    if (!annotations) {
+        return;
+    }
+    
+    if (!_lastAnnotationSet) {
+        _lastAnnotationSet = [NSDate dateWithTimeIntervalSince1970:0];
+    }
+    
+    BOOL shouldContinue = NO;
+    if ([[NSDate date] timeIntervalSinceDate:_lastAnnotationSet] >= 5 || _shouldRefreshMap) {
+        shouldContinue = YES;
+    }
+    
+    if (_originalAnnotations.count > annotations.count) {
+        shouldContinue = YES;
+    }
+    
+    if (!_originalAnnotations.count) {
+        shouldContinue = YES;
+    }
+    
+    if (!_isSettingAnnotations && !_isAnimatingClusters && ! _operationQueue.operationCount && shouldContinue) {
+        _isSettingAnnotations = YES;
+        _shouldRefreshMap = NO;
+        _lastAnnotationSet = [NSDate date];
+        NSLog(@"isSettingAnnoatations");
+        
+        if ([_secondaryDelegate respondsToSelector:@selector(mapViewWillBeginClustering:)]) {
+            [_secondaryDelegate mapViewWillBeginClustering:self];
+        }
+        
+        _originalAnnotations = [[NSMutableSet alloc] initWithSet:annotations];
+        
+        NSInteger numberOfAnnotationsInPool = 2 * [self numberOfClusters]; //We manage a pool of annotations. In case we have N splits and N joins in a single animation we have to double up the actual number of annotations that belongs to the pool.
+        if (_clusterAnnotations.count != numberOfAnnotationsInPool * 2) {
+            [self initAnnotationPools:numberOfAnnotationsInPool];
+        }
+        
+        NSString * clusterTitle = @"%d elements";
+        if ([_secondaryDelegate respondsToSelector:@selector(clusterTitleForMapView:)]) {
+            clusterTitle = [_secondaryDelegate clusterTitleForMapView:self];
+        }
+        
+        [_operationQueue cancelAllOperations];
+        [_operationQueue addOperationWithBlock:^{
+            // use wrapper annotations that expose a MKMapPoint property instead of a CLLocationCoordinate2D property
+            NSMutableSet * mapPointAnnotations = [[NSMutableSet alloc] initWithCapacity:annotations.count];
+            for (id<MKAnnotation> annotation in annotations) {
+                ADMapPointAnnotation * mapPointAnnotation = [[ADMapPointAnnotation alloc] initWithAnnotation:annotation];
+                [mapPointAnnotations addObject:mapPointAnnotation];
+            }
+            
+            _rootMapCluster = [ADMapCluster rootClusterForAnnotations:mapPointAnnotations
+                                                                gamma:_clusterDiscriminationPower
+                                                         clusterTitle:clusterTitle
+                                                         showSubtitle:_clusterShouldShowSubtitle];
+            
+            [self clusterInMapRect:self.visibleMapRect newRootCluster:YES];
+            
+            _isSettingAnnotations = NO;
+            [self checkAnnotationsToBeSet];
+        }];
+    } else {
+        // keep the annotations for setting them later
+        _annotationsToBeSet = annotations;
+        [self checkAnnotationsToBeSet];
+    }
+}
 
 
-- (void)_clusterInMapRect:(MKMapRect)rect newRootCluster:(BOOL)isNewCluster {
+- (void)clusterInMapRect:(MKMapRect)rect newRootCluster:(BOOL)isNewCluster {
     
     if (!self.superview) {
         return;
@@ -536,32 +505,38 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
         _previousVisibleMapRectClustered = MKMapRectNull;
     }
     
-    if (!MKMapRectIsNull(_previousVisibleMapRectClustered) &&
-        !MKMapRectIsEmpty(_previousVisibleMapRectClustered)) {
-        
-        MKMapRect halvedPreviousVisibleRect = MKMapRectInset(_previousVisibleMapRectClustered, _previousVisibleMapRectClustered.size.width/4, _previousVisibleMapRectClustered.size.width/4);
-        
-        if (MKMapRectIntersectsRect(rect, halvedPreviousVisibleRect) &&
-            MKMapRectSizeIsEqual(rect, _previousVisibleMapRectClustered)) {
-            _isAnimatingClusters = NO;
-            return;
+    if (_clusterEdgeBuffer) {
+        if (!MKMapRectIsNull(_previousVisibleMapRectClustered) &&
+            !MKMapRectIsEmpty(_previousVisibleMapRectClustered)) {
+            
+            MKMapRect innerPreviousVisibleRect = MKMapRectInset(_previousVisibleMapRectClustered, _previousVisibleMapRectClustered.size.width/4, _previousVisibleMapRectClustered.size.width/4);
+            
+            //did the map pan far enough or zoom
+            if (MKMapRectIntersectsRect(rect, innerPreviousVisibleRect) &&
+                MKMapRectSizeIsEqual(rect, _previousVisibleMapRectClustered)) {
+                _isAnimatingClusters = NO;
+                return;
+            }
         }
     }
     
     NSLog(@"clusterInMapRect");
     
-    if (_operationQueue.operationCount) {
-        [_operationQueue cancelAllOperations];
+    if (_clusterOperation.isExecuting) {
+        [_clusterOperation cancel];
     }
     
-    TSClusterOperation *clusterOperation = [[TSClusterOperation alloc] initWithMapView:self
+    _clusterOperation = [[TSClusterOperation alloc] initWithMapView:self
                                                                            rootCluster:_rootMapCluster
+                                                                  showNumberOfClusters:[self numberOfClusters]
+                                                                    clusterAnnotations:self.clusterAnnotations
                                                                             completion:^(ADClusterMapView *mapView) {
-                                                                                [_indicatorView stopAnimating];
-                                                                                [_indicatorView removeFromSuperview];
+                                                                                if ([_secondaryDelegate respondsToSelector:@selector(mapViewDidFinishClustering:)]) {
+                                                                                    [_secondaryDelegate mapViewDidFinishClustering:self];
+                                                                                }
                                                                                 _previousVisibleMapRectClustered = rect;
                                                                             }];
-    [_operationQueue addOperation:clusterOperation];
+    [_operationQueue addOperation:_clusterOperation];
     [_operationQueue setSuspended:NO];
 }
 

@@ -44,6 +44,10 @@
 		6F8FE9DE1624966A001A0309 /* CDAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F8FE9C616249428001A0309 /* CDAppDelegate.m */; };
 		6F8FE9DF1624966C001A0309 /* CDMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F8FE9C816249428001A0309 /* CDMapViewController.m */; };
 		6F8FE9E4162496B0001A0309 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F8FE9E3162496AE001A0309 /* main.m */; };
+		C597E86D1A630AA1002DF26A /* CLLocation+Utilities.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E8661A630AA1002DF26A /* CLLocation+Utilities.m */; };
+		C597E86E1A630AA1002DF26A /* NSDictionary+MKMapRect.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E8681A630AA1002DF26A /* NSDictionary+MKMapRect.m */; };
+		C597E86F1A630AA1002DF26A /* TSClusertedAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E86A1A630AA1002DF26A /* TSClusertedAnnotationView.m */; };
+		C597E8701A630AA1002DF26A /* TSClusterOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E86C1A630AA1002DF26A /* TSClusterOperation.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -96,6 +100,14 @@
 		6F8FE9CC1624942E001A0309 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = Resources/Default.png; sourceTree = SOURCE_ROOT; };
 		6F8FE9CD1624942E001A0309 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default@2x.png"; path = "Resources/Default@2x.png"; sourceTree = SOURCE_ROOT; };
 		6F8FE9E3162496AE001A0309 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = SOURCE_ROOT; };
+		C597E8651A630AA1002DF26A /* CLLocation+Utilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CLLocation+Utilities.h"; sourceTree = "<group>"; };
+		C597E8661A630AA1002DF26A /* CLLocation+Utilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CLLocation+Utilities.m"; sourceTree = "<group>"; };
+		C597E8671A630AA1002DF26A /* NSDictionary+MKMapRect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+MKMapRect.h"; sourceTree = "<group>"; };
+		C597E8681A630AA1002DF26A /* NSDictionary+MKMapRect.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+MKMapRect.m"; sourceTree = "<group>"; };
+		C597E8691A630AA1002DF26A /* TSClusertedAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSClusertedAnnotationView.h; sourceTree = "<group>"; };
+		C597E86A1A630AA1002DF26A /* TSClusertedAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSClusertedAnnotationView.m; sourceTree = "<group>"; };
+		C597E86B1A630AA1002DF26A /* TSClusterOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSClusterOperation.h; sourceTree = "<group>"; };
+		C597E86C1A630AA1002DF26A /* TSClusterOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSClusterOperation.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -125,6 +137,14 @@
 				6F8000E416256BCE005D0263 /* ADMapCluster.m */,
 				6F3C8B57162718D70081BF88 /* ADMapPointAnnotation.h */,
 				6F3C8B58162718D70081BF88 /* ADMapPointAnnotation.m */,
+				C597E8651A630AA1002DF26A /* CLLocation+Utilities.h */,
+				C597E8661A630AA1002DF26A /* CLLocation+Utilities.m */,
+				C597E8671A630AA1002DF26A /* NSDictionary+MKMapRect.h */,
+				C597E8681A630AA1002DF26A /* NSDictionary+MKMapRect.m */,
+				C597E8691A630AA1002DF26A /* TSClusertedAnnotationView.h */,
+				C597E86A1A630AA1002DF26A /* TSClusertedAnnotationView.m */,
+				C597E86B1A630AA1002DF26A /* TSClusterOperation.h */,
+				C597E86C1A630AA1002DF26A /* TSClusterOperation.m */,
 			);
 			name = ADClusterMapView;
 			path = ../ADClusterMapView;
@@ -311,13 +331,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				6F8FE9E4162496B0001A0309 /* main.m in Sources */,
+				C597E8701A630AA1002DF26A /* TSClusterOperation.m in Sources */,
 				6F8FE9DE1624966A001A0309 /* CDAppDelegate.m in Sources */,
 				6F8FE9DF1624966C001A0309 /* CDMapViewController.m in Sources */,
 				6F8000F016256D7C005D0263 /* ADClusterableAnnotation.m in Sources */,
+				C597E86F1A630AA1002DF26A /* TSClusertedAnnotationView.m in Sources */,
 				6F8000E516256BCE005D0263 /* ADClusterAnnotation.m in Sources */,
+				C597E86E1A630AA1002DF26A /* NSDictionary+MKMapRect.m in Sources */,
 				6F8000E616256BCE005D0263 /* ADClusterMapView.m in Sources */,
 				6F8000E716256BCE005D0263 /* ADMapCluster.m in Sources */,
 				6F3C8B30162708B00081BF88 /* CDStreetlightsMapViewController.m in Sources */,
+				C597E86D1A630AA1002DF26A /* CLLocation+Utilities.m in Sources */,
 				6F3C8B33162708CB0081BF88 /* CDToiletsMapViewController.m in Sources */,
 				6F3C8B59162718D70081BF88 /* ADMapPointAnnotation.m in Sources */,
 			);

@@ -9,8 +9,6 @@
 #import "CDMapViewController.h"
 #import "ADClusterableAnnotation.h"
 
-#define NUMBER_OF_ANNOTATIONS 1000
-
 @implementation CDMapViewController
 @synthesize mapView = _mapView;
 
@@ -24,6 +22,9 @@
     NSMutableArray * annotations = [[NSMutableArray alloc] init];
 
     self.mapView.visibleMapRect = MKMapRectMake(135888858.533591, 92250098.902419, 190858.927912, 145995.678292);
+    _mapView.clusterDiscriminationPower = 1.8;
+    _mapView.clusterEdgeBuffer = NO;
+    
     NSLog(@"Loading data…");
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         NSData * JSONData = [NSData dataWithContentsOfFile:[[NSBundle mainBundle] pathForResource:self.seedFileName ofType:@"json"]];
@@ -32,10 +33,8 @@
             ADClusterableAnnotation * annotation = [[ADClusterableAnnotation alloc] initWithDictionary:annotationDictionary];
             [annotations addObject:annotation];
         }
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSLog(@"Building KD-Tree…");
-            [self.mapView setAnnotations:annotations];
-        });
+        
+        [self.mapView addClusteredAnnotations:annotations];
     });
 }
 
@@ -94,11 +93,5 @@
     NSLog(@"Done");
 }
 
-- (NSInteger)numberOfClustersInMapView:(ADClusterMapView *)mapView {
-    return 40;
-}
 
-- (double)clusterDiscriminationPowerForMapView:(ADClusterMapView *)mapView {
-    return 1.8;
-}
 @end
