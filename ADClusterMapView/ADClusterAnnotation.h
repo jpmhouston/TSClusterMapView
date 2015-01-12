@@ -24,7 +24,7 @@ typedef enum {
 @interface ADClusterAnnotation : NSObject <MKAnnotation>
 @property (nonatomic) ADClusterAnnotationType type;
 @property (nonatomic) CLLocationCoordinate2D coordinate;
-@property (nonatomic, weak) ADMapCluster * cluster;
+@property (nonatomic, weak) ADMapCluster *cluster;
 @property (nonatomic, weak) TSClusertedAnnotationView *annotationView;
 @property (nonatomic) BOOL shouldBeRemovedAfterAnimation;
 @property (weak, nonatomic, readonly) NSArray * originalAnnotations; // this array contains the annotations contained by the cluster of this annotation

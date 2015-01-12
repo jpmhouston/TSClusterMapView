@@ -21,13 +21,14 @@
 @property (strong, nonatomic) ADMapCluster *rootMapCluster;
 
 @property (assign, nonatomic) NSUInteger numberOfClusters;
+@property (assign, nonatomic) MKMapRect clusteringRect;
 @property (nonatomic, strong) NSSet *clusterAnnotations;
 
 @end
 
 @implementation TSClusterOperation
 
-- (instancetype)initWithMapView:(ADClusterMapView *)mapView rootCluster:(ADMapCluster *)rootCluster showNumberOfClusters:(NSUInteger)numberOfClusters clusterAnnotations:(NSSet *)clusterAnnotations completion:(ClusterOperationCompletionBlock)completion
+- (instancetype)initWithMapView:(ADClusterMapView *)mapView rect:(MKMapRect)rect rootCluster:(ADMapCluster *)rootCluster showNumberOfClusters:(NSUInteger)numberOfClusters clusterAnnotations:(NSSet *)clusterAnnotations completion:(ClusterOperationCompletionBlock)completion
 {
     self = [super init];
     if (self) {
@@ -36,15 +37,16 @@
         self.finishedBlock = completion;
         self.clusterAnnotations = [clusterAnnotations copy];
         self.numberOfClusters = numberOfClusters;
+        self.clusteringRect = rect;
     }
     return self;
 }
 
 - (void)main {
-    // a lengthy operation
+    
     @autoreleasepool {
         
-        [self _clusterInMapRect];
+        [self clusterInMapRect:_clusteringRect];
     }
 }
 
@@ -52,31 +54,19 @@ int nearestEvenInt(int to) {
     return (to % 2 == 0) ? to : (to + 1);
 }
 
-- (void)_clusterInMapRect {
+- (void)clusterInMapRect:(MKMapRect)clusteredMapRect {
     
-    NSLog(@"Begin Clustering");
-    
-    
-    MKMapRect rect;
-    NSUInteger gridAcross;
-    
-    if (_mapView.clusterEdgeBuffer) {
-        //Create buffer room for map drag outside visible rect before next regionDidChange
-        rect = [self visibleMapRectWithBuffer];
-        gridAcross = 15;
-    }
-    else {
-        rect = _mapView.visibleMapRect;
-        gridAcross = 5;
-    }
+    NSLog(@"Begin Clustering Operation %@", self);
     
     //Create grid to estimate number of clusters needed based on the spread of annotations across map rect
     //This helps distribute clusters more evenly and will ensure you don't end up with 30 clusters in one little area.
     //Zooming all the way out can cluster down to one single annotation if needed.
+    NSUInteger gridAcross = 5 + roundf(5*_mapView.clusterEdgeBufferSize/4);
+    
     NSUInteger numberOnScreen;
     if (_mapView.region.span.longitudeDelta > _mapView.clusterMinimumLongitudeDelta) {
         
-        NSSet *mapRects = [self mapRectsFromNumberOfClustersAcross:gridAcross mapRect:rect];
+        NSSet *mapRects = [self mapRectsFromNumberOfClustersAcross:gridAcross mapRect:clusteredMapRect];
         
         //number of map rects that contain at least one annotation
         numberOnScreen = [_rootMapCluster numberOfMapRectsContainingChildren:mapRects];
@@ -87,13 +77,6 @@ int nearestEvenInt(int to) {
                 numberOnScreen = _numberOfClusters;
             }
         }
-        
-//        if (_mapView.region.span.longitudeDelta < .1) {
-//            //if we are at a small enough span lets take into account and not over cluster
-//            if (numberOnScreen < _numberOfClusters/9) {
-//                numberOnScreen = _numberOfClusters/9;
-//            }
-//        }
     }
     else {
         //Show maximum number of clusters
@@ -102,10 +85,11 @@ int nearestEvenInt(int to) {
     
     
     if (self.isCancelled) {
+        NSLog(@"Cancelled %@", self);
         return;
     }
     
-    NSSet *clustersToShowOnMap = [_rootMapCluster find:numberOnScreen childrenInMapRect:rect];//[_rootMapCluster find:[self _numberOfClusters] childrenInMapRect:rect];
+    NSSet *clustersToShowOnMap = [_rootMapCluster find:numberOnScreen childrenInMapRect:clusteredMapRect];
     
     // Build an array with available annotations (eg. not moving or not staying at the same place on the map)
     NSMutableSet * availableSingleAnnotations = [[NSMutableSet alloc] init];
@@ -128,7 +112,7 @@ int nearestEvenInt(int to) {
             }
         }
         if (!isAncestor) { // if not an ancestor
-            if (![self _annotation:annotation belongsToClusters:clustersToShowOnMap]) { // check if this annotation will be used later. If not, it is flagged as "available".
+            if (![self annotation:annotation belongsToClusters:clustersToShowOnMap]) { // check if this annotation will be used later. If not, it is flagged as "available".
                 if (annotation.type == ADClusterAnnotationTypeLeaf) {
                     [availableSingleAnnotations addObject:annotation];
                 } else {
@@ -139,6 +123,7 @@ int nearestEvenInt(int to) {
     }
     
     if (self.isCancelled) {
+        NSLog(@"Cancelled %@", self);
         return;
     }
     
@@ -172,6 +157,7 @@ int nearestEvenInt(int to) {
                     if (cluster.annotation) {
                         availableAnnotation = [availableSingleAnnotations anyObject];
                         [availableSingleAnnotations removeObject:availableAnnotation];
+                        
                     } else {
                         availableAnnotation = [availableClusterAnnotations anyObject];
                         [availableClusterAnnotations removeObject:availableAnnotation];
@@ -184,6 +170,7 @@ int nearestEvenInt(int to) {
     }
     
     if (self.isCancelled) {
+        NSLog(@"Cancelled %@", self);
         return;
     }
     
@@ -199,7 +186,7 @@ int nearestEvenInt(int to) {
                             [availableClusterAnnotations removeObject:clusterAnnotation];
                             clusterAnnotation.cluster = cluster;
                             // Setting the coordinate makes us call viewForAnnotation: right away, so make sure the cluster is set
-
+                            
                             [nonAnimated addObject:@{annotationKey: clusterAnnotation, coordinatesKey: [NSValue valueWithMKCoordinate:annotation.coordinate]}];
                             [availableSingleAnnotations addObject:annotation];
                             annotation = clusterAnnotation;
@@ -259,19 +246,19 @@ int nearestEvenInt(int to) {
         }
         if (!isAlreadyAnnotated) {
             if (cluster.annotation) {
-                    ADClusterAnnotation * annotation = [availableSingleAnnotations anyObject];
-                    [availableSingleAnnotations removeObject:annotation]; // update the availableAnnotations
+                ADClusterAnnotation * annotation = [availableSingleAnnotations anyObject];
+                [availableSingleAnnotations removeObject:annotation]; // update the availableAnnotations
                 [afterAnimation addObject:@{annotationKey: annotation,
-                                           clusterKey: cluster,
-                                           coordinatesKey: [NSValue valueWithMKCoordinate:cluster.clusterCoordinate]}];
+                                            clusterKey: cluster,
+                                            coordinatesKey: [NSValue valueWithMKCoordinate:cluster.clusterCoordinate]}];
             } else {
-                    ADClusterAnnotation * annotation = [availableClusterAnnotations anyObject];
-//                    annotation.cluster = cluster; // the order here is important: because of KVO, the cluster property must be set before the coordinate property (change of coordinate -> refresh of the view -> refresh of the title -> the cluster can't be nil)
-                    [availableClusterAnnotations removeObject:annotation]; // update the availableAnnotations
+                ADClusterAnnotation * annotation = [availableClusterAnnotations anyObject];
+                //                    annotation.cluster = cluster; // the order here is important: because of KVO, the cluster property must be set before the coordinate property (change of coordinate -> refresh of the view -> refresh of the title -> the cluster can't be nil)
+                [availableClusterAnnotations removeObject:annotation]; // update the availableAnnotations
                 
                 [afterAnimation addObject:@{annotationKey: annotation,
-                                           clusterKey: cluster,
-                                           coordinatesKey: [NSValue valueWithMKCoordinate:cluster.clusterCoordinate]}];
+                                            clusterKey: cluster,
+                                            coordinatesKey: [NSValue valueWithMKCoordinate:cluster.clusterCoordinate]}];
             }
         }
     }
@@ -280,32 +267,27 @@ int nearestEvenInt(int to) {
         return;
     }
     
-        for (ADClusterAnnotation * annotation in availableSingleAnnotations) {
-            NSAssert(annotation.type == ADClusterAnnotationTypeLeaf, @"Inconsistent annotation type!");
-            [afterAnimation addObject:@{annotationKey: annotation}];
-        }
+    for (ADClusterAnnotation * annotation in availableSingleAnnotations) {
+        NSAssert(annotation.type == ADClusterAnnotationTypeLeaf, @"Inconsistent annotation type!");
+        [afterAnimation addObject:@{annotationKey: annotation}];
+    }
     
     if (self.isCancelled) {
         return;
     }
-        for (ADClusterAnnotation * annotation in availableClusterAnnotations) {
-            NSAssert(annotation.type == ADClusterAnnotationTypeCluster, @"Inconsistent annotation type!");
-            [afterAnimation addObject:@{annotationKey: annotation}];
-        }
+    for (ADClusterAnnotation * annotation in availableClusterAnnotations) {
+        NSAssert(annotation.type == ADClusterAnnotationTypeCluster, @"Inconsistent annotation type!");
+        [afterAnimation addObject:@{annotationKey: annotation}];
+    }
     
     if (self.isCancelled) {
         return;
     }
     
-    NSLog(@"Finished Clustering");
+    NSLog(@"Finished Clustering Begin Animating %@", self);
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSLog(@"Animating");
-        
-        if (self.isCancelled) {
-            NSLog(@"Animation cancelled");
-            return;
-        }
+        NSLog(@"Animating %@", self);
         
         for (NSDictionary *dic in nonAnimated) {
             ADClusterAnnotation * annotation = [dic objectForKey:annotationKey];
@@ -317,46 +299,55 @@ int nearestEvenInt(int to) {
             }
         }
         
-        [UIView beginAnimations:@"ADClusterMapViewAnimation" context:NULL];
-        [UIView setAnimationBeginsFromCurrentState:NO];
-        [UIView setAnimationDelegate:_mapView];
-        [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
-        [UIView setAnimationDuration:0.3f];
-        for (ADClusterAnnotation * annotation in _clusterAnnotations) {
-            if (![annotation isKindOfClass:[MKUserLocation class]] && annotation.cluster) {
-                annotation.coordinate = annotation.cluster.clusterCoordinate;
-            }
-        }
-        [UIView commitAnimations];
         
-        NSLog(@"Adjust after setting animated annotations");
-        for (NSDictionary *dic in afterAnimation) {
-            ADClusterAnnotation * annotation = [dic objectForKey:annotationKey];
-            if ([dic objectForKey:coordinatesKey]) {
-                annotation.cluster = [dic objectForKey:clusterKey];
-                annotation.coordinate = [[dic objectForKey:coordinatesKey] MKCoordinateValue];
+        [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            
+            for (ADClusterAnnotation * annotation in _clusterAnnotations) {
+                if (![annotation isKindOfClass:[MKUserLocation class]] && annotation.cluster) {
+                    annotation.coordinate = annotation.cluster.clusterCoordinate;
+                }
             }
-            else {
-                [annotation reset];
+            
+        } completion:^(BOOL finished) {
+            
+            NSLog(@"Adjust after setting animated annotations");
+            for (NSDictionary *dic in afterAnimation) {
+                ADClusterAnnotation * annotation = [dic objectForKey:annotationKey];
+                if ([dic objectForKey:coordinatesKey]) {
+                    annotation.cluster = [dic objectForKey:clusterKey];
+                    annotation.coordinate = [[dic objectForKey:coordinatesKey] MKCoordinateValue];
+                }
+                else {
+                    [annotation reset];
+                }
             }
-        }
-        
-        NSLog(@"Refreshing Annotation Views");
-        for (ADClusterAnnotation * annotation in _clusterAnnotations) {
-            if (![annotation isKindOfClass:[MKUserLocation class]] && annotation.cluster) {
-                [annotation.annotationView refreshView];
+            
+            NSLog(@"Refreshing Annotation Views");
+            for (ADClusterAnnotation * annotation in _clusterAnnotations) {
+                if (![annotation isKindOfClass:[MKUserLocation class]] && annotation.cluster) {
+                    [annotation.annotationView refreshView];
+                }
             }
-        }
-        
-        NSLog(@"Finished mainqueue");
-        
-        if (_finishedBlock) {
-            _finishedBlock(nil);
-        }
+            
+            for (ADClusterAnnotation * annotation in _clusterAnnotations) {
+                if ([annotation isKindOfClass:[ADClusterAnnotation class]]) {
+                    if (annotation.shouldBeRemovedAfterAnimation) {
+                        [annotation reset];
+                    }
+                    annotation.shouldBeRemovedAfterAnimation = NO;
+                }
+            }
+            
+            NSLog(@"Finished mainqueue");
+            
+            if (_finishedBlock) {
+                _finishedBlock(clusteredMapRect);
+            }
+        }];
     });
 }
 
-- (BOOL)_annotation:(ADClusterAnnotation *)annotation belongsToClusters:(NSSet *)clusters {
+- (BOOL)annotation:(ADClusterAnnotation *)annotation belongsToClusters:(NSSet *)clusters {
     if (annotation.cluster) {
         for (ADMapCluster * cluster in clusters) {
             if ([cluster isAncestorOf:annotation.cluster] || [cluster isEqual:annotation.cluster]) {
@@ -425,7 +416,7 @@ int nearestEvenInt(int to) {
     }
 }
 
-+ (CLLocationCoordinate2D)calculateCoordinateFrom:(CLLocationCoordinate2D)coordinate  onBearing:(double)bearingInRadians atDistance:(double)distanceInMetres {
++ (CLLocationCoordinate2D)calculateCoordinateFrom:(CLLocationCoordinate2D)coordinate onBearing:(double)bearingInRadians atDistance:(double)distanceInMetres {
     
     double coordinateLatitudeInRadians = coordinate.latitude * M_PI / 180;
     double coordinateLongitudeInRadians = coordinate.longitude * M_PI / 180;
@@ -466,21 +457,12 @@ int nearestEvenInt(int to) {
             double newY = y + clusterHeight*(j);
             MKMapRect newRect = MKMapRectMake(newX, newY, clusterWidth, clusterHeight);
             [set addObject:[NSDictionary dictionaryFromMapRect:newRect]];
-        } 
+        }
     }
     
     return set;
 }
 
-- (MKMapRect)visibleMapRectWithBuffer {
-    
-    double width = _mapView.visibleMapRect.size.width;
-    double height = _mapView.visibleMapRect.size.height;
-    MKMapRect mapRect = _mapView.visibleMapRect;
-    mapRect = MKMapRectUnion(mapRect, MKMapRectOffset(_mapView.visibleMapRect, -width, -height));
-    mapRect = MKMapRectUnion(mapRect, MKMapRectOffset(_mapView.visibleMapRect, width, height));
-    
-    return mapRect;
-}
+
 
 @end

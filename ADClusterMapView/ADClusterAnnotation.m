@@ -14,7 +14,6 @@ BOOL ADClusterCoordinate2DIsOffscreen(CLLocationCoordinate2D coord) {
 }
 
 @implementation ADClusterAnnotation
-@synthesize cluster = _cluster;
 
 - (id)init {
     self = [super init];
@@ -36,10 +35,6 @@ BOOL ADClusterCoordinate2DIsOffscreen(CLLocationCoordinate2D coord) {
     [self didChangeValueForKey:@"title"];
 }
 
-- (ADMapCluster *)cluster {
-    return _cluster;
-}
-
 - (NSString *)title {
     return self.cluster.title;
 }
@@ -58,12 +53,4 @@ BOOL ADClusterCoordinate2DIsOffscreen(CLLocationCoordinate2D coord) {
     return self.cluster.originalAnnotations;
 }
 
-- (void)setCoordinate:(CLLocationCoordinate2D)coordinate {
-    
-    _coordinate = coordinate;
-    
-    if (coordinate.latitude == 0) {
-        NSLog(@"%f, %f", coordinate.latitude, coordinate.longitude);
-    }
-}
 @end

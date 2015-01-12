@@ -47,6 +47,14 @@ extern NSString * const TSMapViewDidChangeRegion;
 
 @end
 
+
+typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
+    ADClusterBufferNone = 0,
+    ADClusterBufferSmall = 2,
+    ADClusterBufferMedium = 4,
+    ADClusterBufferLarge = 8
+};
+
 @interface ADClusterMapView : MKMapView <MKMapViewDelegate, UIGestureRecognizerDelegate>
 
 /*!
@@ -86,9 +94,10 @@ extern NSString * const TSMapViewDidChangeRegion;
 @property (assign, nonatomic) NSUInteger clustersOnScreen;
 
 /**
- Creates a buffer zone surrounding visible map of clustered annotations to simulate seemless loading of annotations and helps prevent annotations from appearing and dissapearing close to the edge. NOTE: Could lose responsiveness on slower devices or larger data sets) Default: YES
+ Creates a buffer zone surrounding visible map of clustered annotations. This helps simulate seemless loading of annotations and helps prevent annotations from appearing and dissapearing close to the edge. NOTE: For older devices or larger data sets try reducing the buffer size Default: ADClusterBufferMedium
  */
-@property (assign, nonatomic) BOOL clusterEdgeBuffer;
+//multiply by 9 for the visible rect plus 8 directions of possible screen travel (up, down, up-left, down-left, etc.)
+@property (assign, nonatomic) ADClusterBufferSize clusterEdgeBufferSize;
 
 /** 
  This parameter emphasize the discrimination of annotations which are far away from the center of mass. Default: 1.0 (no discrimination applied)

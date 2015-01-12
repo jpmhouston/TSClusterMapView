@@ -86,8 +86,17 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
     self.clustersOnScreen = 32;
     self.clusterDiscriminationPower = 1.0;
     self.clusterShouldShowSubtitle = YES;
-    self.clusterEdgeBuffer = YES;
+    self.clusterEdgeBufferSize = ADClusterBufferMedium;
     self.clusterMinimumLongitudeDelta = 0.005;
+}
+
+- (void)setClusterEdgeBufferSize:(ADClusterBufferSize)clusterEdgeBufferSize {
+    
+    if (clusterEdgeBufferSize < 0) {
+        clusterEdgeBufferSize = 0;
+    }
+    
+    _clusterEdgeBufferSize = clusterEdgeBufferSize;
 }
 
 - (void)initHelpers {
@@ -242,21 +251,6 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
     }
 }
 
-- (void)animationDidStop:(NSString *)animationID finished:(NSNumber *)finished context:(void *)context {
-    for (ADClusterAnnotation * annotation in _clusterAnnotations) {
-        if ([annotation isKindOfClass:[ADClusterAnnotation class]]) {
-            if (annotation.shouldBeRemovedAfterAnimation) {
-                [annotation reset];
-            }
-            annotation.shouldBeRemovedAfterAnimation = NO;
-        }
-    }
-    _isAnimatingClusters = NO;
-    [self checkAnnotationsToBeSet];
-    
-    NSLog(@"Finished Animating");
-}
-
 - (void)checkAnnotationsToBeSet {
     
     if (_annotationsToBeSet) {
@@ -326,7 +320,7 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
     }
     
     if (!_isSettingAnnotations){
-        [self clusterInMapRect:self.visibleMapRect newRootCluster:NO];
+        [self clusterVisibleMapRectWithNewRootCluster:NO];
     }
     if (_previouslySelectedAnnotation) {
         _shouldReselectAnnotation = YES;
@@ -387,11 +381,8 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
 
 
 - (NSUInteger)numberOfClusters {
-    //multiply by 9 for the visible rect plus 8 directions of possible screen travel (up, down, up-left, down-left, etc.)
-    if (_clusterEdgeBuffer) {
-        return _clustersOnScreen * 9;
-    }
-    return _clustersOnScreen;
+    
+    return _clustersOnScreen + (_clustersOnScreen*_clusterEdgeBufferSize);
 }
 
 
@@ -448,7 +439,7 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
         _isSettingAnnotations = YES;
         _shouldRefreshMap = NO;
         _lastAnnotationSet = [NSDate date];
-        NSLog(@"isSettingAnnoatations");
+        NSLog(@"isSettingAnnotations");
         
         if ([_secondaryDelegate respondsToSelector:@selector(mapViewWillBeginClustering:)]) {
             [_secondaryDelegate mapViewWillBeginClustering:self];
@@ -480,7 +471,7 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
                                                          clusterTitle:clusterTitle
                                                          showSubtitle:_clusterShouldShowSubtitle];
             
-            [self clusterInMapRect:self.visibleMapRect newRootCluster:YES];
+            [self clusterVisibleMapRectWithNewRootCluster:YES];
             
             _isSettingAnnotations = NO;
             [self checkAnnotationsToBeSet];
@@ -493,7 +484,7 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
 }
 
 
-- (void)clusterInMapRect:(MKMapRect)rect newRootCluster:(BOOL)isNewCluster {
+- (void)clusterVisibleMapRectWithNewRootCluster:(BOOL)isNewCluster {
     
     if (!self.superview) {
         return;
@@ -505,15 +496,18 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
         _previousVisibleMapRectClustered = MKMapRectNull;
     }
     
-    if (_clusterEdgeBuffer) {
+    //Create buffer room for map drag outside visible rect before next regionDidChange
+    MKMapRect clusteredMapRect = [self visibleMapRectWithBuffer:_clusterEdgeBufferSize];
+    
+    if (_clusterEdgeBufferSize) {
         if (!MKMapRectIsNull(_previousVisibleMapRectClustered) &&
             !MKMapRectIsEmpty(_previousVisibleMapRectClustered)) {
             
-            MKMapRect innerPreviousVisibleRect = MKMapRectInset(_previousVisibleMapRectClustered, _previousVisibleMapRectClustered.size.width/4, _previousVisibleMapRectClustered.size.width/4);
-            
-            //did the map pan far enough or zoom
-            if (MKMapRectIntersectsRect(rect, innerPreviousVisibleRect) &&
-                MKMapRectSizeIsEqual(rect, _previousVisibleMapRectClustered)) {
+            //did the map pan far enough or zoom? Compare to rounded size as decimals fluctuate
+            MKMapRect halfBufferRect = MKMapRectInset(_previousVisibleMapRectClustered, (_previousVisibleMapRectClustered.size.width - self.visibleMapRect.size.width)/4, (_previousVisibleMapRectClustered.size.height - self.visibleMapRect.size.height)/4);
+            if (MKMapRectSizeIsEqual(clusteredMapRect, _previousVisibleMapRectClustered) &&
+                MKMapRectContainsRect(halfBufferRect, self.visibleMapRect)
+                ) {
                 _isAnimatingClusters = NO;
                 return;
             }
@@ -527,18 +521,43 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
     }
     
     _clusterOperation = [[TSClusterOperation alloc] initWithMapView:self
-                                                                           rootCluster:_rootMapCluster
-                                                                  showNumberOfClusters:[self numberOfClusters]
-                                                                    clusterAnnotations:self.clusterAnnotations
-                                                                            completion:^(ADClusterMapView *mapView) {
-                                                                                if ([_secondaryDelegate respondsToSelector:@selector(mapViewDidFinishClustering:)]) {
-                                                                                    [_secondaryDelegate mapViewDidFinishClustering:self];
-                                                                                }
-                                                                                _previousVisibleMapRectClustered = rect;
-                                                                            }];
+                                                               rect:clusteredMapRect
+                                                        rootCluster:_rootMapCluster
+                                               showNumberOfClusters:[self numberOfClusters]
+                                                 clusterAnnotations:self.clusterAnnotations
+                                                         completion:^(MKMapRect clusteredRect) {
+                                                             _previousVisibleMapRectClustered = clusteredRect;
+                                                             _isAnimatingClusters = NO;
+                                                             
+                                                             if ([_secondaryDelegate respondsToSelector:@selector(mapViewDidFinishClustering:)]) {
+                                                                 [_secondaryDelegate mapViewDidFinishClustering:self];
+                                                             }
+                                                             
+                                                             [self checkAnnotationsToBeSet];
+                                                         }];
     [_operationQueue addOperation:_clusterOperation];
     [_operationQueue setSuspended:NO];
 }
 
+
+- (MKMapRect)visibleMapRectWithBuffer:(ADClusterBufferSize)bufferSize; {
+    
+    if (!bufferSize) {
+        return self.visibleMapRect;
+    }
+    
+    double width = self.visibleMapRect.size.width;
+    double height = self.visibleMapRect.size.height;
+    
+    //Up Down Left Right - UpLeft UpRight DownLeft DownRight
+    NSUInteger directions = 8;
+    //Large (8) = One full screen size in all directions
+    
+    MKMapRect mapRect = self.visibleMapRect;
+    mapRect = MKMapRectUnion(mapRect, MKMapRectOffset(self.visibleMapRect, -width*bufferSize/directions, -height*bufferSize/directions));
+    mapRect = MKMapRectUnion(mapRect, MKMapRectOffset(self.visibleMapRect, width*bufferSize/directions, height*bufferSize/directions));
+    
+    return mapRect;
+}
 
 @end

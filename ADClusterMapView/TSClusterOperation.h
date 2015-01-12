@@ -9,12 +9,12 @@
 #import <Foundation/Foundation.h>
 #import "ADClusterMapView.h"
 
-typedef void(^ClusterOperationCompletionBlock)(ADClusterMapView *mapView);
+typedef void(^ClusterOperationCompletionBlock)(MKMapRect clusteredRect);
 
 @interface TSClusterOperation : NSOperation
 
 @property (nonatomic, copy) ClusterOperationCompletionBlock finishedBlock;
 
-- (instancetype)initWithMapView:(ADClusterMapView *)mapView rootCluster:(ADMapCluster *)rootCluster showNumberOfClusters:(NSUInteger)numberOfClusters clusterAnnotations:(NSSet *)clusterAnnotations completion:(ClusterOperationCompletionBlock)completion;
+- (instancetype)initWithMapView:(ADClusterMapView *)mapView rect:(MKMapRect)rect rootCluster:(ADMapCluster *)rootCluster showNumberOfClusters:(NSUInteger)numberOfClusters clusterAnnotations:(NSSet *)clusterAnnotations completion:(ClusterOperationCompletionBlock)completion;
 
 @end
