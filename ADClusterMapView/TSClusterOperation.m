@@ -56,17 +56,17 @@ int nearestEvenInt(int to) {
 
 - (void)clusterInMapRect:(MKMapRect)clusteredMapRect {
     
-    NSLog(@"Begin Clustering Operation %@", self);
-    
-    //Create grid to estimate number of clusters needed based on the spread of annotations across map rect
-    //This helps distribute clusters more evenly and will ensure you don't end up with 30 clusters in one little area.
-    //Zooming all the way out can cluster down to one single annotation if needed.
-    NSUInteger gridAcross = 5 + roundf(5*_mapView.clusterEdgeBufferSize/4);
-    
+    //Creates grid to estimate number of clusters needed based on the spread of annotations across map rect
+    //
+    //If there are should be 20 max clusters, we create 20 even rects (plus buffer rects) within the given map rect
+    //and search to see if a cluster is contained in that rect.
+    //
+    //This helps distribute clusters more evenly by limiting clusters presented relative to viewable region.
+    //Zooming all the way out will now cluster down to one single annotation if all clusters are within one grid rect.
     NSUInteger numberOnScreen;
     if (_mapView.region.span.longitudeDelta > _mapView.clusterMinimumLongitudeDelta) {
         
-        NSSet *mapRects = [self mapRectsFromNumberOfClustersAcross:gridAcross mapRect:clusteredMapRect];
+        NSSet *mapRects = [self mapRectsFromMaxNumberOfClusters:_numberOfClusters mapRect:clusteredMapRect];
         
         //number of map rects that contain at least one annotation
         numberOnScreen = [_rootMapCluster numberOfMapRectsContainingChildren:mapRects];
@@ -77,15 +77,20 @@ int nearestEvenInt(int to) {
                 numberOnScreen = _numberOfClusters;
             }
         }
+        else {
+            numberOnScreen = 1;
+        }
     }
     else {
-        //Show maximum number of clusters
+        //Show maximum number of clusters we're at the minimum level set
         numberOnScreen = _numberOfClusters;
     }
     
     
     if (self.isCancelled) {
-        NSLog(@"Cancelled %@", self);
+        if (_finishedBlock) {
+            _finishedBlock(clusteredMapRect, NO);
+        }
         return;
     }
     
@@ -123,7 +128,9 @@ int nearestEvenInt(int to) {
     }
     
     if (self.isCancelled) {
-        NSLog(@"Cancelled %@", self);
+        if (_finishedBlock) {
+            _finishedBlock(clusteredMapRect, NO);
+        }
         return;
     }
     
@@ -170,7 +177,9 @@ int nearestEvenInt(int to) {
     }
     
     if (self.isCancelled) {
-        NSLog(@"Cancelled %@", self);
+        if (_finishedBlock) {
+            _finishedBlock(clusteredMapRect, NO);
+        }
         return;
     }
     
@@ -206,6 +215,9 @@ int nearestEvenInt(int to) {
         }
     }
     if (self.isCancelled) {
+        if (_finishedBlock) {
+            _finishedBlock(clusteredMapRect, NO);
+        }
         return;
     }
     for (ADClusterAnnotation * annotation in availableSingleAnnotations) {
@@ -215,6 +227,9 @@ int nearestEvenInt(int to) {
         }
     }
     if (self.isCancelled) {
+        if (_finishedBlock) {
+            _finishedBlock(clusteredMapRect, NO);
+        }
         return;
     }
     for (ADClusterAnnotation * annotation in availableClusterAnnotations) {
@@ -224,12 +239,18 @@ int nearestEvenInt(int to) {
         }
     }
     if (self.isCancelled) {
+        if (_finishedBlock) {
+            _finishedBlock(clusteredMapRect, NO);
+        }
         return;
     }
     
     //Create a circle around coordinate to display all single annotations that overlap
     [TSClusterOperation mutateCoordinatesOfClashingAnnotations:_clusterAnnotations];
     if (self.isCancelled) {
+        if (_finishedBlock) {
+            _finishedBlock(clusteredMapRect, NO);
+        }
         return;
     }
     
@@ -264,6 +285,9 @@ int nearestEvenInt(int to) {
     }
     
     if (self.isCancelled) {
+        if (_finishedBlock) {
+            _finishedBlock(clusteredMapRect, NO);
+        }
         return;
     }
     
@@ -273,6 +297,9 @@ int nearestEvenInt(int to) {
     }
     
     if (self.isCancelled) {
+        if (_finishedBlock) {
+            _finishedBlock(clusteredMapRect, NO);
+        }
         return;
     }
     for (ADClusterAnnotation * annotation in availableClusterAnnotations) {
@@ -281,13 +308,13 @@ int nearestEvenInt(int to) {
     }
     
     if (self.isCancelled) {
+        if (_finishedBlock) {
+            _finishedBlock(clusteredMapRect, NO);
+        }
         return;
     }
     
-    NSLog(@"Finished Clustering Begin Animating %@", self);
-    
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSLog(@"Animating %@", self);
         
         for (NSDictionary *dic in nonAnimated) {
             ADClusterAnnotation * annotation = [dic objectForKey:annotationKey];
@@ -310,7 +337,6 @@ int nearestEvenInt(int to) {
             
         } completion:^(BOOL finished) {
             
-            NSLog(@"Adjust after setting animated annotations");
             for (NSDictionary *dic in afterAnimation) {
                 ADClusterAnnotation * annotation = [dic objectForKey:annotationKey];
                 if ([dic objectForKey:coordinatesKey]) {
@@ -321,8 +347,7 @@ int nearestEvenInt(int to) {
                     [annotation reset];
                 }
             }
-            
-            NSLog(@"Refreshing Annotation Views");
+
             for (ADClusterAnnotation * annotation in _clusterAnnotations) {
                 if (![annotation isKindOfClass:[MKUserLocation class]] && annotation.cluster) {
                     [annotation.annotationView refreshView];
@@ -338,10 +363,8 @@ int nearestEvenInt(int to) {
                 }
             }
             
-            NSLog(@"Finished mainqueue");
-            
             if (_finishedBlock) {
-                _finishedBlock(clusteredMapRect);
+                _finishedBlock(clusteredMapRect, YES);
             }
         }];
     });
@@ -432,30 +455,34 @@ int nearestEvenInt(int to) {
     return result;
 }
 
-- (NSSet *)mapRectsFromNumberOfClustersAcross:(NSUInteger)amount mapRect:(MKMapRect)rect {
+- (NSSet *)mapRectsFromMaxNumberOfClusters:(NSUInteger)amount mapRect:(MKMapRect)rect {
     
     if (amount == 0) {
         return [NSSet setWithObject:[NSDictionary dictionaryFromMapRect:rect]];
     }
+    
     
     double x = rect.origin.x;
     double y = rect.origin.y;
     double width = rect.size.width;
     double height = rect.size.height;
     
+    float weight = width/height;
+    
+    int columns = round(sqrt(amount*weight));
+    int rows = ceil(amount / (double)columns);
+    
     //create basic cluster grid
-    double clusterWidth = width/amount;
-    NSUInteger horizontalClusters = amount;
-    NSUInteger verticalClusters = round(height/clusterWidth);
-    double clusterHeight = height/verticalClusters;
+    double columnWidth = width/columns;
+    double rowHeight = height/rows;
     
     //build array of MKMapRects
-    NSMutableSet* set = [[NSMutableSet alloc] initWithCapacity:10];
-    for (int i=0; i<horizontalClusters; i++) {
-        double newX = x + clusterWidth*(i);
-        for (int j=0; j<verticalClusters; j++) {
-            double newY = y + clusterHeight*(j);
-            MKMapRect newRect = MKMapRectMake(newX, newY, clusterWidth, clusterHeight);
+    NSMutableSet* set = [[NSMutableSet alloc] initWithCapacity:rows*columns];
+    for (int i=0; i< columns; i++) {
+        double newX = x + columnWidth*(i);
+        for (int j=0; j< rows; j++) {
+            double newY = y + rowHeight*(j);
+            MKMapRect newRect = MKMapRectMake(newX, newY, columnWidth, rowHeight);
             [set addObject:[NSDictionary dictionaryFromMapRect:newRect]];
         }
     }

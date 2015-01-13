@@ -58,7 +58,7 @@
     return nil;
 }
 
-#pragma mark - ADClusterMapViewDelegate
+#pragma mark - MKMapViewDelegate
 - (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation {
     MKAnnotationView * pinView = (MKAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"ADClusterableAnnotation"];
     if (!pinView) {
@@ -72,6 +72,9 @@
     }
     return pinView;
 }
+
+
+#pragma mark - ADClusterMapView Delegate
 
 - (MKAnnotationView *)mapView:(ADClusterMapView *)mapView viewForClusterAnnotation:(id<MKAnnotation>)annotation {
     MKAnnotationView * pinView = (MKAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:@"ADMapCluster"];
@@ -87,9 +90,39 @@
     return pinView;
 }
 
+- (void)mapView:(ADClusterMapView *)mapView willBeginBuildingClusterTreeForMapPoints:(NSSet *)annotations {
+    
+    NSLog(@"Kd-tree will begin mapping item count %lu", (unsigned long)annotations.count);
+}
 
-- (void)mapViewDidFinishClustering:(ADClusterMapView *)mapView {
-    NSLog(@"Done");
+- (void)mapView:(ADClusterMapView *)mapView didFinishBuildingClusterTreeForMapPoints:(NSSet *)annotations {
+    
+    NSLog(@"Kd-tree finished mapping item count %lu", (unsigned long)annotations.count);
+}
+
+- (void)mapViewWillBeginClusteringAnimation:(ADClusterMapView *)mapView{
+    
+     NSLog(@"Animation operation will begin");
+}
+
+- (void)mapViewDidCancelClusteringAnimation:(ADClusterMapView *)mapView {
+    
+    NSLog(@"Animation operation cancelled");
+}
+
+- (void)mapViewDidFinishClusteringAnimation:(ADClusterMapView *)mapView{
+    
+    NSLog(@"Animation operation finished");
+}
+
+- (void)userWillPanMapView:(ADClusterMapView *)mapView {
+    
+    NSLog(@"Map will pan from user interaction");
+}
+
+- (void)userDidPanMapView:(ADClusterMapView *)mapView {
+    
+    NSLog(@"Map did pan from user interaction");
 }
 
 

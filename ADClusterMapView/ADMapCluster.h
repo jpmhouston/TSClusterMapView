@@ -10,6 +10,8 @@
 #import <MapKit/MapKit.h>
 #import "ADMapPointAnnotation.h"
 
+@class ADClusterMapView;
+
 @interface ADMapCluster : NSObject
 
 @property (nonatomic, strong) ADMapPointAnnotation *annotation;
@@ -42,6 +44,15 @@
 /*!
  * @discussion Creates a KD-tree of clusters http://en.wikipedia.org/wiki/K-d_tree
  * @param annotations Set of ADMapPointAnnotation objects
+ * @param mapView The ADClusterMapView that will send the delegate callback
+ * @return A new ADMapCluster object.
+ */
++ (ADMapCluster *)rootClusterForAnnotations:(NSSet *)annotations mapView:(ADClusterMapView *)mapView;
+
+
+/*!
+ * @discussion Creates a KD-tree of clusters http://en.wikipedia.org/wiki/K-d_tree
+ * @param annotations Set of ADMapPointAnnotation objects
  * @param gamma Descrimination power
  * @param title Title of cluster
  * @param showSubtitle A Boolean to show subtitle from titles of children
@@ -51,10 +62,11 @@
 
 /*!
  * @discussion Add a single map point annotation to an existing KD-tree map cluster root
+ * @param mapView The ADClusterMapView that will send the delegate callback
  * @param mapPointAnnotation A single ADMapPointAnnotation object
  * @return YES if tree was updated, NO if full root should be updated
  */
-- (BOOL)didInsertAnnotationToRootCluster:(ADMapPointAnnotation *)mapPointAnnotation;
+- (BOOL)mapView:(ADClusterMapView *)mapView rootClusterDidAddAnnotation:(ADMapPointAnnotation *)mapPointAnnotation;
 
 /*!
  * @discussion Get a set number of children contained within a map rect

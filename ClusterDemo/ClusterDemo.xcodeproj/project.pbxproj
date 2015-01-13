@@ -76,9 +76,9 @@
 		6F8000DF16256BCE005D0263 /* ADClusterAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ADClusterAnnotation.h; sourceTree = "<group>"; };
 		6F8000E016256BCE005D0263 /* ADClusterAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ADClusterAnnotation.m; sourceTree = "<group>"; };
 		6F8000E116256BCE005D0263 /* ADClusterMapView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ADClusterMapView.h; sourceTree = "<group>"; };
-		6F8000E216256BCE005D0263 /* ADClusterMapView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ADClusterMapView.m; sourceTree = "<group>"; };
+		6F8000E216256BCE005D0263 /* ADClusterMapView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = ADClusterMapView.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		6F8000E316256BCE005D0263 /* ADMapCluster.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ADMapCluster.h; sourceTree = "<group>"; };
-		6F8000E416256BCE005D0263 /* ADMapCluster.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ADMapCluster.m; sourceTree = "<group>"; };
+		6F8000E416256BCE005D0263 /* ADMapCluster.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = ADMapCluster.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		6F8000E816256C1B005D0263 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		6F8000EB16256C6C005D0263 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		6F8000ED16256D46005D0263 /* ADClusterableAnnotation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ADClusterableAnnotation.h; path = Classes/ADClusterableAnnotation.h; sourceTree = SOURCE_ROOT; };
@@ -94,7 +94,7 @@
 		6F8FE9C516249428001A0309 /* CDAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CDAppDelegate.h; path = Classes/CDAppDelegate.h; sourceTree = SOURCE_ROOT; };
 		6F8FE9C616249428001A0309 /* CDAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CDAppDelegate.m; path = Classes/CDAppDelegate.m; sourceTree = SOURCE_ROOT; };
 		6F8FE9C716249428001A0309 /* CDMapViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CDMapViewController.h; path = Classes/CDMapViewController.h; sourceTree = SOURCE_ROOT; };
-		6F8FE9C816249428001A0309 /* CDMapViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CDMapViewController.m; path = Classes/CDMapViewController.m; sourceTree = SOURCE_ROOT; };
+		6F8FE9C816249428001A0309 /* CDMapViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = CDMapViewController.m; path = Classes/CDMapViewController.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		6F8FE9C91624942E001A0309 /* CDMapViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = CDMapViewController.xib; path = Resources/CDMapViewController.xib; sourceTree = SOURCE_ROOT; };
 		6F8FE9CB1624942E001A0309 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "Resources/Default-568h@2x.png"; sourceTree = SOURCE_ROOT; };
 		6F8FE9CC1624942E001A0309 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = Resources/Default.png; sourceTree = SOURCE_ROOT; };

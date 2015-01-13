@@ -27,16 +27,34 @@ extern NSString * const TSMapViewDidChangeRegion;
 - (MKAnnotationView *)mapView:(ADClusterMapView *)mapView viewForClusterAnnotation:(id <MKAnnotation>)annotation;
 
 /*!
- * @discussion MapView will begin clustering operation
+ * @discussion MapView will begin creating Kd-tree from new annotations. Use this delegate to alert the user of a refresh for large data sets with long build times.
  * @param mapView The map view that will begin clustering.
  */
-- (void)mapViewWillBeginClustering:(ADClusterMapView *)mapView;
+- (void)mapView:(ADClusterMapView *)mapView willBeginBuildingClusterTreeForMapPoints:(NSSet *)annotations;
 
 /*!
- * @discussion MapView did finish clustering operation
+ * @discussion MapView did finish creating Kd-tree from new annotations. Remove any UI associated with loading annotations, cluster animation will begin.
+ * @param mapView The map view that will begin clustering.
+ */
+- (void)mapView:(ADClusterMapView *)mapView didFinishBuildingClusterTreeForMapPoints:(NSSet *)annotations;
+
+/*!
+ * @discussion Animation operation will begin for mapView. Follows a mapView:regionDidChangeAnimated: or mapViewDidFinishBuildingClusterTree. Operation may cancel before finishing from new clustering parameters.
+ * @param mapView The map view that will begin clustering.
+ */
+- (void)mapViewWillBeginClusteringAnimation:(ADClusterMapView *)mapView;
+
+/*!
+ * @discussion Animation operation was cancelled due to map movement or new tree.
+ * @param mapView The map view that did cancel clustering.
+ */
+- (void)mapViewDidCancelClusteringAnimation:(ADClusterMapView *)mapView;
+
+/*!
+ * @discussion Animation operation did finish successfully.
  * @param mapView The map view that did finish clustering.
  */
-- (void)mapViewDidFinishClustering:(ADClusterMapView *)mapView;
+- (void)mapViewDidFinishClusteringAnimation:(ADClusterMapView *)mapView;
 
 /*!
  * @discussion Convenience delegate to determine if map will pan by user gesture
@@ -59,7 +77,7 @@ typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
     ADClusterBufferLarge = 8
 };
 
-@interface ADClusterMapView : MKMapView <MKMapViewDelegate, UIGestureRecognizerDelegate>
+@interface ADClusterMapView : MKMapView <MKMapViewDelegate, UIGestureRecognizerDelegate, ADClusterMapViewDelegate>
 
 /*!
  * @discussion Finds the cluster that contains a single annotation
@@ -95,7 +113,7 @@ typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
 
 
 /**
- Visible cluster annotations. May contain contain clusters just outside visible rect included in buffer zone.
+ Visible cluster annotations. Will contain clusters just outside visible rect included in buffer zone.
  */
 @property (readonly) NSArray * visibleClusterAnnotations;
 

@@ -10,6 +10,7 @@
 #import "ADMapPointAnnotation.h"
 #import "NSDictionary+MKMapRect.h"
 #import "CLLocation+Utilities.h"
+#import "ADClusterMapView.h"
 
 #define ADMapClusterDiscriminationPrecision 1E-4
 
@@ -26,9 +27,21 @@
 
 @implementation ADMapCluster
 
++ (ADMapCluster *)rootClusterForAnnotations:(NSSet *)annotations mapView:(ADClusterMapView *)mapView {
+    
+    [mapView mapView:mapView willBeginBuildingClusterTreeForMapPoints:annotations];
+    
+    ADMapCluster *cluster = [ADMapCluster rootClusterForAnnotations:annotations discriminationPower:mapView.clusterDiscriminationPower title:mapView.clusterTitle showSubtitle:mapView.clusterShouldShowSubtitle];
+    
+     [mapView mapView:mapView didFinishBuildingClusterTreeForMapPoints:annotations];
+    
+    return cluster;
+}
 
 + (ADMapCluster *)rootClusterForAnnotations:(NSSet *)annotations discriminationPower:(double)gamma title:(NSString *)clusterTitle showSubtitle:(BOOL)showSubtitle {
     // KDTree
+    
+    //NSLog(@"Computing KD-tree for %lu annotations...", (unsigned long)annotations.count);
     
     MKMapRect boundaries = MKMapRectMake(HUGE_VALF, HUGE_VALF, 0.0, 0.0);
     
@@ -48,9 +61,12 @@
         }
     }
     
-    NSLog(@"Computing KD-tree for %lu annotations...", (unsigned long)annotations.count);
+    
     ADMapCluster * cluster = [[ADMapCluster alloc] initWithAnnotations:annotations atDepth:0 inMapRect:boundaries gamma:gamma clusterTitle:clusterTitle showSubtitle:showSubtitle parentCluster:nil];
-    NSLog(@"Computation done !");
+    
+    
+    //NSLog(@"Computation done !");
+    
     return cluster;
 }
 
@@ -252,9 +268,9 @@
     _parentCluster.clusterCount += change;
 }
 
-- (BOOL)didInsertAnnotationToRootCluster:(ADMapPointAnnotation *)mapPointAnnotation {
+- (BOOL)mapView:(ADClusterMapView *)mapView rootClusterDidAddAnnotation:(ADMapPointAnnotation *)mapPointAnnotation {
     
-    NSLog(@"begin Adding single annotation");
+    //NSLog(@"begin Adding single annotation");
     
     //Outside original rect should do a full tree refresh
     if (!MKMapRectContainsPoint(self.mapRect, mapPointAnnotation.mapPoint)) {
@@ -289,7 +305,7 @@
     NSMutableSet *annotationsToRecalculate = [[NSMutableSet alloc] initWithArray:closestClusterParent.originalMapPointAnnotations];
     [annotationsToRecalculate addObject:mapPointAnnotation];
     
-    NSLog(@"recalculating - %lu", (unsigned long)annotationsToRecalculate.count);
+    //NSLog(@"recalculating - %lu", (unsigned long)annotationsToRecalculate.count);
     
     closestClusterParent.clusterCount = 0;
     
@@ -304,7 +320,7 @@
     
     newCluster.parentCluster = closestClusterParent.parentCluster;
     
-    NSLog(@"set new cluster");
+    //NSLog(@"set new cluster");
     
     return YES;
 }
@@ -466,7 +482,7 @@
 }
 
 - (NSString *)subtitle {
-    if (!self.annotation && self.showSubtitle) {
+    if (!self.annotation && self.showSubtitle && self.clusterCount < 20) {
         return [self.clusteredAnnotationTitles componentsJoinedByString:@", "];
     } else if ([self.annotation.annotation respondsToSelector:@selector(subtitle)]) {
         return self.annotation.annotation.subtitle;
