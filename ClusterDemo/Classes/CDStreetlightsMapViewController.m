@@ -43,7 +43,9 @@
     
     [self.mapView addClusteredAnnotation:annotation clusterTreeRefresh:NO];
     
-    [self performSelector:@selector(addRandomAnnotation) withObject:nil afterDelay:15];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+       [self performSelector:@selector(addRandomAnnotation) withObject:nil afterDelay:15];
+    }];
 }
 
 - (void)removeOtherAnnotationsFromMap {

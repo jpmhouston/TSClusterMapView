@@ -135,6 +135,7 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
     }
     
     if (_clusterableAnnotationsAdded) {
+        [_clusterableAnnotationsAdded removeObject:annotation];
         [_clusterableAnnotationsAdded addObject:annotation];
     }
     else {
@@ -157,6 +158,7 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
     }
     
     if (_clusterableAnnotationsAdded) {
+        [_clusterableAnnotationsAdded minusSet:[NSSet setWithArray:annotations]];
         [_clusterableAnnotationsAdded addObjectsFromArray:annotations];
     }
     else {

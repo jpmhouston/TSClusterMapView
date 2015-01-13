@@ -48,7 +48,7 @@
         }
     }
     
-    NSLog(@"Computing KD-tree...");
+    NSLog(@"Computing KD-tree for %lu annotations...", (unsigned long)annotations.count);
     ADMapCluster * cluster = [[ADMapCluster alloc] initWithAnnotations:annotations atDepth:0 inMapRect:boundaries gamma:gamma clusterTitle:clusterTitle showSubtitle:showSubtitle parentCluster:nil];
     NSLog(@"Computation done !");
     return cluster;
@@ -62,8 +62,8 @@
         _clusterTitle = clusterTitle;
         _showSubtitle = showSubtitle;
         _gamma = gamma;
-        _clusterCount = 0;
-        self.parentCluster = parentCluster;
+        _parentCluster = parentCluster;
+        _clusterCount = annotations.count;
         
         if (annotations.count == 0) {
             _leftChild = nil;
@@ -238,8 +238,8 @@
     
     _parentCluster = parentCluster;
     
-    //add cluster plus children count
-    _parentCluster.clusterCount += _clusterCount + 1;
+    //add annotation children count
+    _parentCluster.clusterCount += _clusterCount;
 }
 
 - (void)setClusterCount:(NSInteger)clusterCount {
@@ -257,7 +257,7 @@
     NSLog(@"begin Adding single annotation");
     
     //Outside original rect should do a full tree refresh
-    if (MKMapRectContainsPoint(self.mapRect, mapPointAnnotation.mapPoint)) {
+    if (!MKMapRectContainsPoint(self.mapRect, mapPointAnnotation.mapPoint)) {
         return NO;
     }
     
@@ -267,15 +267,20 @@
     
     NSSet *allChildClusters = self.allChildClusters;
     for (ADMapCluster *existingCluster in allChildClusters) {
+        
+        if (existingCluster.depth < 2) {
+            continue;
+        }
+        
         CLLocationDistance pointDistance = MKMetersBetweenMapPoints(mapPointAnnotation.mapPoint, MKMapPointForCoordinate(existingCluster.clusterCoordinate));
         
-        if (pointDistance < distance && existingCluster.depth <= 2) {
+        if (pointDistance < distance) {
             distance = pointDistance;
             closestCluster = existingCluster;
         }
     }
     
-    if (!closestCluster || closestCluster.parentCluster.parentCluster) {
+    if (!closestCluster || !closestCluster.parentCluster.parentCluster) {
         return NO;
     }
     

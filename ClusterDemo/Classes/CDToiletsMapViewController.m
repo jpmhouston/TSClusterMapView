@@ -14,7 +14,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [self removeOtherAnnotationsFromMap];
+//    [self removeOtherAnnotationsFromMap];
 }
 
 - (void)addOtherAnnotations {
