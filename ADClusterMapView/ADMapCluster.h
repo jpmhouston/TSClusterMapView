@@ -12,7 +12,7 @@
 
 @interface ADMapCluster : NSObject
 
-@property (nonatomic, strong) ADMapPointAnnotation * annotation;
+@property (nonatomic, strong) ADMapPointAnnotation *annotation;
 
 @property (nonatomic, assign) CLLocationCoordinate2D clusterCoordinate;
 
@@ -20,52 +20,67 @@
 
 @property (nonatomic, readonly) NSInteger depth;
 
-@property (readonly) NSMutableArray * originalAnnotations;
+@property (readonly) NSMutableArray *originalAnnotations;
 
-@property (readonly) NSString * title;
+@property (readonly) NSMutableArray *originalMapPointAnnotations;
 
-@property (readonly) NSString * subtitle;
+@property (readonly) NSString *title;
 
-@property (readonly) NSUInteger clusterCount;
+@property (readonly) NSString *subtitle;
+
+@property (assign, nonatomic, readonly) NSInteger clusterCount;
 
 @property (readonly) NSArray *clusteredAnnotationTitles;
 
 @property (readonly) NSArray *children;
 
+@property (readonly) NSMutableSet *allChildClusters;
+
+@property (weak, nonatomic) ADMapCluster *parentCluster;
+
 
 /*!
- * @discussion Creates a KD-tree of clusters  http://en.wikipedia.org/wiki/K-d_tree
- * @param Set of clusterable annotations
- * @param 
- * @return A set containing children found in the rect. May return less than specified or none depending on results.
+ * @discussion Creates a KD-tree of clusters http://en.wikipedia.org/wiki/K-d_tree
+ * @param annotations Set of ADMapPointAnnotation objects
+ * @param gamma Descrimination power
+ * @param title Title of cluster
+ * @param showSubtitle A Boolean to show subtitle from titles of children
+ * @return A new ADMapCluster object.
  */
-+ (ADMapCluster *)rootClusterForAnnotations:(NSSet *)annotations gamma:(double)gamma clusterTitle:(NSString *)clusterTitle showSubtitle:(BOOL)showSubtitle;
++ (ADMapCluster *)rootClusterForAnnotations:(NSSet *)annotations discriminationPower:(double)gamma title:(NSString *)clusterTitle showSubtitle:(BOOL)showSubtitle;
+
+/*!
+ * @discussion Add a single map point annotation to an existing KD-tree map cluster root
+ * @param mapPointAnnotation A single ADMapPointAnnotation object
+ * @return YES if tree was updated, NO if full root should be updated
+ */
+- (BOOL)didInsertAnnotationToRootCluster:(ADMapPointAnnotation *)mapPointAnnotation;
 
 /*!
  * @discussion Get a set number of children contained within a map rect
- * @param Max number of children to be returned
- * @param MKMapRect to search within
+ * @param number Max number of children to be returned
+ * @param mapRect MKMapRect to search within
  * @return A set containing children found in the rect. May return less than specified or none depending on results.
  */
-- (NSSet *)find:(NSInteger)N childrenInMapRect:(MKMapRect)mapRect;
+- (NSSet *)find:(NSInteger)number childrenInMapRect:(MKMapRect)mapRect;
 
 /*!
  * @discussion Checks the receiver to see how many of the given rects contain coordinates of children
- * @param An NSSet of NSDictionary objects containing MKMapRect structs (Use NSDictionary+MKMapRect method)
+ * @param mapRects An NSSet of NSDictionary objects containing MKMapRect structs (Use NSDictionary+MKMapRect method)
  * @return Number of map rects containing coordinates of children
  */
 - (NSUInteger)numberOfMapRectsContainingChildren:(NSSet *)mapRects;
 
 /*!
  * @discussion Check the receiver to see if contains the given cluster within it's cluster children
- * @param An ADMapCluster object
+ * @param mapCluster An ADMapCluster object
  * @return YES if receiver found cluster in children
  */
 - (BOOL)isAncestorOf:(ADMapCluster *)mapCluster;
 
 /*!
  * @discussion Check the receiver to see if contains the given annotation within it's cluster
- * @param A clusterable MKAnnotation
+ * @param annotation A clusterable MKAnnotation
  * @return YES if receiver found annotation in children
  */
 - (BOOL)isRootClusterForAnnotation:(id<MKAnnotation>)annotation;

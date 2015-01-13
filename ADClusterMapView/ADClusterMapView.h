@@ -18,30 +18,34 @@ extern NSString * const TSMapViewDidChangeRegion;
 @protocol ADClusterMapViewDelegate <MKMapViewDelegate, UIGestureRecognizerDelegate>
 @optional
 
-- (MKAnnotationView *)mapView:(ADClusterMapView *)mapView viewForClusterAnnotation:(id <MKAnnotation>)annotation; // default: same as returned by mapView:viewForAnnotation:
-- (NSString *)clusterTitleForMapView:(ADClusterMapView *)mapView; // default : @"%d elements"
-
+/*!
+ * @discussion Set the annotation view for clustered annotations. To take advantage of a refresh call during clustering return a subclass of TSClusteredAnnotationView
+ * @param mapView The map view that requested the annotation view.
+ * @param annotation The object representing the annotation that is about to be displayed.
+ * @return The annotation view to display for the specified annotation or nil if you want to display a standard annotation view.
+ */
+- (MKAnnotationView *)mapView:(ADClusterMapView *)mapView viewForClusterAnnotation:(id <MKAnnotation>)annotation;
 
 /*!
  * @discussion MapView will begin clustering operation
- * @param Current ADClusterMapView
+ * @param mapView The map view that will begin clustering.
  */
 - (void)mapViewWillBeginClustering:(ADClusterMapView *)mapView;
 
 /*!
  * @discussion MapView did finish clustering operation
- * @param Current ADClusterMapView
+ * @param mapView The map view that did finish clustering.
  */
 - (void)mapViewDidFinishClustering:(ADClusterMapView *)mapView;
 
 /*!
  * @discussion Convenience delegate to determine if map will pan by user gesture
- * @param Current ADClusterMapView
+ * @param mapView The map view that will begin panning.
  */
 - (void)userWillPanMapView:(ADClusterMapView *)mapView;
 /*!
  * @discussion Convenience delegate to determine if map did pan by user gesture
- * @param Current ADClusterMapView
+ * @param mapView The map view that did finish panning.
  */
 - (void)userDidPanMapView:(ADClusterMapView *)mapView;
 
@@ -59,26 +63,33 @@ typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
 
 /*!
  * @discussion Finds the cluster that contains a single annotation
- * @param MKAnnotation of annotation within a cluster
- * @return the ADClusterAnnotation instance containing the annotation originally added.
+ * @param annotation The annotation that was clustered
+ * @return The ADClusterAnnotation instance containing the annotation originally added.
  */
 - (ADClusterAnnotation *)clusterAnnotationForOriginalAnnotation:(id<MKAnnotation>)annotation;
 
 /*!
- * @discussion Adds an annotation to the map and clusters if needed (threadsafe)
- * @param MKAnnotation to be added to map
+ * @discussion Adds an annotation to the map and clusters if needed (threadsafe). Only rebuilds entire cluster tree if there are less than 200 clustered annotations or the annotation coordinate is an outlier from current clustered data set.
+ * @param annotation The annotation to be added to map
  */
 - (void)addClusteredAnnotation:(id<MKAnnotation>)annotation;
 
 /*!
- * @discussion Adds multiple annotations to the map and clusters if needed (threadsafe)
- * @param NSArray of MKAnnotation types to be added to map
+ * @discussion Adds multiple annotations to the map and clusters if needed (threadsafe). Rebuilds entire cluster tree.
+ * @param annotations The array of MKAnnotation objects to be added to map
  */
 - (void)addClusteredAnnotations:(NSArray *)annotations;
 
 
 /*!
- * @discussion Force a refresh of clusters
+ * @discussion Add annotation with option to force a full tree refresh (threadsafe).
+ * @param annotation The MKAnnotation to be added to map
+ * @param refresh A Boolean that specifies whether the cluster tree should rebuild or quickly insert into existing tree. Cluster tree refresh can cause a delay with large data sets but provides more accurate clustering.
+ */
+- (void)addClusteredAnnotation:(id<MKAnnotation>)annotation clusterTreeRefresh:(BOOL)refresh;
+
+/*!
+ * @discussion Force a refresh of clustering tree
  */
 - (void)needsRefresh;
 
@@ -112,5 +123,10 @@ typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
  Will always shows max number of clusters past this span delta level (zoom). Default: .005
  */
 @property (assign, nonatomic) CLLocationDegrees clusterMinimumLongitudeDelta;
+
+/**
+ Title for cluster annotations. Default @"%d elements"
+ */
+@property (strong, nonatomic) NSString *clusterTitle;
 
 @end

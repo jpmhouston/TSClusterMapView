@@ -11,4 +11,6 @@
 
 @interface CDStreetlightsMapViewController : CDMapViewController
 
+@property (strong, nonatomic) NSMutableArray *otherAnnotations;
+
 @end

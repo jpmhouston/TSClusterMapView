@@ -40,7 +40,7 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
 @property (nonatomic, assign) BOOL isAnimatingClusters;
 @property (nonatomic, assign) BOOL isSettingAnnotations;
 
-@property (nonatomic,assign) MKMapRect previousVisibleMapRectClustered;
+@property (nonatomic, assign) MKMapRect previousVisibleMapRectClustered;
 
 @property (nonatomic, strong) NSOperationQueue *operationQueue;
 
@@ -88,6 +88,7 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
     self.clusterShouldShowSubtitle = YES;
     self.clusterEdgeBufferSize = ADClusterBufferMedium;
     self.clusterMinimumLongitudeDelta = 0.005;
+    self.clusterTitle = @"%d elements";
 }
 
 - (void)setClusterEdgeBufferSize:(ADClusterBufferSize)clusterEdgeBufferSize {
@@ -118,6 +119,17 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
 
 - (void)addClusteredAnnotation:(id<MKAnnotation>)annotation {
     
+    BOOL refresh = NO;
+    
+    if (_clusterableAnnotationsAdded.count < 200) {
+        refresh = YES;
+    }
+    
+    [self addClusteredAnnotation:annotation clusterTreeRefresh:refresh];
+}
+
+- (void)addClusteredAnnotation:(id<MKAnnotation>)annotation clusterTreeRefresh:(BOOL)refresh {
+    
     if (!annotation) {
         return;
     }
@@ -129,7 +141,13 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
         _clusterableAnnotationsAdded = [[NSMutableSet alloc] initWithObjects:annotation, nil];
     }
     
-    [self setClusterableAnnotations:[NSSet setWithSet:_clusterableAnnotationsAdded]];
+    //Insertion may fail if a match is not found at an acceptable depth
+    if (!refresh && [_rootMapCluster didInsertAnnotationToRootCluster:[[ADMapPointAnnotation alloc] initWithAnnotation:annotation]]) {
+        [self clusterVisibleMapRectWithNewRootCluster:YES];
+    }
+    else {
+        [self setClusterableAnnotations:_clusterableAnnotationsAdded];
+    }
 }
 
 - (void)addClusteredAnnotations:(NSArray *)annotations {
@@ -443,11 +461,6 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
             [self initAnnotationPools:numberOfAnnotationsInPool];
         }
         
-        NSString * clusterTitle = @"%d elements";
-        if ([_secondaryDelegate respondsToSelector:@selector(clusterTitleForMapView:)]) {
-            clusterTitle = [_secondaryDelegate clusterTitleForMapView:self];
-        }
-        
         [_operationQueue cancelAllOperations];
         [_operationQueue addOperationWithBlock:^{
             // use wrapper annotations that expose a MKMapPoint property instead of a CLLocationCoordinate2D property
@@ -458,8 +471,8 @@ NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
             }
             
             _rootMapCluster = [ADMapCluster rootClusterForAnnotations:mapPointAnnotations
-                                                                gamma:_clusterDiscriminationPower
-                                                         clusterTitle:clusterTitle
+                                                  discriminationPower:_clusterDiscriminationPower
+                                                                title:_clusterTitle
                                                          showSubtitle:_clusterShouldShowSubtitle];
             
             [self clusterVisibleMapRectWithNewRootCluster:YES];
