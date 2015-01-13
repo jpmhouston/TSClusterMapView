@@ -256,6 +256,11 @@
     
     NSLog(@"begin Adding single annotation");
     
+    //Outside original rect should do a full tree refresh
+    if (MKMapRectContainsPoint(self.mapRect, mapPointAnnotation.mapPoint)) {
+        return NO;
+    }
+    
     //Find closest existing cluster
     CLLocationDistance distance = MAXFLOAT;
     ADMapCluster *closestCluster;
@@ -264,17 +269,17 @@
     for (ADMapCluster *existingCluster in allChildClusters) {
         CLLocationDistance pointDistance = MKMetersBetweenMapPoints(mapPointAnnotation.mapPoint, MKMapPointForCoordinate(existingCluster.clusterCoordinate));
         
-        if (pointDistance < distance) {
+        if (pointDistance < distance && existingCluster.depth <= 2) {
             distance = pointDistance;
             closestCluster = existingCluster;
         }
     }
     
-    if (!closestCluster.parentCluster.parentCluster) {
+    if (!closestCluster || closestCluster.parentCluster.parentCluster) {
         return NO;
     }
     
-    //Go up one cluster to get a more complete result
+    //Go up one cluster to ensure a more complete result
     ADMapCluster *closestClusterParent = closestCluster.parentCluster;
     NSMutableSet *annotationsToRecalculate = [[NSMutableSet alloc] initWithArray:closestClusterParent.originalMapPointAnnotations];
     [annotationsToRecalculate addObject:mapPointAnnotation];
