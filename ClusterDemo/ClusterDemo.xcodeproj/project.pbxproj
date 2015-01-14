@@ -9,68 +9,36 @@
 /* Begin PBXBuildFile section */
 		6F1715B81625CAB00042E6AA /* CDToilets.json in Resources */ = {isa = PBXBuildFile; fileRef = 6F1715B71625CAB00042E6AA /* CDToilets.json */; };
 		6F1715BF1625D1890042E6AA /* CDStreetlights.json in Resources */ = {isa = PBXBuildFile; fileRef = 6F1715BE1625D1890042E6AA /* CDStreetlights.json */; };
-		6F3C8B2A1627054A0081BF88 /* CDStreetlight.png in Resources */ = {isa = PBXBuildFile; fileRef = 6F3C8B261627054A0081BF88 /* CDStreetlight.png */; };
-		6F3C8B2B1627054A0081BF88 /* CDStreetlight@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6F3C8B271627054A0081BF88 /* CDStreetlight@2x.png */; };
-		6F3C8B2C1627054A0081BF88 /* CDStreetlightCluster.png in Resources */ = {isa = PBXBuildFile; fileRef = 6F3C8B281627054A0081BF88 /* CDStreetlightCluster.png */; };
-		6F3C8B2D1627054A0081BF88 /* CDStreetlightCluster@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6F3C8B291627054A0081BF88 /* CDStreetlightCluster@2x.png */; };
-		6F3C8B30162708B00081BF88 /* CDStreetlightsMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F3C8B2F162708B00081BF88 /* CDStreetlightsMapViewController.m */; };
-		6F3C8B33162708CB0081BF88 /* CDToiletsMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F3C8B32162708CB0081BF88 /* CDToiletsMapViewController.m */; };
 		6F3C8B59162718D70081BF88 /* ADMapPointAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F3C8B58162718D70081BF88 /* ADMapPointAnnotation.m */; };
-		6F3C8B70162C1A430081BF88 /* CDStreetlightItem.png in Resources */ = {isa = PBXBuildFile; fileRef = 6F3C8B6E162C1A430081BF88 /* CDStreetlightItem.png */; };
-		6F3C8B71162C1A430081BF88 /* CDStreetlightItem@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6F3C8B6F162C1A430081BF88 /* CDStreetlightItem@2x.png */; };
-		6F3C8B75162C1ABA0081BF88 /* CDToiletItem.png in Resources */ = {isa = PBXBuildFile; fileRef = 6F3C8B73162C1ABA0081BF88 /* CDToiletItem.png */; };
-		6F3C8B76162C1ABA0081BF88 /* CDToiletItem@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6F3C8B74162C1ABA0081BF88 /* CDToiletItem@2x.png */; };
-		6F3C8B7B162C1B870081BF88 /* CDToilet.png in Resources */ = {isa = PBXBuildFile; fileRef = 6F3C8B77162C1B860081BF88 /* CDToilet.png */; };
-		6F3C8B7C162C1B870081BF88 /* CDToilet@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6F3C8B78162C1B860081BF88 /* CDToilet@2x.png */; };
-		6F3C8B7D162C1B870081BF88 /* CDToiletCluster.png in Resources */ = {isa = PBXBuildFile; fileRef = 6F3C8B79162C1B860081BF88 /* CDToiletCluster.png */; };
-		6F3C8B7E162C1B870081BF88 /* CDToiletCluster@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6F3C8B7A162C1B870081BF88 /* CDToiletCluster@2x.png */; };
 		6F8000E516256BCE005D0263 /* ADClusterAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F8000E016256BCE005D0263 /* ADClusterAnnotation.m */; };
 		6F8000E616256BCE005D0263 /* ADClusterMapView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F8000E216256BCE005D0263 /* ADClusterMapView.m */; };
 		6F8000E716256BCE005D0263 /* ADMapCluster.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F8000E416256BCE005D0263 /* ADMapCluster.m */; };
 		6F8000EA16256C26005D0263 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F8000E816256C1B005D0263 /* MapKit.framework */; };
 		6F8000EC16256C6C005D0263 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F8000EB16256C6C005D0263 /* CoreLocation.framework */; };
-		6F8000F016256D7C005D0263 /* ADClusterableAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F8000EE16256D46005D0263 /* ADClusterableAnnotation.m */; };
-		6F8000F516257E9C005D0263 /* CDIcon~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 6F8000F116257E9C005D0263 /* CDIcon~ipad.png */; };
-		6F8000F616257E9C005D0263 /* CDIcon~ipad@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6F8000F216257E9C005D0263 /* CDIcon~ipad@2x.png */; };
-		6F8000F716257E9C005D0263 /* CDIcon~iphone.png in Resources */ = {isa = PBXBuildFile; fileRef = 6F8000F316257E9C005D0263 /* CDIcon~iphone.png */; };
-		6F8000F816257E9C005D0263 /* CDIcon~iphone@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6F8000F416257E9C005D0263 /* CDIcon~iphone@2x.png */; };
 		6F8FE99B16249223001A0309 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F8FE99A16249223001A0309 /* UIKit.framework */; };
 		6F8FE99D16249223001A0309 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F8FE99C16249223001A0309 /* Foundation.framework */; };
 		6F8FE99F16249223001A0309 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F8FE99E16249223001A0309 /* CoreGraphics.framework */; };
-		6F8FE9CE1624942E001A0309 /* CDMapViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6F8FE9C91624942E001A0309 /* CDMapViewController.xib */; };
-		6F8FE9D01624942E001A0309 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6F8FE9CB1624942E001A0309 /* Default-568h@2x.png */; };
-		6F8FE9D11624942E001A0309 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 6F8FE9CC1624942E001A0309 /* Default.png */; };
-		6F8FE9D21624942E001A0309 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6F8FE9CD1624942E001A0309 /* Default@2x.png */; };
-		6F8FE9DE1624966A001A0309 /* CDAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F8FE9C616249428001A0309 /* CDAppDelegate.m */; };
-		6F8FE9DF1624966C001A0309 /* CDMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F8FE9C816249428001A0309 /* CDMapViewController.m */; };
 		6F8FE9E4162496B0001A0309 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F8FE9E3162496AE001A0309 /* main.m */; };
 		C597E86D1A630AA1002DF26A /* CLLocation+Utilities.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E8661A630AA1002DF26A /* CLLocation+Utilities.m */; };
 		C597E86E1A630AA1002DF26A /* NSDictionary+MKMapRect.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E8681A630AA1002DF26A /* NSDictionary+MKMapRect.m */; };
-		C597E86F1A630AA1002DF26A /* TSClusertedAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E86A1A630AA1002DF26A /* TSClusertedAnnotationView.m */; };
+		C597E86F1A630AA1002DF26A /* TSClusterAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E86A1A630AA1002DF26A /* TSClusterAnnotationView.m */; };
 		C597E8701A630AA1002DF26A /* TSClusterOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E86C1A630AA1002DF26A /* TSClusterOperation.m */; };
+		C597E8741A65FECC002DF26A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C597E8731A65FECC002DF26A /* Images.xcassets */; };
+		C597E88D1A66173D002DF26A /* ADClusterableAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E87D1A66173D002DF26A /* ADClusterableAnnotation.m */; };
+		C597E88E1A66173D002DF26A /* TSBathroomAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E87F1A66173D002DF26A /* TSBathroomAnnotation.m */; };
+		C597E88F1A66173D002DF26A /* TSStreetLightAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E8811A66173D002DF26A /* TSStreetLightAnnotation.m */; };
+		C597E8901A66173D002DF26A /* CDAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E8841A66173D002DF26A /* CDAppDelegate.m */; };
+		C597E8911A66173D002DF26A /* Storyboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C597E8851A66173D002DF26A /* Storyboard.storyboard */; };
+		C597E8921A66173D002DF26A /* CDMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E8881A66173D002DF26A /* CDMapViewController.m */; };
+		C597E8981A6619C1002DF26A /* TSDemoClusteredAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E8971A6619C1002DF26A /* TSDemoClusteredAnnotationView.m */; };
+		C597E89A1A662708002DF26A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C597E8991A662708002DF26A /* QuartzCore.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		6F1715B71625CAB00042E6AA /* CDToilets.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = CDToilets.json; path = Resources/CDToilets.json; sourceTree = SOURCE_ROOT; };
 		6F1715BE1625D1890042E6AA /* CDStreetlights.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = CDStreetlights.json; path = Resources/CDStreetlights.json; sourceTree = SOURCE_ROOT; };
-		6F3C8B261627054A0081BF88 /* CDStreetlight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CDStreetlight.png; path = Resources/CDStreetlight.png; sourceTree = SOURCE_ROOT; };
-		6F3C8B271627054A0081BF88 /* CDStreetlight@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "CDStreetlight@2x.png"; path = "Resources/CDStreetlight@2x.png"; sourceTree = SOURCE_ROOT; };
-		6F3C8B281627054A0081BF88 /* CDStreetlightCluster.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CDStreetlightCluster.png; path = Resources/CDStreetlightCluster.png; sourceTree = SOURCE_ROOT; };
-		6F3C8B291627054A0081BF88 /* CDStreetlightCluster@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "CDStreetlightCluster@2x.png"; path = "Resources/CDStreetlightCluster@2x.png"; sourceTree = SOURCE_ROOT; };
-		6F3C8B2E162708B00081BF88 /* CDStreetlightsMapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDStreetlightsMapViewController.h; path = Classes/CDStreetlightsMapViewController.h; sourceTree = SOURCE_ROOT; };
-		6F3C8B2F162708B00081BF88 /* CDStreetlightsMapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDStreetlightsMapViewController.m; path = Classes/CDStreetlightsMapViewController.m; sourceTree = SOURCE_ROOT; };
-		6F3C8B31162708CB0081BF88 /* CDToiletsMapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDToiletsMapViewController.h; path = Classes/CDToiletsMapViewController.h; sourceTree = SOURCE_ROOT; };
-		6F3C8B32162708CB0081BF88 /* CDToiletsMapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDToiletsMapViewController.m; path = Classes/CDToiletsMapViewController.m; sourceTree = SOURCE_ROOT; };
 		6F3C8B57162718D70081BF88 /* ADMapPointAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ADMapPointAnnotation.h; sourceTree = "<group>"; };
 		6F3C8B58162718D70081BF88 /* ADMapPointAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ADMapPointAnnotation.m; sourceTree = "<group>"; };
-		6F3C8B6E162C1A430081BF88 /* CDStreetlightItem.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CDStreetlightItem.png; path = Resources/CDStreetlightItem.png; sourceTree = SOURCE_ROOT; };
-		6F3C8B6F162C1A430081BF88 /* CDStreetlightItem@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "CDStreetlightItem@2x.png"; path = "Resources/CDStreetlightItem@2x.png"; sourceTree = SOURCE_ROOT; };
-		6F3C8B73162C1ABA0081BF88 /* CDToiletItem.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CDToiletItem.png; path = Resources/CDToiletItem.png; sourceTree = SOURCE_ROOT; };
-		6F3C8B74162C1ABA0081BF88 /* CDToiletItem@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "CDToiletItem@2x.png"; path = "Resources/CDToiletItem@2x.png"; sourceTree = SOURCE_ROOT; };
-		6F3C8B77162C1B860081BF88 /* CDToilet.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CDToilet.png; path = Resources/CDToilet.png; sourceTree = SOURCE_ROOT; };
-		6F3C8B78162C1B860081BF88 /* CDToilet@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "CDToilet@2x.png"; path = "Resources/CDToilet@2x.png"; sourceTree = SOURCE_ROOT; };
-		6F3C8B79162C1B860081BF88 /* CDToiletCluster.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = CDToiletCluster.png; path = Resources/CDToiletCluster.png; sourceTree = SOURCE_ROOT; };
-		6F3C8B7A162C1B870081BF88 /* CDToiletCluster@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "CDToiletCluster@2x.png"; path = "Resources/CDToiletCluster@2x.png"; sourceTree = SOURCE_ROOT; };
 		6F8000C0162569E5005D0263 /* ClusterDemo-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "ClusterDemo-Info.plist"; sourceTree = SOURCE_ROOT; };
 		6F8000C1162569E5005D0263 /* ClusterDemo-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ClusterDemo-Prefix.pch"; sourceTree = SOURCE_ROOT; };
 		6F8000DF16256BCE005D0263 /* ADClusterAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ADClusterAnnotation.h; sourceTree = "<group>"; };
@@ -81,33 +49,34 @@
 		6F8000E416256BCE005D0263 /* ADMapCluster.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = ADMapCluster.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		6F8000E816256C1B005D0263 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		6F8000EB16256C6C005D0263 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
-		6F8000ED16256D46005D0263 /* ADClusterableAnnotation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ADClusterableAnnotation.h; path = Classes/ADClusterableAnnotation.h; sourceTree = SOURCE_ROOT; };
-		6F8000EE16256D46005D0263 /* ADClusterableAnnotation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ADClusterableAnnotation.m; path = Classes/ADClusterableAnnotation.m; sourceTree = SOURCE_ROOT; };
-		6F8000F116257E9C005D0263 /* CDIcon~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "CDIcon~ipad.png"; path = "Resources/CDIcon~ipad.png"; sourceTree = SOURCE_ROOT; };
-		6F8000F216257E9C005D0263 /* CDIcon~ipad@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "CDIcon~ipad@2x.png"; path = "Resources/CDIcon~ipad@2x.png"; sourceTree = SOURCE_ROOT; };
-		6F8000F316257E9C005D0263 /* CDIcon~iphone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "CDIcon~iphone.png"; path = "Resources/CDIcon~iphone.png"; sourceTree = SOURCE_ROOT; };
-		6F8000F416257E9C005D0263 /* CDIcon~iphone@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "CDIcon~iphone@2x.png"; path = "Resources/CDIcon~iphone@2x.png"; sourceTree = SOURCE_ROOT; };
 		6F8FE99616249223001A0309 /* ClusterDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ClusterDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F8FE99A16249223001A0309 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		6F8FE99C16249223001A0309 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		6F8FE99E16249223001A0309 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		6F8FE9C516249428001A0309 /* CDAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CDAppDelegate.h; path = Classes/CDAppDelegate.h; sourceTree = SOURCE_ROOT; };
-		6F8FE9C616249428001A0309 /* CDAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CDAppDelegate.m; path = Classes/CDAppDelegate.m; sourceTree = SOURCE_ROOT; };
-		6F8FE9C716249428001A0309 /* CDMapViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CDMapViewController.h; path = Classes/CDMapViewController.h; sourceTree = SOURCE_ROOT; };
-		6F8FE9C816249428001A0309 /* CDMapViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = CDMapViewController.m; path = Classes/CDMapViewController.m; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		6F8FE9C91624942E001A0309 /* CDMapViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = CDMapViewController.xib; path = Resources/CDMapViewController.xib; sourceTree = SOURCE_ROOT; };
-		6F8FE9CB1624942E001A0309 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "Resources/Default-568h@2x.png"; sourceTree = SOURCE_ROOT; };
-		6F8FE9CC1624942E001A0309 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Default.png; path = Resources/Default.png; sourceTree = SOURCE_ROOT; };
-		6F8FE9CD1624942E001A0309 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default@2x.png"; path = "Resources/Default@2x.png"; sourceTree = SOURCE_ROOT; };
 		6F8FE9E3162496AE001A0309 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = SOURCE_ROOT; };
 		C597E8651A630AA1002DF26A /* CLLocation+Utilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CLLocation+Utilities.h"; sourceTree = "<group>"; };
 		C597E8661A630AA1002DF26A /* CLLocation+Utilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CLLocation+Utilities.m"; sourceTree = "<group>"; };
 		C597E8671A630AA1002DF26A /* NSDictionary+MKMapRect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+MKMapRect.h"; sourceTree = "<group>"; };
 		C597E8681A630AA1002DF26A /* NSDictionary+MKMapRect.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+MKMapRect.m"; sourceTree = "<group>"; };
-		C597E8691A630AA1002DF26A /* TSClusertedAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSClusertedAnnotationView.h; sourceTree = "<group>"; };
-		C597E86A1A630AA1002DF26A /* TSClusertedAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSClusertedAnnotationView.m; sourceTree = "<group>"; };
+		C597E8691A630AA1002DF26A /* TSClusterAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSClusterAnnotationView.h; sourceTree = "<group>"; };
+		C597E86A1A630AA1002DF26A /* TSClusterAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSClusterAnnotationView.m; sourceTree = "<group>"; };
 		C597E86B1A630AA1002DF26A /* TSClusterOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSClusterOperation.h; sourceTree = "<group>"; };
 		C597E86C1A630AA1002DF26A /* TSClusterOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSClusterOperation.m; sourceTree = "<group>"; };
+		C597E8731A65FECC002DF26A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Resources/Images.xcassets; sourceTree = SOURCE_ROOT; };
+		C597E87C1A66173D002DF26A /* ADClusterableAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ADClusterableAnnotation.h; sourceTree = "<group>"; };
+		C597E87D1A66173D002DF26A /* ADClusterableAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ADClusterableAnnotation.m; sourceTree = "<group>"; };
+		C597E87E1A66173D002DF26A /* TSBathroomAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSBathroomAnnotation.h; sourceTree = "<group>"; };
+		C597E87F1A66173D002DF26A /* TSBathroomAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSBathroomAnnotation.m; sourceTree = "<group>"; };
+		C597E8801A66173D002DF26A /* TSStreetLightAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSStreetLightAnnotation.h; sourceTree = "<group>"; };
+		C597E8811A66173D002DF26A /* TSStreetLightAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSStreetLightAnnotation.m; sourceTree = "<group>"; };
+		C597E8831A66173D002DF26A /* CDAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDAppDelegate.h; sourceTree = "<group>"; };
+		C597E8841A66173D002DF26A /* CDAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDAppDelegate.m; sourceTree = "<group>"; };
+		C597E8851A66173D002DF26A /* Storyboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Storyboard.storyboard; sourceTree = "<group>"; };
+		C597E8871A66173D002DF26A /* CDMapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDMapViewController.h; sourceTree = "<group>"; };
+		C597E8881A66173D002DF26A /* CDMapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDMapViewController.m; sourceTree = "<group>"; };
+		C597E8961A6619C1002DF26A /* TSDemoClusteredAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSDemoClusteredAnnotationView.h; sourceTree = "<group>"; };
+		C597E8971A6619C1002DF26A /* TSDemoClusteredAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSDemoClusteredAnnotationView.m; sourceTree = "<group>"; };
+		C597E8991A662708002DF26A /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,6 +84,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C597E89A1A662708002DF26A /* QuartzCore.framework in Frameworks */,
 				6F8000EA16256C26005D0263 /* MapKit.framework in Frameworks */,
 				6F8000EC16256C6C005D0263 /* CoreLocation.framework in Frameworks */,
 				6F8FE99B16249223001A0309 /* UIKit.framework in Frameworks */,
@@ -141,8 +111,8 @@
 				C597E8661A630AA1002DF26A /* CLLocation+Utilities.m */,
 				C597E8671A630AA1002DF26A /* NSDictionary+MKMapRect.h */,
 				C597E8681A630AA1002DF26A /* NSDictionary+MKMapRect.m */,
-				C597E8691A630AA1002DF26A /* TSClusertedAnnotationView.h */,
-				C597E86A1A630AA1002DF26A /* TSClusertedAnnotationView.m */,
+				C597E8691A630AA1002DF26A /* TSClusterAnnotationView.h */,
+				C597E86A1A630AA1002DF26A /* TSClusterAnnotationView.m */,
 				C597E86B1A630AA1002DF26A /* TSClusterOperation.h */,
 				C597E86C1A630AA1002DF26A /* TSClusterOperation.m */,
 			);
@@ -171,6 +141,7 @@
 		6F8FE99916249223001A0309 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C597E8991A662708002DF26A /* QuartzCore.framework */,
 				6F8000EB16256C6C005D0263 /* CoreLocation.framework */,
 				6F8000E816256C1B005D0263 /* MapKit.framework */,
 				6F8FE99A16249223001A0309 /* UIKit.framework */,
@@ -183,7 +154,10 @@
 		6F8FE9A016249223001A0309 /* ClusterDemo */ = {
 			isa = PBXGroup;
 			children = (
-				6F8FE9C016249409001A0309 /* Classes */,
+				C597E8951A661983002DF26A /* AnnotationViews */,
+				C597E87B1A66173D002DF26A /* Annotations */,
+				C597E8821A66173D002DF26A /* Application */,
+				C597E8861A66173D002DF26A /* ViewControllers */,
 				6F8FE9C11624940E001A0309 /* Resources */,
 				6F8FE9A116249223001A0309 /* Supporting Files */,
 			);
@@ -200,51 +174,56 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		6F8FE9C016249409001A0309 /* Classes */ = {
-			isa = PBXGroup;
-			children = (
-				6F8FE9C516249428001A0309 /* CDAppDelegate.h */,
-				6F8FE9C616249428001A0309 /* CDAppDelegate.m */,
-				6F8FE9C716249428001A0309 /* CDMapViewController.h */,
-				6F8FE9C816249428001A0309 /* CDMapViewController.m */,
-				6F8000ED16256D46005D0263 /* ADClusterableAnnotation.h */,
-				6F8000EE16256D46005D0263 /* ADClusterableAnnotation.m */,
-				6F3C8B2E162708B00081BF88 /* CDStreetlightsMapViewController.h */,
-				6F3C8B2F162708B00081BF88 /* CDStreetlightsMapViewController.m */,
-				6F3C8B31162708CB0081BF88 /* CDToiletsMapViewController.h */,
-				6F3C8B32162708CB0081BF88 /* CDToiletsMapViewController.m */,
-			);
-			name = Classes;
-			sourceTree = "<group>";
-		};
 		6F8FE9C11624940E001A0309 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				C597E8731A65FECC002DF26A /* Images.xcassets */,
 				6F1715BE1625D1890042E6AA /* CDStreetlights.json */,
 				6F1715B71625CAB00042E6AA /* CDToilets.json */,
-				6F3C8B77162C1B860081BF88 /* CDToilet.png */,
-				6F3C8B78162C1B860081BF88 /* CDToilet@2x.png */,
-				6F3C8B79162C1B860081BF88 /* CDToiletCluster.png */,
-				6F3C8B7A162C1B870081BF88 /* CDToiletCluster@2x.png */,
-				6F3C8B73162C1ABA0081BF88 /* CDToiletItem.png */,
-				6F3C8B74162C1ABA0081BF88 /* CDToiletItem@2x.png */,
-				6F3C8B261627054A0081BF88 /* CDStreetlight.png */,
-				6F3C8B271627054A0081BF88 /* CDStreetlight@2x.png */,
-				6F3C8B281627054A0081BF88 /* CDStreetlightCluster.png */,
-				6F3C8B291627054A0081BF88 /* CDStreetlightCluster@2x.png */,
-				6F3C8B6E162C1A430081BF88 /* CDStreetlightItem.png */,
-				6F3C8B6F162C1A430081BF88 /* CDStreetlightItem@2x.png */,
-				6F8000F116257E9C005D0263 /* CDIcon~ipad.png */,
-				6F8000F216257E9C005D0263 /* CDIcon~ipad@2x.png */,
-				6F8000F316257E9C005D0263 /* CDIcon~iphone.png */,
-				6F8000F416257E9C005D0263 /* CDIcon~iphone@2x.png */,
-				6F8FE9C91624942E001A0309 /* CDMapViewController.xib */,
-				6F8FE9CB1624942E001A0309 /* Default-568h@2x.png */,
-				6F8FE9CC1624942E001A0309 /* Default.png */,
-				6F8FE9CD1624942E001A0309 /* Default@2x.png */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
+		};
+		C597E87B1A66173D002DF26A /* Annotations */ = {
+			isa = PBXGroup;
+			children = (
+				C597E87C1A66173D002DF26A /* ADClusterableAnnotation.h */,
+				C597E87D1A66173D002DF26A /* ADClusterableAnnotation.m */,
+				C597E87E1A66173D002DF26A /* TSBathroomAnnotation.h */,
+				C597E87F1A66173D002DF26A /* TSBathroomAnnotation.m */,
+				C597E8801A66173D002DF26A /* TSStreetLightAnnotation.h */,
+				C597E8811A66173D002DF26A /* TSStreetLightAnnotation.m */,
+			);
+			path = Annotations;
+			sourceTree = SOURCE_ROOT;
+		};
+		C597E8821A66173D002DF26A /* Application */ = {
+			isa = PBXGroup;
+			children = (
+				C597E8831A66173D002DF26A /* CDAppDelegate.h */,
+				C597E8841A66173D002DF26A /* CDAppDelegate.m */,
+				C597E8851A66173D002DF26A /* Storyboard.storyboard */,
+			);
+			path = Application;
+			sourceTree = SOURCE_ROOT;
+		};
+		C597E8861A66173D002DF26A /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				C597E8871A66173D002DF26A /* CDMapViewController.h */,
+				C597E8881A66173D002DF26A /* CDMapViewController.m */,
+			);
+			path = ViewControllers;
+			sourceTree = SOURCE_ROOT;
+		};
+		C597E8951A661983002DF26A /* AnnotationViews */ = {
+			isa = PBXGroup;
+			children = (
+				C597E8961A6619C1002DF26A /* TSDemoClusteredAnnotationView.h */,
+				C597E8971A6619C1002DF26A /* TSDemoClusteredAnnotationView.m */,
+			);
+			path = AnnotationViews;
+			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXGroup section */
 
@@ -298,28 +277,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6F8FE9CE1624942E001A0309 /* CDMapViewController.xib in Resources */,
-				6F8FE9D01624942E001A0309 /* Default-568h@2x.png in Resources */,
-				6F8FE9D11624942E001A0309 /* Default.png in Resources */,
-				6F8FE9D21624942E001A0309 /* Default@2x.png in Resources */,
-				6F8000F516257E9C005D0263 /* CDIcon~ipad.png in Resources */,
-				6F8000F616257E9C005D0263 /* CDIcon~ipad@2x.png in Resources */,
-				6F8000F716257E9C005D0263 /* CDIcon~iphone.png in Resources */,
-				6F8000F816257E9C005D0263 /* CDIcon~iphone@2x.png in Resources */,
+				C597E8741A65FECC002DF26A /* Images.xcassets in Resources */,
 				6F1715B81625CAB00042E6AA /* CDToilets.json in Resources */,
 				6F1715BF1625D1890042E6AA /* CDStreetlights.json in Resources */,
-				6F3C8B2A1627054A0081BF88 /* CDStreetlight.png in Resources */,
-				6F3C8B2B1627054A0081BF88 /* CDStreetlight@2x.png in Resources */,
-				6F3C8B2C1627054A0081BF88 /* CDStreetlightCluster.png in Resources */,
-				6F3C8B2D1627054A0081BF88 /* CDStreetlightCluster@2x.png in Resources */,
-				6F3C8B70162C1A430081BF88 /* CDStreetlightItem.png in Resources */,
-				6F3C8B71162C1A430081BF88 /* CDStreetlightItem@2x.png in Resources */,
-				6F3C8B75162C1ABA0081BF88 /* CDToiletItem.png in Resources */,
-				6F3C8B76162C1ABA0081BF88 /* CDToiletItem@2x.png in Resources */,
-				6F3C8B7B162C1B870081BF88 /* CDToilet.png in Resources */,
-				6F3C8B7C162C1B870081BF88 /* CDToilet@2x.png in Resources */,
-				6F3C8B7D162C1B870081BF88 /* CDToiletCluster.png in Resources */,
-				6F3C8B7E162C1B870081BF88 /* CDToiletCluster@2x.png in Resources */,
+				C597E8911A66173D002DF26A /* Storyboard.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -332,17 +293,18 @@
 			files = (
 				6F8FE9E4162496B0001A0309 /* main.m in Sources */,
 				C597E8701A630AA1002DF26A /* TSClusterOperation.m in Sources */,
-				6F8FE9DE1624966A001A0309 /* CDAppDelegate.m in Sources */,
-				6F8FE9DF1624966C001A0309 /* CDMapViewController.m in Sources */,
-				6F8000F016256D7C005D0263 /* ADClusterableAnnotation.m in Sources */,
-				C597E86F1A630AA1002DF26A /* TSClusertedAnnotationView.m in Sources */,
+				C597E8921A66173D002DF26A /* CDMapViewController.m in Sources */,
+				C597E86F1A630AA1002DF26A /* TSClusterAnnotationView.m in Sources */,
 				6F8000E516256BCE005D0263 /* ADClusterAnnotation.m in Sources */,
 				C597E86E1A630AA1002DF26A /* NSDictionary+MKMapRect.m in Sources */,
 				6F8000E616256BCE005D0263 /* ADClusterMapView.m in Sources */,
+				C597E88E1A66173D002DF26A /* TSBathroomAnnotation.m in Sources */,
 				6F8000E716256BCE005D0263 /* ADMapCluster.m in Sources */,
-				6F3C8B30162708B00081BF88 /* CDStreetlightsMapViewController.m in Sources */,
+				C597E88F1A66173D002DF26A /* TSStreetLightAnnotation.m in Sources */,
 				C597E86D1A630AA1002DF26A /* CLLocation+Utilities.m in Sources */,
-				6F3C8B33162708CB0081BF88 /* CDToiletsMapViewController.m in Sources */,
+				C597E8901A66173D002DF26A /* CDAppDelegate.m in Sources */,
+				C597E88D1A66173D002DF26A /* ADClusterableAnnotation.m in Sources */,
+				C597E8981A6619C1002DF26A /* TSDemoClusteredAnnotationView.m in Sources */,
 				6F3C8B59162718D70081BF88 /* ADMapPointAnnotation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -407,7 +369,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ClusterDemo-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/ClusterDemo-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = ClusterDemo;
 				WRAPPER_EXTENSION = app;
 			};
@@ -420,7 +382,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ClusterDemo-Prefix.pch";
 				INFOPLIST_FILE = "$(SRCROOT)/ClusterDemo-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				PRODUCT_NAME = ClusterDemo;
 				WRAPPER_EXTENSION = app;
 			};

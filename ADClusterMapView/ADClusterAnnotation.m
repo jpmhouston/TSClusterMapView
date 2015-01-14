@@ -7,6 +7,7 @@
 //
 
 #import "ADClusterAnnotation.h"
+#import "TSClusterAnnotationView.h"
 
 
 BOOL ADClusterCoordinate2DIsOffscreen(CLLocationCoordinate2D coord) {
@@ -51,6 +52,11 @@ BOOL ADClusterCoordinate2DIsOffscreen(CLLocationCoordinate2D coord) {
 - (NSArray *)originalAnnotations {
     NSAssert(self.cluster != nil, @"This annotation should have a cluster assigned!");
     return self.cluster.originalAnnotations;
+}
+
+- (NSUInteger *)clusterCount {
+    
+    return _cluster.clusterCount;
 }
 
 @end

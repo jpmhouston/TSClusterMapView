@@ -14,6 +14,7 @@
 #import "NSDictionary+MKMapRect.h"
 #import "CLLocation+Utilities.h"
 #import "ADClusterMapView.h"
+#import "TSClusterAnnotationView.h"
 
 @interface TSClusterOperation ()
 
@@ -134,6 +135,9 @@ int nearestEvenInt(int to) {
         return;
     }
     
+    
+    //Begin Setting Clusters = No turning back now!
+    
     static NSString *coordinatesKey = @"coordinates";
     static NSString *annotationKey = @"annotation";
     static NSString *clusterKey = @"cluster";
@@ -176,13 +180,6 @@ int nearestEvenInt(int to) {
         }
     }
     
-    if (self.isCancelled) {
-        if (_finishedBlock) {
-            _finishedBlock(clusteredMapRect, NO);
-        }
-        return;
-    }
-    
     // Converge annotations to ancestor clusters
     for (ADMapCluster * cluster in clustersToShowOnMap) {
         BOOL didAlreadyFindAChild = NO;
@@ -214,45 +211,23 @@ int nearestEvenInt(int to) {
             }
         }
     }
-    if (self.isCancelled) {
-        if (_finishedBlock) {
-            _finishedBlock(clusteredMapRect, NO);
-        }
-        return;
-    }
+    
     for (ADClusterAnnotation * annotation in availableSingleAnnotations) {
         NSAssert(annotation.type == ADClusterAnnotationTypeLeaf, @"Inconsistent annotation type!");
         if (annotation.cluster) { // This is here for performance reason (annotation reset causes the refresh of the annotation because of KVO)
             [nonAnimated addObject:@{annotationKey: annotation}];
         }
     }
-    if (self.isCancelled) {
-        if (_finishedBlock) {
-            _finishedBlock(clusteredMapRect, NO);
-        }
-        return;
-    }
+    
     for (ADClusterAnnotation * annotation in availableClusterAnnotations) {
         NSAssert(annotation.type == ADClusterAnnotationTypeCluster, @"Inconsistent annotation type!");
         if (annotation.cluster) {
             [nonAnimated addObject:@{annotationKey: annotation}];
         }
     }
-    if (self.isCancelled) {
-        if (_finishedBlock) {
-            _finishedBlock(clusteredMapRect, NO);
-        }
-        return;
-    }
     
     //Create a circle around coordinate to display all single annotations that overlap
     [TSClusterOperation mutateCoordinatesOfClashingAnnotations:_clusterAnnotations];
-    if (self.isCancelled) {
-        if (_finishedBlock) {
-            _finishedBlock(clusteredMapRect, NO);
-        }
-        return;
-    }
     
     // Add not-yet-annotated clusters
     for (ADMapCluster * cluster in clustersToShowOnMap) {
@@ -284,37 +259,17 @@ int nearestEvenInt(int to) {
         }
     }
     
-    if (self.isCancelled) {
-        if (_finishedBlock) {
-            _finishedBlock(clusteredMapRect, NO);
-        }
-        return;
-    }
-    
     for (ADClusterAnnotation * annotation in availableSingleAnnotations) {
         NSAssert(annotation.type == ADClusterAnnotationTypeLeaf, @"Inconsistent annotation type!");
         [afterAnimation addObject:@{annotationKey: annotation}];
     }
     
-    if (self.isCancelled) {
-        if (_finishedBlock) {
-            _finishedBlock(clusteredMapRect, NO);
-        }
-        return;
-    }
     for (ADClusterAnnotation * annotation in availableClusterAnnotations) {
         NSAssert(annotation.type == ADClusterAnnotationTypeCluster, @"Inconsistent annotation type!");
         [afterAnimation addObject:@{annotationKey: annotation}];
     }
     
-    if (self.isCancelled) {
-        if (_finishedBlock) {
-            _finishedBlock(clusteredMapRect, NO);
-        }
-        return;
-    }
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         
         for (NSDictionary *dic in nonAnimated) {
             ADClusterAnnotation * annotation = [dic objectForKey:annotationKey];
@@ -332,6 +287,7 @@ int nearestEvenInt(int to) {
             for (ADClusterAnnotation * annotation in _clusterAnnotations) {
                 if (![annotation isKindOfClass:[MKUserLocation class]] && annotation.cluster) {
                     annotation.coordinate = annotation.cluster.clusterCoordinate;
+                    [annotation.annotationView refreshView];
                 }
             }
             
@@ -367,7 +323,7 @@ int nearestEvenInt(int to) {
                 _finishedBlock(clusteredMapRect, YES);
             }
         }];
-    });
+    }];
 }
 
 - (BOOL)annotation:(ADClusterAnnotation *)annotation belongsToClusters:(NSSet *)clusters {

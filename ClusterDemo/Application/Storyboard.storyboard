@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="bV8-3H-Edx">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+    </dependencies>
+    <scenes>
+        <!--Map View Controller-->
+        <scene sceneID="m02-Ci-2OQ">
+            <objects>
+                <viewController restorationIdentifier="CDMapViewController" storyboardIdentifier="CDMapViewController" id="bV8-3H-Edx" customClass="CDMapViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="gYd-gO-6Ij"/>
+                        <viewControllerLayoutGuide type="bottom" id="XdT-y2-VGv"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="deA-x0-VJI">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="BFz-fq-RjB" customClass="ADClusterMapView">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                                <connections>
+                                    <outlet property="delegate" destination="bV8-3H-Edx" id="wrQ-Vn-2Oe"/>
+                                </connections>
+                            </mapView>
+                            <tabBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="t7T-3w-Ldr">
+                                <rect key="frame" x="0.0" y="519" width="320" height="49"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="49" id="m18-0Z-fem"/>
+                                </constraints>
+                                <items>
+                                    <tabBarItem title="Public Bathrooms" image="Bathroom" id="3TL-Jc-YGW"/>
+                                    <tabBarItem title="Street Lights" image="StreetLight" id="JUB-Bh-gfZ"/>
+                                </items>
+                                <connections>
+                                    <outlet property="delegate" destination="bV8-3H-Edx" id="Ytw-Li-t6b"/>
+                                </connections>
+                            </tabBar>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="BFz-fq-RjB" secondAttribute="trailing" id="7si-cF-KBD"/>
+                            <constraint firstItem="XdT-y2-VGv" firstAttribute="top" secondItem="t7T-3w-Ldr" secondAttribute="bottom" id="LRV-dB-Qeu"/>
+                            <constraint firstAttribute="trailing" secondItem="t7T-3w-Ldr" secondAttribute="trailing" id="YW6-48-4Zt"/>
+                            <constraint firstItem="BFz-fq-RjB" firstAttribute="top" secondItem="deA-x0-VJI" secondAttribute="top" id="eUd-g3-hkf"/>
+                            <constraint firstItem="BFz-fq-RjB" firstAttribute="leading" secondItem="deA-x0-VJI" secondAttribute="leading" id="uFa-dW-I2P"/>
+                            <constraint firstItem="t7T-3w-Ldr" firstAttribute="leading" secondItem="deA-x0-VJI" secondAttribute="leading" id="yPn-FM-FK6"/>
+                            <constraint firstItem="XdT-y2-VGv" firstAttribute="top" secondItem="BFz-fq-RjB" secondAttribute="bottom" id="ykZ-b3-E1A"/>
+                        </constraints>
+                        <variation key="heightClass=compact"/>
+                    </view>
+                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
+                    <connections>
+                        <outlet property="bathroomTabBarItem" destination="3TL-Jc-YGW" id="loS-8C-fKw"/>
+                        <outlet property="mapView" destination="BFz-fq-RjB" id="Ywq-VL-ntq"/>
+                        <outlet property="streetLightsTabBarItem" destination="JUB-Bh-gfZ" id="QA3-VS-3jv"/>
+                        <outlet property="tabBar" destination="t7T-3w-Ldr" id="dwV-vV-fQm"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="eYT-2I-6HF" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="481" y="208"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="Bathroom" width="31" height="25"/>
+        <image name="StreetLight" width="36" height="25"/>
+    </resources>
+</document>

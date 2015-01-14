@@ -87,7 +87,7 @@ typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
 - (ADClusterAnnotation *)clusterAnnotationForOriginalAnnotation:(id<MKAnnotation>)annotation;
 
 /*!
- * @discussion Adds an annotation to the map and clusters if needed (threadsafe). Only rebuilds entire cluster tree if there are less than 200 clustered annotations or the annotation coordinate is an outlier from current clustered data set.
+ * @discussion Adds an annotation to the map and clusters if needed (threadsafe). Only rebuilds entire cluster tree if there are less than 500 clustered annotations or the annotation coordinate is an outlier from current clustered data set.
  * @param annotation The annotation to be added to map
  */
 - (void)addClusteredAnnotation:(id<MKAnnotation>)annotation;
@@ -97,7 +97,6 @@ typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
  * @param annotations The array of MKAnnotation objects to be added to map
  */
 - (void)addClusteredAnnotations:(NSArray *)annotations;
-
 
 /*!
  * @discussion Add annotation with option to force a full tree refresh (threadsafe).
@@ -146,5 +145,8 @@ typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
  Title for cluster annotations. Default @"%d elements"
  */
 @property (strong, nonatomic) NSString *clusterTitle;
+
+
+@property (nonatomic, strong, readonly) NSOperationQueue *treeOperationQueue;
 
 @end

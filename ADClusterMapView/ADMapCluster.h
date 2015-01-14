@@ -14,6 +14,8 @@
 
 @interface ADMapCluster : NSObject
 
+typedef void(^KdtreeCompletionBlock)(ADMapCluster *mapCluster);
+
 @property (nonatomic, strong) ADMapPointAnnotation *annotation;
 
 @property (nonatomic, assign) CLLocationCoordinate2D clusterCoordinate;
@@ -47,7 +49,7 @@
  * @param mapView The ADClusterMapView that will send the delegate callback
  * @return A new ADMapCluster object.
  */
-+ (ADMapCluster *)rootClusterForAnnotations:(NSSet *)annotations mapView:(ADClusterMapView *)mapView;
++ (void)rootClusterForAnnotations:(NSSet *)annotations mapView:(ADClusterMapView *)mapView completion:(KdtreeCompletionBlock)completion ;
 
 
 /*!
@@ -58,15 +60,24 @@
  * @param showSubtitle A Boolean to show subtitle from titles of children
  * @return A new ADMapCluster object.
  */
-+ (ADMapCluster *)rootClusterForAnnotations:(NSSet *)annotations discriminationPower:(double)gamma title:(NSString *)clusterTitle showSubtitle:(BOOL)showSubtitle;
++ (void)rootClusterForAnnotations:(NSSet *)annotations discriminationPower:(double)gamma title:(NSString *)clusterTitle showSubtitle:(BOOL)showSubtitle completion:(KdtreeCompletionBlock)completion ;
 
 /*!
- * @discussion Add a single map point annotation to an existing KD-tree map cluster root
+ * @discussion Adds a single map point annotation to an existing KD-tree map cluster root
  * @param mapView The ADClusterMapView that will send the delegate callback
  * @param mapPointAnnotation A single ADMapPointAnnotation object
  * @return YES if tree was updated, NO if full root should be updated
  */
-- (BOOL)mapView:(ADClusterMapView *)mapView rootClusterDidAddAnnotation:(ADMapPointAnnotation *)mapPointAnnotation;
+- (void)mapView:(ADClusterMapView *)mapView addAnnotation:(ADMapPointAnnotation *)mapPointAnnotation completion:(void(^)(BOOL added))completion;
+
+
+/*!
+ * @discussion Removes a single map point annotation to an existing KD-tree map cluster root
+ * @param mapView The ADClusterMapView that will send the delegate callback
+ * @param mapPointAnnotation A single ADMapPointAnnotation object
+ * @return YES if tree was updated, NO if full root should be updated
+ */
+- (void)mapView:(ADClusterMapView *)mapView removeAnnotation:(id<MKAnnotation>)annotation completion:(void(^)(BOOL added))completion;;
 
 /*!
  * @discussion Get a set number of children contained within a map rect
@@ -96,5 +107,12 @@
  * @return YES if receiver found annotation in children
  */
 - (BOOL)isRootClusterForAnnotation:(id<MKAnnotation>)annotation;
+
+/*!
+ * @discussion Finds the cluster object associated with the annotation
+ * @param annotation A clustered MKAnnotation
+ * @return The ADMapCluster object that contains the annotation
+ */
+- (ADMapCluster *)clusterForAnnotation:(id<MKAnnotation>)annotation;
 
 @end
