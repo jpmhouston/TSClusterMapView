@@ -29,10 +29,11 @@
         [self addSubview:self.label];
         
         self.canShowCallout = YES;
+        
+        [self refreshView];
     }
     return self;
 }
-
 
 - (void)refreshView {
     
@@ -44,7 +45,11 @@
     self.accessibilityLabel = @"Map annotation cluster";
 }
 
-- (NSString *)numberLabelText:(NSUInteger)count {
+- (NSString *)numberLabelText:(float)count {
+    
+    if (!count) {
+        count = 1;
+    }
     
     if (count > 1000) {
         float rounded;

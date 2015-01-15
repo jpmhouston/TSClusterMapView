@@ -10,6 +10,7 @@
 #import <MapKit/MapKit.h>
 #import "ADMapCluster.h"
 #import "ADClusterAnnotation.h"
+#import "TSClusterAnnotationView.h"
 
 extern NSString * const TSMapViewWillChangeRegion;
 extern NSString * const TSMapViewDidChangeRegion;
@@ -80,11 +81,11 @@ typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
 @interface ADClusterMapView : MKMapView <MKMapViewDelegate, UIGestureRecognizerDelegate, ADClusterMapViewDelegate>
 
 /*!
- * @discussion Finds the cluster that contains a single annotation
- * @param annotation The annotation that was clustered
- * @return The ADClusterAnnotation instance containing the annotation originally added.
+ * @discussion Finds the cluster visible on the map that contains a single annotation
+ * @param annotation The annotation that was added to the map view.
+ * @return The visible ADClusterAnnotation instance containing the annotation originally added.
  */
-- (ADClusterAnnotation *)clusterAnnotationForOriginalAnnotation:(id<MKAnnotation>)annotation;
+- (ADClusterAnnotation *)currentClusterAnnotationForAddedAnnotation:(id<MKAnnotation>)annotation;
 
 /*!
  * @discussion Adds an annotation to the map and clusters if needed (threadsafe). Only rebuilds entire cluster tree if there are less than 500 clustered annotations or the annotation coordinate is an outlier from current clustered data set.
@@ -110,6 +111,10 @@ typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
  */
 - (void)needsRefresh;
 
+/*!
+ * @discussion Asks delegate for a new MKAnnotationView. Used before cluster animation to update annotation views.
+ */
+- (void)refreshClusterAnnotation:(ADClusterAnnotation *)annotation;
 
 /**
  Visible cluster annotations. Will contain clusters just outside visible rect included in buffer zone.

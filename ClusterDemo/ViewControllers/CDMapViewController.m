@@ -7,7 +7,7 @@
 //
 
 #import "CDMapViewController.h"
-#import "ADClusterableAnnotation.h"
+#import "ADBaseAnnotation.h"
 #import "TSBathroomAnnotation.h"
 #import "TSStreetLightAnnotation.h"
 #import "TSDemoClusteredAnnotationView.h"
@@ -88,6 +88,7 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
                                                    reuseIdentifier:NSStringFromClass([TSStreetLightAnnotation class])];
             view.image = [UIImage imageNamed:kStreetLightAnnotationImage];
             view.canShowCallout = YES;
+            view.centerOffset = CGPointMake(view.centerOffset.x, -view.frame.size.height/2);
         }
     }
     else if ([annotation isKindOfClass:[TSBathroomAnnotation class]]) {
@@ -97,6 +98,7 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
                                                 reuseIdentifier:NSStringFromClass([TSBathroomAnnotation class])];
             view.image = [UIImage imageNamed:kBathroomAnnotationImage];
             view.canShowCallout = YES;
+            view.centerOffset = CGPointMake(view.centerOffset.x, -view.frame.size.height/2);
         }
     }
     

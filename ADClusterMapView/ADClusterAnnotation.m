@@ -7,7 +7,7 @@
 //
 
 #import "ADClusterAnnotation.h"
-#import "TSClusterAnnotationView.h"
+#import "TSRefreshedAnnotationView.h"
 
 
 BOOL ADClusterCoordinate2DIsOffscreen(CLLocationCoordinate2D coord) {
@@ -29,6 +29,14 @@ BOOL ADClusterCoordinate2DIsOffscreen(CLLocationCoordinate2D coord) {
 }
 
 - (void)setCluster:(ADMapCluster *)cluster {
+    
+    if (cluster && cluster!=_cluster) {
+        _needsRefresh = YES;
+    }
+    else {
+        _needsRefresh = NO;
+    }
+    
     [self willChangeValueForKey:@"title"];
     [self willChangeValueForKey:@"subtitle"];
     _cluster = cluster;
@@ -44,9 +52,22 @@ BOOL ADClusterCoordinate2DIsOffscreen(CLLocationCoordinate2D coord) {
     return self.cluster.subtitle;
 }
 
+- (void)setCoordinate:(CLLocationCoordinate2D)coordinate {
+    
+    _coordinate = coordinate;
+    _coordinatePreAnimation = coordinate;
+}
+
 - (void)reset {
     self.cluster = nil;
     self.coordinate = kADCoordinate2DOffscreen;
+//    self.coordinatePostAnimation = kADCoordinate2DOffscreen;
+}
+
+- (void)shouldReset {
+    self.cluster = nil;
+    self.coordinatePreAnimation = kADCoordinate2DOffscreen;
+//    self.coordinatePostAnimation = kADCoordinate2DOffscreen;
 }
 
 - (NSArray *)originalAnnotations {

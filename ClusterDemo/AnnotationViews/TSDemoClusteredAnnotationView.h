@@ -6,8 +6,10 @@
 //  Copyright (c) 2015 Applidium. All rights reserved.
 //
 
-#import "TSClusterAnnotationView.h"
+#import "TSRefreshedAnnotationView.h"
 
-@interface TSDemoClusteredAnnotationView : TSClusterAnnotationView
+@interface TSDemoClusteredAnnotationView : TSRefreshedAnnotationView
+
+@property (strong, nonatomic) UILabel *label;
 
 @end

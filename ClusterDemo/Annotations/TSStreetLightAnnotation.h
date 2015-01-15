@@ -6,8 +6,8 @@
 //  Copyright (c) 2015 Applidium. All rights reserved.
 //
 
-#import "ADClusterableAnnotation.h"
+#import "ADBaseAnnotation.h"
 
-@interface TSStreetLightAnnotation : ADClusterableAnnotation
+@interface TSStreetLightAnnotation : ADBaseAnnotation
 
 @end

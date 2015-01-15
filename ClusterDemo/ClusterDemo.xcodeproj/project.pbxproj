@@ -21,10 +21,10 @@
 		6F8FE9E4162496B0001A0309 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F8FE9E3162496AE001A0309 /* main.m */; };
 		C597E86D1A630AA1002DF26A /* CLLocation+Utilities.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E8661A630AA1002DF26A /* CLLocation+Utilities.m */; };
 		C597E86E1A630AA1002DF26A /* NSDictionary+MKMapRect.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E8681A630AA1002DF26A /* NSDictionary+MKMapRect.m */; };
-		C597E86F1A630AA1002DF26A /* TSClusterAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E86A1A630AA1002DF26A /* TSClusterAnnotationView.m */; };
+		C597E86F1A630AA1002DF26A /* TSRefreshedAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E86A1A630AA1002DF26A /* TSRefreshedAnnotationView.m */; };
 		C597E8701A630AA1002DF26A /* TSClusterOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E86C1A630AA1002DF26A /* TSClusterOperation.m */; };
 		C597E8741A65FECC002DF26A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C597E8731A65FECC002DF26A /* Images.xcassets */; };
-		C597E88D1A66173D002DF26A /* ADClusterableAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E87D1A66173D002DF26A /* ADClusterableAnnotation.m */; };
+		C597E88D1A66173D002DF26A /* ADBaseAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E87D1A66173D002DF26A /* ADBaseAnnotation.m */; };
 		C597E88E1A66173D002DF26A /* TSBathroomAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E87F1A66173D002DF26A /* TSBathroomAnnotation.m */; };
 		C597E88F1A66173D002DF26A /* TSStreetLightAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E8811A66173D002DF26A /* TSStreetLightAnnotation.m */; };
 		C597E8901A66173D002DF26A /* CDAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E8841A66173D002DF26A /* CDAppDelegate.m */; };
@@ -32,6 +32,7 @@
 		C597E8921A66173D002DF26A /* CDMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E8881A66173D002DF26A /* CDMapViewController.m */; };
 		C597E8981A6619C1002DF26A /* TSDemoClusteredAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E8971A6619C1002DF26A /* TSDemoClusteredAnnotationView.m */; };
 		C597E89A1A662708002DF26A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C597E8991A662708002DF26A /* QuartzCore.framework */; };
+		C597E8CF1A677CCE002DF26A /* TSClusterAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E8CE1A677CCE002DF26A /* TSClusterAnnotationView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -58,13 +59,13 @@
 		C597E8661A630AA1002DF26A /* CLLocation+Utilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CLLocation+Utilities.m"; sourceTree = "<group>"; };
 		C597E8671A630AA1002DF26A /* NSDictionary+MKMapRect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+MKMapRect.h"; sourceTree = "<group>"; };
 		C597E8681A630AA1002DF26A /* NSDictionary+MKMapRect.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+MKMapRect.m"; sourceTree = "<group>"; };
-		C597E8691A630AA1002DF26A /* TSClusterAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSClusterAnnotationView.h; sourceTree = "<group>"; };
-		C597E86A1A630AA1002DF26A /* TSClusterAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSClusterAnnotationView.m; sourceTree = "<group>"; };
+		C597E8691A630AA1002DF26A /* TSRefreshedAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSRefreshedAnnotationView.h; sourceTree = "<group>"; };
+		C597E86A1A630AA1002DF26A /* TSRefreshedAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSRefreshedAnnotationView.m; sourceTree = "<group>"; };
 		C597E86B1A630AA1002DF26A /* TSClusterOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSClusterOperation.h; sourceTree = "<group>"; };
 		C597E86C1A630AA1002DF26A /* TSClusterOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSClusterOperation.m; sourceTree = "<group>"; };
 		C597E8731A65FECC002DF26A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Resources/Images.xcassets; sourceTree = SOURCE_ROOT; };
-		C597E87C1A66173D002DF26A /* ADClusterableAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ADClusterableAnnotation.h; sourceTree = "<group>"; };
-		C597E87D1A66173D002DF26A /* ADClusterableAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ADClusterableAnnotation.m; sourceTree = "<group>"; };
+		C597E87C1A66173D002DF26A /* ADBaseAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ADBaseAnnotation.h; sourceTree = "<group>"; };
+		C597E87D1A66173D002DF26A /* ADBaseAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ADBaseAnnotation.m; sourceTree = "<group>"; };
 		C597E87E1A66173D002DF26A /* TSBathroomAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSBathroomAnnotation.h; sourceTree = "<group>"; };
 		C597E87F1A66173D002DF26A /* TSBathroomAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSBathroomAnnotation.m; sourceTree = "<group>"; };
 		C597E8801A66173D002DF26A /* TSStreetLightAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSStreetLightAnnotation.h; sourceTree = "<group>"; };
@@ -77,6 +78,8 @@
 		C597E8961A6619C1002DF26A /* TSDemoClusteredAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSDemoClusteredAnnotationView.h; sourceTree = "<group>"; };
 		C597E8971A6619C1002DF26A /* TSDemoClusteredAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSDemoClusteredAnnotationView.m; sourceTree = "<group>"; };
 		C597E8991A662708002DF26A /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		C597E8CD1A677CCE002DF26A /* TSClusterAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSClusterAnnotationView.h; sourceTree = "<group>"; };
+		C597E8CE1A677CCE002DF26A /* TSClusterAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSClusterAnnotationView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,8 +114,10 @@
 				C597E8661A630AA1002DF26A /* CLLocation+Utilities.m */,
 				C597E8671A630AA1002DF26A /* NSDictionary+MKMapRect.h */,
 				C597E8681A630AA1002DF26A /* NSDictionary+MKMapRect.m */,
-				C597E8691A630AA1002DF26A /* TSClusterAnnotationView.h */,
-				C597E86A1A630AA1002DF26A /* TSClusterAnnotationView.m */,
+				C597E8691A630AA1002DF26A /* TSRefreshedAnnotationView.h */,
+				C597E86A1A630AA1002DF26A /* TSRefreshedAnnotationView.m */,
+				C597E8CD1A677CCE002DF26A /* TSClusterAnnotationView.h */,
+				C597E8CE1A677CCE002DF26A /* TSClusterAnnotationView.m */,
 				C597E86B1A630AA1002DF26A /* TSClusterOperation.h */,
 				C597E86C1A630AA1002DF26A /* TSClusterOperation.m */,
 			);
@@ -187,8 +192,8 @@
 		C597E87B1A66173D002DF26A /* Annotations */ = {
 			isa = PBXGroup;
 			children = (
-				C597E87C1A66173D002DF26A /* ADClusterableAnnotation.h */,
-				C597E87D1A66173D002DF26A /* ADClusterableAnnotation.m */,
+				C597E87C1A66173D002DF26A /* ADBaseAnnotation.h */,
+				C597E87D1A66173D002DF26A /* ADBaseAnnotation.m */,
 				C597E87E1A66173D002DF26A /* TSBathroomAnnotation.h */,
 				C597E87F1A66173D002DF26A /* TSBathroomAnnotation.m */,
 				C597E8801A66173D002DF26A /* TSStreetLightAnnotation.h */,
@@ -294,7 +299,8 @@
 				6F8FE9E4162496B0001A0309 /* main.m in Sources */,
 				C597E8701A630AA1002DF26A /* TSClusterOperation.m in Sources */,
 				C597E8921A66173D002DF26A /* CDMapViewController.m in Sources */,
-				C597E86F1A630AA1002DF26A /* TSClusterAnnotationView.m in Sources */,
+				C597E8CF1A677CCE002DF26A /* TSClusterAnnotationView.m in Sources */,
+				C597E86F1A630AA1002DF26A /* TSRefreshedAnnotationView.m in Sources */,
 				6F8000E516256BCE005D0263 /* ADClusterAnnotation.m in Sources */,
 				C597E86E1A630AA1002DF26A /* NSDictionary+MKMapRect.m in Sources */,
 				6F8000E616256BCE005D0263 /* ADClusterMapView.m in Sources */,
@@ -303,7 +309,7 @@
 				C597E88F1A66173D002DF26A /* TSStreetLightAnnotation.m in Sources */,
 				C597E86D1A630AA1002DF26A /* CLLocation+Utilities.m in Sources */,
 				C597E8901A66173D002DF26A /* CDAppDelegate.m in Sources */,
-				C597E88D1A66173D002DF26A /* ADClusterableAnnotation.m in Sources */,
+				C597E88D1A66173D002DF26A /* ADBaseAnnotation.m in Sources */,
 				C597E8981A6619C1002DF26A /* TSDemoClusteredAnnotationView.m in Sources */,
 				6F3C8B59162718D70081BF88 /* ADMapPointAnnotation.m in Sources */,
 			);
