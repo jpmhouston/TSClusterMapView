@@ -9,8 +9,8 @@
 #import <MapKit/MapKit.h>
 
 
-/*!
- * @discussion Do not subclass. This MKAnnotationView is a wrapper to keep the annotation view static during clustering.
+/**
+ * Do not subclass. This MKAnnotationView is a wrapper to keep the annotation view static during clustering.
  */
 @interface TSClusterAnnotationView : MKAnnotationView
 

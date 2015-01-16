@@ -176,6 +176,55 @@ int nearestEvenInt(int to) {
         [annotation shouldReset];
     }
     
+    //Annotations may not be on the map yet if there are available nearby setup for animation to the new cluster coordinate
+    for (ADMapCluster *cluster in unMatchedClusters) {
+        
+        ADClusterAnnotation *annotation;
+        ADClusterAnnotation *resetAnnotation = [unmatchedAnnotations anyObject];
+        
+        MKMapRect mRect = _mapView.visibleMapRect;
+        MKMapPoint eastMapPoint = MKMapPointMake(MKMapRectGetMinX(mRect), MKMapRectGetMidY(mRect));
+        MKMapPoint westMapPoint = MKMapPointMake(MKMapRectGetMaxX(mRect), MKMapRectGetMidY(mRect));
+        //Don't want annotations flying across the map
+        CLLocationDistance min = MKMetersBetweenMapPoints(eastMapPoint, westMapPoint)/2;
+        
+        for (ADClusterAnnotation *checkAnnotation in unmatchedAnnotations) {
+            
+            if (ADClusterCoordinate2DIsOffscreen(checkAnnotation.coordinate)) {
+                checkAnnotation.popInAnimation = YES;
+                resetAnnotation = checkAnnotation;
+                continue;
+            }
+            
+            if (CLLocationCoordinate2DIsApproxEqual(checkAnnotation.coordinate, cluster.clusterCoordinate, 0.00001)) {
+                annotation = checkAnnotation;
+                annotation.popInAnimation = NO;
+                break;
+            }
+            
+            CLLocationDistance distance = MKMetersBetweenMapPoints(MKMapPointForCoordinate(checkAnnotation.coordinate), MKMapPointForCoordinate(cluster.clusterCoordinate));
+            if (distance < min) {
+                annotation = checkAnnotation;
+            }
+        }
+        
+        if (annotation) {
+            annotation.coordinatePreAnimation = annotation.coordinate;
+        }
+        else if (resetAnnotation) {
+            annotation = resetAnnotation;
+            annotation.coordinatePreAnimation = cluster.clusterCoordinate;
+        }
+        else {
+            NSLog(@"Not enough annotations??");
+            break;
+        }
+        
+        annotation.cluster = cluster;
+        [unmatchedAnnotations removeObject:annotation];
+    }
+    
+    //Still need unmatched for a split into multiple from cluster
     if (stillNeedsMatch.count) {
         for (NSArray *array in stillNeedsMatch) {
             ADClusterAnnotation *clusterlessAnnotation = [unmatchedAnnotations anyObject];
@@ -190,21 +239,6 @@ int nearestEvenInt(int to) {
         }
     }
     
-    //Annotations may not be on the map yet
-    for (ADMapCluster *cluster in unMatchedClusters) {
-        ADClusterAnnotation *annotation = [unmatchedAnnotations anyObject];
-        if (!annotation) {
-            NSLog(@"Not enough annotations??");
-            break;
-        }
-        
-        [unmatchedAnnotations removeObject:annotation];
-        
-        annotation.cluster = cluster;
-        annotation.coordinatePreAnimation = cluster.clusterCoordinate;
-        annotation.popInAnimation = YES;
-    }
-    
     matchedAnnotations = [NSMutableSet setWithSet:_annotationPool];
     [matchedAnnotations minusSet:unmatchedAnnotations];
     
@@ -213,9 +247,20 @@ int nearestEvenInt(int to) {
     
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         
+//        for (ADClusterAnnotation *annotation in unmatchedAnnotations) {
+//            [annotation reset];
+//        }
+        
+        //Make sure we close callout of cluster if needed
         NSArray *selectedAnnotations = _mapView.selectedAnnotations;
-        for(id annotation in selectedAnnotations) {
-            [_mapView deselectAnnotation:annotation animated:NO];
+        for (ADClusterAnnotation *annotation in selectedAnnotations) {
+            if ([annotation isKindOfClass:[ADClusterAnnotation class]]) {
+                if ((annotation.type == ADClusterAnnotationTypeCluster &&
+                    !CLLocationCoordinate2DIsApproxEqual(annotation.coordinate, annotation.coordinatePreAnimation, .000001)) ||
+                    [removeAfterAnimation containsObject:annotation]) {
+                    [_mapView deselectAnnotation:annotation animated:NO];
+                }
+            }
         }
         
         for (ADClusterAnnotation *annotation in _annotationPool) {
@@ -230,9 +275,9 @@ int nearestEvenInt(int to) {
             }
             
             if (annotation.popInAnimation && _mapView.clusterAppearanceAnimated) {
-                CGAffineTransform t = CGAffineTransformMakeScale(0.001, 0.001);
-                t = CGAffineTransformTranslate(t, 0, -annotation.annotationView.frame.size.height);
-                annotation.annotationView.transform  = t;
+//                CGAffineTransform t = CGAffineTransformMakeScale(0.001, 0.001);
+//                t = CGAffineTransformTranslate(t, 0, -annotation.annotationView.frame.size.height);
+//                annotation.annotationView.transform  = t;
             }
             else {
                 annotation.popInAnimation = NO;
@@ -268,7 +313,7 @@ int nearestEvenInt(int to) {
 
 - (NSSet *)poolAnnotationsToRemove:(NSInteger)numberOfAnnotationsInPool freeAnnotations:(NSSet *)annotations {
     
-    NSInteger difference = _annotationPool.count - numberOfAnnotationsInPool;
+    NSInteger difference = _annotationPool.count - (numberOfAnnotationsInPool*2);
     
     if (difference > 0) {
         if (annotations.count >= difference) {

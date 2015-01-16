@@ -9,8 +9,8 @@
 #import <Foundation/Foundation.h>
 #import <MapKit/MapKit.h>
 
-/*!
- * @discussion Do not subclass. This is a wrapper to give annotations added to cluster a map point.
+/**
+ * Do not subclass. This is a wrapper to give annotations added to cluster a map point.
  */
 @interface ADMapPointAnnotation : NSObject
 

@@ -30,19 +30,17 @@
         
         self.canShowCallout = YES;
         
-        [self refreshView];
+        [self clusteringAnimation];
     }
     return self;
 }
 
-- (void)refreshView {
+- (void)clusteringAnimation {
     
     ADClusterAnnotation *clusterAnnotation = (ADClusterAnnotation *)self.annotation;
     
     NSUInteger count = clusterAnnotation.clusterCount;
     self.label.text = [self numberLabelText:count];
-    
-    self.accessibilityLabel = @"Map annotation cluster";
 }
 
 - (NSString *)numberLabelText:(float)count {
