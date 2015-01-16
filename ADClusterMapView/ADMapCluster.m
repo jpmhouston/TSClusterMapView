@@ -345,6 +345,7 @@
             if (completion) {
                 completion(NO);
             }
+            return;
         }
         
         //Go up two cluster to ensure a more complete result
@@ -585,9 +586,9 @@
 
 - (ADMapCluster *)clusterForAnnotation:(id<MKAnnotation>)annotation {
     
-    for (ADMapCluster *cluster in self.children) {
+    for (ADMapCluster *cluster in self.allChildClusters) {
         if (cluster.annotation.annotation == annotation) {
-            return cluster.annotation.annotation;
+            return cluster;
         }
     }
     
@@ -618,26 +619,6 @@
     }
     [clusters minusSet:clustersToRemove];
 }
-
-//- (BOOL)isAncestorForClusterInSet:(NSSet *)set {
-//    
-//    for (ADMapCluster *cluster in set) {
-//        if ([self isAncestorOf:cluster]) {
-//            return YES;
-//        }
-//    }
-//    
-//    return NO;
-//}
-//
-//- (BOOL)isChildOfClusterInSet:(NSSet *)clusters {
-//    for (ADMapCluster *cluster in clusters) {
-//        if ([cluster isAncestorOf:self] || [cluster isEqual:self]) {
-//            return YES;
-//        }
-//    }
-//    return NO;
-//}
 
 - (NSMutableSet *)findChildrenForClusterInSet:(NSSet *)set {
     

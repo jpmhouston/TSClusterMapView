@@ -98,7 +98,7 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
 
 - (void)setDefaults {
     
-    self.clustersOnScreen = 20;
+    self.clusterPreferredCountVisible = 20;
     self.clusterDiscriminationPower = 1.0;
     self.clusterShouldShowSubtitle = YES;
     self.clusterEdgeBufferSize = ADClusterBufferMedium;
@@ -115,16 +115,20 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
     _clusterEdgeBufferSize = clusterEdgeBufferSize;
 }
 
-- (void)setClustersOnScreen:(NSUInteger)clustersOnScreen {
+- (void)setClusterPreferredCountVisible:(NSUInteger)clustersOnScreen {
     
-    _clustersOnScreen = clustersOnScreen;
+    _clusterPreferredCountVisible = clustersOnScreen;
     
-    [self needsRefresh];
+    [self clusterVisibleMapRectForceRefresh:YES];
 }
 
 - (NSUInteger)numberOfClusters {
     
-    return _clustersOnScreen + (_clustersOnScreen*_clusterEdgeBufferSize);
+    NSUInteger adjusted = _clusterPreferredCountVisible + (_clusterPreferredCountVisible*_clusterEdgeBufferSize);
+    if (_clusterPreferredCountVisible > 6) {
+        return adjusted;
+    }
+    return _clusterPreferredCountVisible;
 }
 
 - (void)needsRefresh {
@@ -170,7 +174,7 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
         ADClusterMapView *strongSelf = weakSelf;
         
         if (added) {
-            [strongSelf clusterVisibleMapRectWithNewRootCluster:YES];
+            [strongSelf clusterVisibleMapRectForceRefresh:YES];
         }
         else {
             [strongSelf needsRefresh];
@@ -218,7 +222,7 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
                 ADClusterMapView *strongSelf = weakSelf;
                 
                 if (removed) {
-                    [strongSelf clusterVisibleMapRectWithNewRootCluster:YES];
+                    [strongSelf clusterVisibleMapRectForceRefresh:YES];
                 }
                 else {
                     [strongSelf needsRefresh];
@@ -419,7 +423,7 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
             
             strongSelf.rootMapCluster = mapCluster;
             
-            [strongSelf clusterVisibleMapRectWithNewRootCluster:YES];
+            [strongSelf clusterVisibleMapRectForceRefresh:YES];
             
             strongSelf.isBuildingRootCluster = NO;
         }];
@@ -469,7 +473,7 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
 }
 
 
-- (void)clusterVisibleMapRectWithNewRootCluster:(BOOL)isNewCluster {
+- (void)clusterVisibleMapRectForceRefresh:(BOOL)isNewCluster {
     
     if (!self.superview) {
         return;
@@ -632,7 +636,7 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
         return;
     }
     
-    [self clusterVisibleMapRectWithNewRootCluster:NO];
+    [self clusterVisibleMapRectForceRefresh:NO];
     
     if (_previouslySelectedAnnotation) {
         _shouldReselectAnnotation = YES;

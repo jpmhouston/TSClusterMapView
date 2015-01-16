@@ -16,9 +16,21 @@
 @property (weak, nonatomic) IBOutlet UITabBar *tabBar;
 @property (weak, nonatomic) IBOutlet UITabBarItem *bathroomTabBarItem;
 @property (weak, nonatomic) IBOutlet UITabBarItem *streetLightsTabBarItem;
+@property (weak, nonatomic) IBOutlet UIStepper *stepper;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentedControl;
+@property (weak, nonatomic) IBOutlet UISlider *slider;
+@property (weak, nonatomic) IBOutlet UILabel *label;
 
+- (IBAction)addAll:(id)sender;
+- (IBAction)removeAll:(id)sender;
+- (IBAction)stepperValueChanged:(id)sender;
+- (IBAction)segmentedControlValueChanged:(id)sender;
+- (IBAction)sliderValueChanged:(id)sender;
 
 @property (strong, nonatomic) NSMutableArray *streetLightAnnotations;
 @property (strong, nonatomic) NSMutableArray *bathroomAnnotations;
+
+@property (strong, nonatomic) NSMutableArray *streetLightAnnotationsAdded;
+@property (strong, nonatomic) NSMutableArray *bathroomAnnotationsAdded;
 
 @end

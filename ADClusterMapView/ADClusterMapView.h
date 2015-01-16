@@ -122,9 +122,9 @@ typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
 @property (readonly) NSArray * visibleClusterAnnotations;
 
 /**
- Max number of clusters visible at once. Default: 20
+ Suggested number of clusterable annotations visible at once. May exceed if buffer size not set to none. Default: 20
  */
-@property (assign, nonatomic) NSUInteger clustersOnScreen;
+@property (assign, nonatomic) NSUInteger clusterPreferredCountVisible;
 
 /**
  Creates a buffer zone surrounding visible map of clustered annotations. This helps simulate seemless loading of annotations and helps prevent annotations from appearing and dissapearing close to the edge. NOTE: For older devices or larger data sets try reducing the buffer size Default: ADClusterBufferMedium
@@ -142,7 +142,7 @@ typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
 @property (assign, nonatomic) BOOL clusterShouldShowSubtitle;
 
 /**
- Will always shows max number of clusters past this span delta level (zoom). Default: .005
+ Will alway show max number of clusters past this span delta level (zoom). Default: .005
  */
 @property (assign, nonatomic) CLLocationDegrees clusterMinimumLongitudeDelta;
 

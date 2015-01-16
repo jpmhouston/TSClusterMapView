@@ -1,10 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="bV8-3H-Edx">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="2h4-6r-fNb">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
     </dependencies>
     <scenes>
+        <!--Navigation Controller-->
+        <scene sceneID="6R3-V0-CB5">
+            <objects>
+                <navigationController id="2h4-6r-fNb" sceneMemberID="viewController">
+                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="dGq-ts-7dZ">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="bV8-3H-Edx" kind="relationship" relationship="rootViewController" id="rqf-9t-Eo9"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="rkv-eI-zya" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-99" y="193"/>
+        </scene>
         <!--Map View Controller-->
         <scene sceneID="m02-Ci-2OQ">
             <objects>
@@ -37,6 +54,50 @@
                                     <outlet property="delegate" destination="bV8-3H-Edx" id="Ytw-Li-t6b"/>
                                 </connections>
                             </tabBar>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kkO-TM-PwV">
+                                <rect key="frame" x="0.0" y="475" width="320" height="44"/>
+                                <items>
+                                    <barButtonItem title="- All" width="87" id="xOP-hX-307">
+                                        <connections>
+                                            <action selector="removeAll:" destination="bV8-3H-Edx" id="pts-sS-BYq"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem width="94" style="plain" id="VkL-pB-8I6">
+                                        <stepper key="customView" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" maximumValue="100" id="XLp-LT-P49">
+                                            <rect key="frame" x="-47" y="-14" width="94" height="29"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <connections>
+                                                <action selector="stepperValueChanged:" destination="bV8-3H-Edx" eventType="valueChanged" id="z88-3g-c15"/>
+                                            </connections>
+                                        </stepper>
+                                    </barButtonItem>
+                                    <barButtonItem title="+ All" width="87" id="SNs-X0-2iu">
+                                        <connections>
+                                            <action selector="addAll:" destination="bV8-3H-Edx" id="Cg9-uP-Pn2"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="st3-K2-lqv">
+                                <rect key="frame" x="0.0" y="431" width="320" height="44"/>
+                                <items>
+                                    <barButtonItem style="plain" id="lE8-Ee-tmz">
+                                        <slider key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="20" minValue="1" maxValue="100" continuous="NO" id="43g-Ev-1XX">
+                                            <rect key="frame" x="14" y="6" width="222" height="32"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <connections>
+                                                <action selector="sliderValueChanged:" destination="bV8-3H-Edx" eventType="valueChanged" id="iU2-bh-dLC"/>
+                                            </connections>
+                                        </slider>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="20" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yyq-po-JOS">
+                                <rect key="frame" x="262" y="442" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -48,23 +109,42 @@
                             <constraint firstItem="t7T-3w-Ldr" firstAttribute="leading" secondItem="deA-x0-VJI" secondAttribute="leading" id="yPn-FM-FK6"/>
                             <constraint firstItem="XdT-y2-VGv" firstAttribute="top" secondItem="BFz-fq-RjB" secondAttribute="bottom" id="ykZ-b3-E1A"/>
                         </constraints>
-                        <variation key="heightClass=compact"/>
                     </view>
+                    <navigationItem key="navigationItem" id="cpp-TE-B3n">
+                        <segmentedControl key="titleView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="2" id="zVg-tm-hei">
+                            <rect key="frame" x="9" y="7" width="302" height="30"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <segments>
+                                <segment title="None"/>
+                                <segment title="Small"/>
+                                <segment title="Medium"/>
+                                <segment title="Large"/>
+                            </segments>
+                            <connections>
+                                <action selector="segmentedControlValueChanged:" destination="bV8-3H-Edx" eventType="valueChanged" id="Dsq-hJ-DH8"/>
+                            </connections>
+                        </segmentedControl>
+                    </navigationItem>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
                     <connections>
                         <outlet property="bathroomTabBarItem" destination="3TL-Jc-YGW" id="loS-8C-fKw"/>
+                        <outlet property="label" destination="Yyq-po-JOS" id="OCl-TO-LO9"/>
                         <outlet property="mapView" destination="BFz-fq-RjB" id="Ywq-VL-ntq"/>
+                        <outlet property="segmentedControl" destination="zVg-tm-hei" id="2fJ-Vt-1Gc"/>
+                        <outlet property="slider" destination="43g-Ev-1XX" id="w0Y-tG-mP5"/>
+                        <outlet property="stepper" destination="XLp-LT-P49" id="3Fp-Y5-48X"/>
                         <outlet property="streetLightsTabBarItem" destination="JUB-Bh-gfZ" id="QA3-VS-3jv"/>
                         <outlet property="tabBar" destination="t7T-3w-Ldr" id="dwV-vV-fQm"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="eYT-2I-6HF" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="481" y="208"/>
+            <point key="canvasLocation" x="434" y="191.5"/>
         </scene>
     </scenes>
     <resources>
         <image name="Bathroom" width="31" height="25"/>
         <image name="StreetLight" width="36" height="25"/>
     </resources>
+    <color key="tintColor" red="0.0" green="0.62352941176470589" blue="0.83921568627450982" alpha="1" colorSpace="calibratedRGB"/>
 </document>
