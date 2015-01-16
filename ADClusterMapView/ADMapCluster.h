@@ -115,4 +115,12 @@ typedef void(^KdtreeCompletionBlock)(ADMapCluster *mapCluster);
  */
 - (ADMapCluster *)clusterForAnnotation:(id<MKAnnotation>)annotation;
 
+
+
+//- (BOOL)isAncestorForClusterInSet:(NSSet *)set;
+//- (BOOL)isChildOfClusterInSet:(NSSet *)clusters;
+
+- (NSMutableSet *)findChildrenForClusterInSet:(NSSet *)set;
+- (ADMapCluster *)findAncestorForClusterInSet:(NSSet *)set;
+
 @end

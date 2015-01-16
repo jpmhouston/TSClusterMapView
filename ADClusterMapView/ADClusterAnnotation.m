@@ -21,7 +21,6 @@ BOOL ADClusterCoordinate2DIsOffscreen(CLLocationCoordinate2D coord) {
     if (self) {
         _cluster = nil;
         self.coordinate = kADCoordinate2DOffscreen;
-        _type = ADClusterAnnotationTypeUnknown;
         _shouldBeRemovedAfterAnimation = NO;
         _title = @"Title";
     }
@@ -37,11 +36,11 @@ BOOL ADClusterCoordinate2DIsOffscreen(CLLocationCoordinate2D coord) {
         _needsRefresh = NO;
     }
     
-    [self willChangeValueForKey:@"title"];
-    [self willChangeValueForKey:@"subtitle"];
+//    [self willChangeValueForKey:@"title"];
+//    [self willChangeValueForKey:@"subtitle"];
     _cluster = cluster;
-    [self didChangeValueForKey:@"subtitle"];
-    [self didChangeValueForKey:@"title"];
+//    [self didChangeValueForKey:@"subtitle"];
+//    [self didChangeValueForKey:@"title"];
 }
 
 - (NSString *)title {
@@ -55,19 +54,17 @@ BOOL ADClusterCoordinate2DIsOffscreen(CLLocationCoordinate2D coord) {
 - (void)setCoordinate:(CLLocationCoordinate2D)coordinate {
     
     _coordinate = coordinate;
-    _coordinatePreAnimation = coordinate;
+    _coordinatePreAnimation = kCLLocationCoordinate2DInvalid;
 }
 
 - (void)reset {
     self.cluster = nil;
     self.coordinate = kADCoordinate2DOffscreen;
-//    self.coordinatePostAnimation = kADCoordinate2DOffscreen;
 }
 
 - (void)shouldReset {
     self.cluster = nil;
     self.coordinatePreAnimation = kADCoordinate2DOffscreen;
-//    self.coordinatePostAnimation = kADCoordinate2DOffscreen;
 }
 
 - (NSArray *)originalAnnotations {
@@ -75,9 +72,19 @@ BOOL ADClusterCoordinate2DIsOffscreen(CLLocationCoordinate2D coord) {
     return self.cluster.originalAnnotations;
 }
 
-- (NSUInteger *)clusterCount {
+- (NSUInteger)clusterCount {
     
     return _cluster.clusterCount;
 }
+
+- (ADClusterAnnotationType)type {
+    
+    if (self.clusterCount > 1) {
+        return ADClusterAnnotationTypeCluster;
+    }
+    
+    return ADClusterAnnotationTypeLeaf;
+}
+
 
 @end

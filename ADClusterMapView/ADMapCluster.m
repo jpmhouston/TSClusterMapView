@@ -598,9 +598,9 @@
 #pragma mark - Clean Clusters
 
 - (void)cleanClusters:(NSMutableSet *)clusters fromAncestorsOfClusters:(NSSet *)referenceClusters {
-    NSMutableSet * clustersToRemove = [[NSMutableSet alloc] init];
-    for (ADMapCluster * cluster in clusters) {
-        for (ADMapCluster * referenceCluster in referenceClusters) {
+    NSMutableSet *clustersToRemove = [[NSMutableSet alloc] init];
+    for (ADMapCluster *cluster in clusters) {
+        for (ADMapCluster *referenceCluster in referenceClusters) {
             if ([cluster isAncestorOf:referenceCluster]) {
                 [clustersToRemove addObject:cluster];
                 break;
@@ -610,12 +610,54 @@
     [clusters minusSet:clustersToRemove];
 }
 - (void)cleanClusters:(NSMutableSet *)clusters outsideMapRect:(MKMapRect)mapRect {
-    NSMutableSet * clustersToRemove = [[NSMutableSet alloc] init];
-    for (ADMapCluster * cluster in clusters) {
+    NSMutableSet *clustersToRemove = [[NSMutableSet alloc] init];
+    for (ADMapCluster *cluster in clusters) {
         if (!MKMapRectContainsPoint(mapRect, MKMapPointForCoordinate(cluster.clusterCoordinate))) {
             [clustersToRemove addObject:cluster];
         }
     }
     [clusters minusSet:clustersToRemove];
 }
+
+//- (BOOL)isAncestorForClusterInSet:(NSSet *)set {
+//    
+//    for (ADMapCluster *cluster in set) {
+//        if ([self isAncestorOf:cluster]) {
+//            return YES;
+//        }
+//    }
+//    
+//    return NO;
+//}
+//
+//- (BOOL)isChildOfClusterInSet:(NSSet *)clusters {
+//    for (ADMapCluster *cluster in clusters) {
+//        if ([cluster isAncestorOf:self] || [cluster isEqual:self]) {
+//            return YES;
+//        }
+//    }
+//    return NO;
+//}
+
+- (NSMutableSet *)findChildrenForClusterInSet:(NSSet *)set {
+    
+    NSMutableSet *children = [[NSMutableSet alloc] initWithCapacity:set.count];
+    for (ADMapCluster *cluster in set) {
+        if ([self isAncestorOf:cluster]) {
+            [children addObject:cluster];
+        }
+    }
+    
+    return children;
+}
+
+- (ADMapCluster *)findAncestorForClusterInSet:(NSSet *)set {
+    for (ADMapCluster *cluster in set) {
+        if ([cluster isAncestorOf:self] || [cluster isEqual:self]) {
+            return cluster;
+        }
+    }
+    return nil;
+}
+
 @end

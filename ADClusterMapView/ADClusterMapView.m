@@ -437,10 +437,8 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
             _clusterAnnotationsPool = [[NSMutableSet alloc] initWithCapacity: numberOfAnnotationsInPool*2];
             for (int i = 0; i < numberOfAnnotationsInPool; i++) {
                 ADClusterAnnotation * annotation = [[ADClusterAnnotation alloc] init];
-                annotation.type = ADClusterAnnotationTypeLeaf;
                 [_clusterAnnotationsPool addObject:annotation];
                 annotation = [[ADClusterAnnotation alloc] init];
-                annotation.type = ADClusterAnnotationTypeCluster;
                 [_clusterAnnotationsPool addObject:annotation];
             }
         
@@ -470,12 +468,10 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
             
             for (int i = 0; i < abs((int)difference); i++) {
                 ADClusterAnnotation * annotation = [[ADClusterAnnotation alloc] init];
-                annotation.type = ADClusterAnnotationTypeLeaf;
                 [_clusterAnnotationsPool addObject:annotation];
                 [toAdd addObject:annotation];
                 
                 annotation = [[ADClusterAnnotation alloc] init];
-                annotation.type = ADClusterAnnotationTypeCluster;
                 [_clusterAnnotationsPool addObject:annotation];
                 [toAdd addObject:annotation];
             }

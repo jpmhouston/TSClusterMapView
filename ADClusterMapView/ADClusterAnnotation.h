@@ -35,7 +35,7 @@ typedef enum {
 /*!
  * @discussion Type of annotation, cluster or single.
  */
-@property (nonatomic) ADClusterAnnotationType type;
+@property (readonly) ADClusterAnnotationType type;
 
 /*!
  * @discussion Cluster tree of annotations.
@@ -60,13 +60,12 @@ typedef enum {
 /*!
  * @discussion Number of annotations represented by the annotation
  */
-@property (nonatomic, readonly) NSUInteger * clusterCount;
+@property (nonatomic, readonly) NSUInteger clusterCount;
 
 @property (nonatomic, assign) BOOL needsRefresh;
 
 - (void)shouldReset;
 @property (nonatomic, assign) CLLocationCoordinate2D coordinatePreAnimation;
-@property (nonatomic, assign) CLLocationCoordinate2D coordinatePostAnimation;
 
 - (void)reset;
 

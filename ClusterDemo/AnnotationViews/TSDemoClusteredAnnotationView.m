@@ -48,7 +48,7 @@
 - (NSString *)numberLabelText:(float)count {
     
     if (!count) {
-        count = 1;
+        return nil;
     }
     
     if (count > 1000) {
