@@ -191,14 +191,12 @@ int nearestEvenInt(int to) {
         for (ADClusterAnnotation *checkAnnotation in unmatchedAnnotations) {
             
             if (ADClusterCoordinate2DIsOffscreen(checkAnnotation.coordinate)) {
-                checkAnnotation.popInAnimation = YES;
                 resetAnnotation = checkAnnotation;
                 continue;
             }
             
             if (CLLocationCoordinate2DIsApproxEqual(checkAnnotation.coordinate, cluster.clusterCoordinate, 0.00001)) {
                 annotation = checkAnnotation;
-                annotation.popInAnimation = NO;
                 break;
             }
             
@@ -210,10 +208,12 @@ int nearestEvenInt(int to) {
         
         if (annotation) {
             annotation.coordinatePreAnimation = annotation.coordinate;
+            annotation.popInAnimation = NO;
         }
         else if (resetAnnotation) {
             annotation = resetAnnotation;
             annotation.coordinatePreAnimation = cluster.clusterCoordinate;
+            annotation.popInAnimation = YES;
         }
         else {
             NSLog(@"Not enough annotations??");
@@ -275,27 +275,22 @@ int nearestEvenInt(int to) {
             }
             
             if (annotation.popInAnimation && _mapView.clusterAppearanceAnimated) {
-//                CGAffineTransform t = CGAffineTransformMakeScale(0.001, 0.001);
-//                t = CGAffineTransformTranslate(t, 0, -annotation.annotationView.frame.size.height);
-//                annotation.annotationView.transform  = t;
+                CGAffineTransform t = CGAffineTransformMakeScale(0.001, 0.001);
+                t = CGAffineTransformTranslate(t, 0, -annotation.annotationView.frame.size.height);
+                annotation.annotationView.transform  = t;
             }
-            else {
-                annotation.popInAnimation = NO;
-            }
+            annotation.popInAnimation = NO;
         }
         
         TSClusterAnimationOptions *options = _mapView.clusterAnimationOptions;
         [UIView animateWithDuration:options.duration delay:0.0 usingSpringWithDamping:options.springDamping initialSpringVelocity:options.springVelocity options:options.viewAnimationOptions animations:^{
             for (ADClusterAnnotation * annotation in _annotationPool) {
                 if (annotation.cluster) {
-                    if (annotation.popInAnimation) {
-                        annotation.annotationView.transform = CGAffineTransformIdentity;
-                        annotation.popInAnimation = NO;
-                    }
                     annotation.coordinate = annotation.cluster.clusterCoordinate;
                     [annotation.annotationView animateView];
                 }
-            }        
+                annotation.annotationView.transform = CGAffineTransformIdentity;
+            }
         } completion:^(BOOL finished) {
             
             for (ADClusterAnnotation *annotation in [unmatchedAnnotations setByAddingObjectsFromSet:removeAfterAnimation]) {
