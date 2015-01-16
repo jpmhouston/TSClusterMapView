@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "ADClusterMapView.h"
 
-typedef void(^ClusterOperationCompletionBlock)(MKMapRect clusteredRect, BOOL finished);
+typedef void(^ClusterOperationCompletionBlock)(MKMapRect clusteredRect, BOOL finished, NSSet *poolAnnotationsToRemove);
 
 @interface TSClusterOperation : NSOperation
 

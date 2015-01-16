@@ -36,11 +36,7 @@ BOOL ADClusterCoordinate2DIsOffscreen(CLLocationCoordinate2D coord) {
         _needsRefresh = NO;
     }
     
-//    [self willChangeValueForKey:@"title"];
-//    [self willChangeValueForKey:@"subtitle"];
     _cluster = cluster;
-//    [self didChangeValueForKey:@"subtitle"];
-//    [self didChangeValueForKey:@"title"];
 }
 
 - (NSString *)title {
@@ -78,6 +74,10 @@ BOOL ADClusterCoordinate2DIsOffscreen(CLLocationCoordinate2D coord) {
 }
 
 - (ADClusterAnnotationType)type {
+    
+    if (!self.clusterCount) {
+        return ADClusterAnnotationTypeUnknown;
+    }
     
     if (self.clusterCount > 1) {
         return ADClusterAnnotationTypeCluster;

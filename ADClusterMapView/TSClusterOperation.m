@@ -25,7 +25,8 @@
 
 @property (assign, nonatomic) NSUInteger numberOfClusters;
 @property (assign, nonatomic) MKMapRect clusteringRect;
-@property (nonatomic, strong) NSSet *clusterAnnotations;
+@property (nonatomic, strong) NSMutableSet *annotationPool;
+@property (nonatomic, strong) NSMutableSet *poolAnnotationRemoval;
 
 @end
 
@@ -38,7 +39,7 @@
         self.mapView = mapView;
         self.rootMapCluster = rootCluster;
         self.finishedBlock = completion;
-        self.clusterAnnotations = [clusterAnnotations copy];
+        self.annotationPool = [clusterAnnotations copy];
         self.numberOfClusters = numberOfClusters;
         self.clusteringRect = rect;
     }
@@ -56,7 +57,6 @@
 int nearestEvenInt(int to) {
     return (to % 2 == 0) ? to : (to + 1);
 }
-
 
 - (void)clusterInMapRect:(MKMapRect)clusteredMapRect {
     
@@ -95,19 +95,19 @@ int nearestEvenInt(int to) {
     
     if (self.isCancelled) {
         if (_finishedBlock) {
-            _finishedBlock(clusteredMapRect, NO);
+            _finishedBlock(clusteredMapRect, NO, nil);
         }
         return;
     }
     
-    NSMutableSet *unmatchedAnnotations = [[NSMutableSet alloc] initWithCapacity:_clusterAnnotations.count];
-    for (ADClusterAnnotation *annotation in _clusterAnnotations) {
+    NSMutableSet *unmatchedAnnotations = [[NSMutableSet alloc] initWithCapacity:_annotationPool.count];
+    for (ADClusterAnnotation *annotation in _annotationPool) {
         if (!annotation.cluster) {
             [unmatchedAnnotations addObject:annotation];
         }
     }
     
-    NSMutableSet *matchedAnnotations = [[NSMutableSet alloc] initWithSet:_clusterAnnotations];
+    NSMutableSet *matchedAnnotations = [[NSMutableSet alloc] initWithSet:_annotationPool];
     [matchedAnnotations minusSet:unmatchedAnnotations];
     
     //Clusters that need to be visible after the animation
@@ -164,8 +164,7 @@ int nearestEvenInt(int to) {
             continue;
         }
         
-        //Whoops what happened?
-        NSLog(@"No ancestor or child found");
+        //No ancestor or child found probably off screen
         [unmatchedAnnotations addObject:annotation];
         [annotation shouldReset];
     }
@@ -184,7 +183,7 @@ int nearestEvenInt(int to) {
         annotation.coordinatePreAnimation = cluster.clusterCoordinate;
     }
     
-    matchedAnnotations = [NSMutableSet setWithSet:_clusterAnnotations];
+    matchedAnnotations = [NSMutableSet setWithSet:_annotationPool];
     [matchedAnnotations minusSet:unmatchedAnnotations];
     
     //Create a circle around coordinate to display all single annotations that overlap
@@ -197,13 +196,13 @@ int nearestEvenInt(int to) {
             [_mapView deselectAnnotation:annotation animated:NO];
         }
         
-        for (ADClusterAnnotation *annotation in _clusterAnnotations) {
+        for (ADClusterAnnotation *annotation in _annotationPool) {
             if (CLLocationCoordinate2DIsValid(annotation.coordinatePreAnimation)) {
                 annotation.coordinate = annotation.coordinatePreAnimation;
             }
         }
         
-        for (ADClusterAnnotation * annotation in _clusterAnnotations) {
+        for (ADClusterAnnotation * annotation in _annotationPool) {
             if (annotation.cluster && annotation.needsRefresh) {
                 [_mapView refreshClusterAnnotation:annotation];
             }
@@ -211,7 +210,7 @@ int nearestEvenInt(int to) {
         
         [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
             
-            for (ADClusterAnnotation * annotation in _clusterAnnotations) {
+            for (ADClusterAnnotation * annotation in _annotationPool) {
                 if (annotation.cluster) {
                     annotation.coordinate = annotation.cluster.clusterCoordinate;
 //                    [annotation.annotationView refreshView];
@@ -224,22 +223,26 @@ int nearestEvenInt(int to) {
                 [annotation reset];
             }
             
+            NSSet *toRemove = [self poolAnnotationsToRemove:_numberOfClusters freeAnnotations:[unmatchedAnnotations setByAddingObjectsFromSet:removeAfterAnimation]];
+            
             if (_finishedBlock) {
-                _finishedBlock(clusteredMapRect, YES);
+                _finishedBlock(clusteredMapRect, YES, toRemove);
             }
         }];
     }];
 }
 
-- (BOOL)annotation:(ADClusterAnnotation *)annotation belongsToClusters:(NSSet *)clusters {
-    if (annotation.cluster) {
-        for (ADMapCluster * cluster in clusters) {
-            if ([cluster isAncestorOf:annotation.cluster] || [cluster isEqual:annotation.cluster]) {
-                return YES;
-            }
+- (NSSet *)poolAnnotationsToRemove:(NSInteger)numberOfAnnotationsInPool freeAnnotations:(NSSet *)annotations {
+    
+    NSInteger difference = _annotationPool.count - numberOfAnnotationsInPool;
+    
+    if (difference > 0) {
+        if (annotations.count >= difference) {
+            return [NSSet setWithArray:[annotations.allObjects subarrayWithRange:NSMakeRange(0, difference)]];
         }
     }
-    return NO;
+    
+    return nil;
 }
 
 #pragma mark - Spread close annotations

@@ -433,53 +433,38 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
         return;
     }
     
+    //Count for splits
+    numberOfAnnotationsInPool*=2;
+    
+    NSArray *toAdd;
+    
     if (!_clusterAnnotationsPool) {
-            _clusterAnnotationsPool = [[NSMutableSet alloc] initWithCapacity: numberOfAnnotationsInPool*2];
-            for (int i = 0; i < numberOfAnnotationsInPool; i++) {
-                ADClusterAnnotation * annotation = [[ADClusterAnnotation alloc] init];
-                [_clusterAnnotationsPool addObject:annotation];
-                annotation = [[ADClusterAnnotation alloc] init];
-                [_clusterAnnotationsPool addObject:annotation];
-            }
+        _clusterAnnotationsPool = [[NSMutableSet alloc] initWithCapacity:numberOfAnnotationsInPool];
+        for (int i = 0; i < numberOfAnnotationsInPool; i++) {
+            ADClusterAnnotation * annotation = [[ADClusterAnnotation alloc] init];
+            [_clusterAnnotationsPool addObject:annotation];
+        }
         
-        NSArray *toAdd = _clusterAnnotationsPool.allObjects;
+        toAdd = _clusterAnnotationsPool.allObjects;
+    }
+    else if (numberOfAnnotationsInPool > _clusterAnnotationsPool.count) {
         
+        NSUInteger difference = numberOfAnnotationsInPool - _clusterAnnotationsPool.count;
+        NSMutableArray *mutableAdd = [[NSMutableArray alloc] initWithCapacity:difference];
+        
+        for (int i = 0; i < difference; i++) {
+            ADClusterAnnotation * annotation = [[ADClusterAnnotation alloc] init];
+            [_clusterAnnotationsPool addObject:annotation];
+            [mutableAdd addObject:annotation];
+        }
+        
+        toAdd = mutableAdd;
+    }
+    
+    if (toAdd.count) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [super addAnnotations:toAdd];
         }];
-        
-        return;
-    }
-    else {
-        NSInteger difference = _clusterAnnotationsPool.count/2 - numberOfAnnotationsInPool;
-        
-        if (difference > 0) {
-            NSMutableArray *toRemove = [[NSMutableArray alloc] initWithCapacity:abs((int)difference*2)];
-            
-            [toRemove addObjectsFromArray:[_clusterAnnotationsPool.allObjects subarrayWithRange:NSMakeRange(0, difference*2)]];
-            [_clusterAnnotationsPool minusSet:[NSSet setWithArray:toRemove]];
-            
-            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                [super removeAnnotations:toRemove];
-            }];
-        }
-        else {
-            NSMutableArray *toAdd = [[NSMutableArray alloc] initWithCapacity:abs((int)difference*2)];
-            
-            for (int i = 0; i < abs((int)difference); i++) {
-                ADClusterAnnotation * annotation = [[ADClusterAnnotation alloc] init];
-                [_clusterAnnotationsPool addObject:annotation];
-                [toAdd addObject:annotation];
-                
-                annotation = [[ADClusterAnnotation alloc] init];
-                [_clusterAnnotationsPool addObject:annotation];
-                [toAdd addObject:annotation];
-            }
-            
-            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                [super addAnnotations:toAdd];
-            }];
-        }
     }
 }
 
@@ -511,13 +496,7 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
         }
     }
     
-    //NSLog(@"clusterInMapRect");
-    
-    //We manage a pool of annotations. In case we have N splits and N joins in a single animation we have to double up the actual number of annotations that belongs to the pool.
-    NSInteger numberOfAnnotationsInPool = 2 * [self numberOfClusters];
-    if (_clusterAnnotationsPool.count != numberOfAnnotationsInPool * 2) {
-        [self initAnnotationPools:numberOfAnnotationsInPool];
-    }
+    [self initAnnotationPools:[self numberOfClusters]];
     
     if (_clusterOperation.isExecuting) {
         [_clusterOperation cancel];
@@ -531,9 +510,11 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
                                                         rootCluster:_rootMapCluster
                                                showNumberOfClusters:[self numberOfClusters]
                                                  clusterAnnotations:self.clusterAnnotationsPool
-                                                         completion:^(MKMapRect clusteredRect, BOOL finished) {
+                                                         completion:^(MKMapRect clusteredRect, BOOL finished, NSSet *poolAnnotationsToRemove) {
                                                              
                                                              ADClusterMapView *strongSelf = weakSelf;
+                                                             
+                                                             [strongSelf poolAnnotationsToRemove:poolAnnotationsToRemove];
                                                              
                                                              if (finished) {
                                                                  strongSelf.previousVisibleMapRectClustered = clusteredRect;
@@ -548,6 +529,16 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
     [_clusterOperationQueue setSuspended:NO];
 }
 
+- (void)poolAnnotationsToRemove:(NSSet *)remove {
+    
+    if (!remove.count) {
+        return;
+    }
+    
+    [super removeAnnotations:remove.allObjects];
+    
+    [_clusterAnnotationsPool minusSet:remove];
+}
 
 - (MKMapRect)visibleMapRectWithBuffer:(ADClusterBufferSize)bufferSize; {
     
