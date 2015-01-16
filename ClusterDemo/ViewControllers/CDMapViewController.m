@@ -164,7 +164,7 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
 - (IBAction)stepperValueChanged:(id)sender {
     
     if (_tabBar.selectedItem == _bathroomTabBarItem) {
-        if (_stepper.value > _bathroomAnnotationsAdded.count) {
+        if (_stepper.value >= _bathroomAnnotationsAdded.count) {
             [self addNewBathroom];
         }
         else {
@@ -172,7 +172,7 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
         }
     }
     else if (_tabBar.selectedItem == _streetLightsTabBarItem) {
-        if (_stepper.value > _streetLightAnnotationsAdded.count) {
+        if (_stepper.value >= _streetLightAnnotationsAdded.count) {
             [self addNewStreetLight];
         }
         else {

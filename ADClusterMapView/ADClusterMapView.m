@@ -14,27 +14,17 @@
 #import "CLLocation+Utilities.h"
 #import "TSClusterOperation.h"
 
-NSString * const TSMapViewWillChangeRegion = @"TSMapViewWillChangeRegion";
-NSString * const TSMapViewDidChangeRegion = @"TSMapViewDidChangeRegion";
-
 static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewID-private";
-
 
 @interface ADClusterMapView ()
 
 @property (nonatomic, weak) id <ADClusterMapViewDelegate>  secondaryDelegate;
-
-@property (nonatomic, assign) BOOL shouldReselectAnnotation;
-
-@property (nonatomic, strong) id<MKAnnotation> previouslySelectedAnnotation;
 
 //Clustering
 @property (nonatomic, strong) ADMapCluster *rootMapCluster;
 
 @property (nonatomic, strong) NSMutableSet *clusterAnnotationsPool;
 @property (nonatomic, strong) NSMutableSet *clusterableAnnotationsAdded;
-
-@property (nonatomic, assign) BOOL isBuildingRootCluster;
 
 @property (nonatomic, assign) MKMapRect previousVisibleMapRectClustered;
 
@@ -43,6 +33,8 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
 @property (nonatomic, strong) TSClusterOperation *clusterOperation;
 
 @property (nonatomic, strong) NSCache *annotationViewCache;
+
+@property (nonatomic, strong) NSOperationQueue *treeOperationQueue;
 
 @end
 
@@ -78,6 +70,7 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
     [_treeOperationQueue setMaxConcurrentOperationCount:1];
     [_treeOperationQueue setName:@"Tree Building Queue"];
     
+    _clusterAnimationOptions = [TSClusterAnimationOptions defaultOptions];
     _annotationViewCache = [[NSCache alloc] init];
     
     UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self
@@ -93,6 +86,7 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
     //No longer relevant to display stop operations
     if (!self.superview) {
         [_clusterOperationQueue cancelAllOperations];
+        [_treeOperationQueue cancelAllOperations];
     }
 }
 
@@ -164,23 +158,26 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
         _clusterableAnnotationsAdded = [[NSMutableSet alloc] initWithObjects:annotation, nil];
     }
     
-    if (refresh) {
+    if (refresh || _treeOperationQueue.operationCount > 3) {
         [self needsRefresh];
         return;
     }
     
-    //Attempt to insert in existing root cluster - will fail if small data set or an outlier
+    
     __weak ADClusterMapView *weakSelf = self;
-    [_rootMapCluster mapView:self addAnnotation:[[ADMapPointAnnotation alloc] initWithAnnotation:annotation] completion:^(BOOL added) {
-        
-        ADClusterMapView *strongSelf = weakSelf;
-        
-        if (added) {
-            [strongSelf clusterVisibleMapRectForceRefresh:YES];
-        }
-        else {
-            [strongSelf needsRefresh];
-        }
+    [_treeOperationQueue addOperationWithBlock:^{
+        //Attempt to insert in existing root cluster - will fail if small data set or an outlier
+        [_rootMapCluster mapView:self addAnnotation:[[ADMapPointAnnotation alloc] initWithAnnotation:annotation] completion:^(BOOL added) {
+            
+            ADClusterMapView *strongSelf = weakSelf;
+            
+            if (added) {
+                [strongSelf clusterVisibleMapRectForceRefresh:YES];
+            }
+            else {
+                [strongSelf needsRefresh];
+            }
+        }];
     }];
 }
 
@@ -214,21 +211,25 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
         [_clusterableAnnotationsAdded removeObject:annotation];
         
         //Small data set just rebuild
-        if (_clusterableAnnotationsAdded.count < 500) {
+        if (_clusterableAnnotationsAdded.count < 500 || _treeOperationQueue.operationCount > 3) {
             [self needsRefresh];
         }
         else {
+            
+            
             __weak ADClusterMapView *weakSelf = self;
-            [_rootMapCluster mapView:self removeAnnotation:annotation completion:^(BOOL removed) {
-                
-                ADClusterMapView *strongSelf = weakSelf;
-                
-                if (removed) {
-                    [strongSelf clusterVisibleMapRectForceRefresh:YES];
-                }
-                else {
-                    [strongSelf needsRefresh];
-                }
+            [_treeOperationQueue addOperationWithBlock:^{
+                [weakSelf.rootMapCluster mapView:self removeAnnotation:annotation completion:^(BOOL removed) {
+                    
+                    ADClusterMapView *strongSelf = weakSelf;
+                    
+                    if (removed) {
+                        [strongSelf clusterVisibleMapRectForceRefresh:YES];
+                    }
+                    else {
+                        [strongSelf needsRefresh];
+                    }
+                }];
             }];
         }
     }
@@ -402,14 +403,12 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
         return;
     }
     
-    _isBuildingRootCluster = YES;
-    //NSLog(@"isSettingAnnotations");
+    annotations = [annotations copy];
     
-    NSOperationQueue *queue = [NSOperationQueue currentQueue];
-    if (!queue || queue == [NSOperationQueue mainQueue]) {
-        queue = [NSOperationQueue new];
-    }
-    [queue addOperationWithBlock:^{
+    [_treeOperationQueue cancelAllOperations];
+    
+    __weak ADClusterMapView *weakSelf = self;
+    [_treeOperationQueue addOperationWithBlock:^{
         
         // use wrapper annotations that expose a MKMapPoint property instead of a CLLocationCoordinate2D property
         NSMutableSet * mapPointAnnotations = [[NSMutableSet alloc] initWithCapacity:annotations.count];
@@ -418,7 +417,6 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
             [mapPointAnnotations addObject:mapPointAnnotation];
         }
         
-        __weak ADClusterMapView *weakSelf = self;
         [ADMapCluster rootClusterForAnnotations:mapPointAnnotations mapView:self completion:^(ADMapCluster *mapCluster) {
             
             ADClusterMapView *strongSelf = weakSelf;
@@ -426,8 +424,6 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
             strongSelf.rootMapCluster = mapCluster;
             
             [strongSelf clusterVisibleMapRectForceRefresh:YES];
-            
-            strongSelf.isBuildingRootCluster = NO;
         }];
     }];
 }
@@ -623,39 +619,22 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
 
 - (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated {
     
-    [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    
     if ([_secondaryDelegate respondsToSelector:@selector(mapView:regionWillChangeAnimated:)]) {
         [_secondaryDelegate mapView:self regionWillChangeAnimated:animated];
     }
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:TSMapViewWillChangeRegion object:nil];
 }
 
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated {
     
-    if (MKMapRectContainsPoint(self.visibleMapRect, MKMapPointForCoordinate(kADCoordinate2DOffscreen))) {
-        return;
-    }
+//    if (MKMapRectContainsPoint(self.visibleMapRect, MKMapPointForCoordinate(kADCoordinate2DOffscreen))) {
+//        return;
+//    }
     
     [self clusterVisibleMapRectForceRefresh:NO];
     
-    if (_previouslySelectedAnnotation) {
-        _shouldReselectAnnotation = YES;
-    }
-    for (id<MKAnnotation> annotation in [self selectedAnnotations]) {
-        [self deselectAnnotation:annotation animated:YES];
-    }
     if ([_secondaryDelegate respondsToSelector:@selector(mapView:regionDidChangeAnimated:)]) {
         [_secondaryDelegate mapView:self regionDidChangeAnimated:animated];
     }
-    if (_shouldReselectAnnotation) {
-        _shouldReselectAnnotation = NO;
-        [self selectAnnotation:_previouslySelectedAnnotation animated:YES];
-        _previouslySelectedAnnotation = nil;
-    }
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:TSMapViewDidChangeRegion object:nil];
 }
 
 - (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view {
@@ -682,10 +661,6 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
 }
 
 - (void)mapView:(MKMapView *)mapView didDeselectAnnotationView:(MKAnnotationView *)view {
-    
-    if (!_shouldReselectAnnotation) {
-        _previouslySelectedAnnotation = nil;
-    }
     
     if ([_secondaryDelegate respondsToSelector:@selector(mapView:didDeselectAnnotationView:)]) {
         [_secondaryDelegate mapView:mapView didDeselectAnnotationView:view];

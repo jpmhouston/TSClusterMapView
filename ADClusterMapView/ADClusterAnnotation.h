@@ -22,7 +22,7 @@ typedef enum {
 } ADClusterAnnotationType;
 
 /*!
- * @discussion Do not subclass. This MKAnnotation is a wrapper to keep the annotation static during clustering.
+ * @discussion Do not subclass or directly modify. This MKAnnotation is a wrapper to keep the annotation static during clustering.
  */
 @interface ADClusterAnnotation : NSObject <MKAnnotation>
 

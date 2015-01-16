@@ -33,6 +33,7 @@
 		C597E8981A6619C1002DF26A /* TSDemoClusteredAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E8971A6619C1002DF26A /* TSDemoClusteredAnnotationView.m */; };
 		C597E89A1A662708002DF26A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C597E8991A662708002DF26A /* QuartzCore.framework */; };
 		C597E8CF1A677CCE002DF26A /* TSClusterAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E8CE1A677CCE002DF26A /* TSClusterAnnotationView.m */; };
+		C597E8D21A698080002DF26A /* TSClusterAnimationOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E8D11A698080002DF26A /* TSClusterAnimationOptions.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -80,6 +81,8 @@
 		C597E8991A662708002DF26A /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		C597E8CD1A677CCE002DF26A /* TSClusterAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSClusterAnnotationView.h; sourceTree = "<group>"; };
 		C597E8CE1A677CCE002DF26A /* TSClusterAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSClusterAnnotationView.m; sourceTree = "<group>"; };
+		C597E8D01A69807F002DF26A /* TSClusterAnimationOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSClusterAnimationOptions.h; sourceTree = "<group>"; };
+		C597E8D11A698080002DF26A /* TSClusterAnimationOptions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSClusterAnimationOptions.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,24 +105,9 @@
 		6F8000DE16256BCE005D0263 /* ADClusterMapView */ = {
 			isa = PBXGroup;
 			children = (
-				6F8000DF16256BCE005D0263 /* ADClusterAnnotation.h */,
-				6F8000E016256BCE005D0263 /* ADClusterAnnotation.m */,
-				6F8000E116256BCE005D0263 /* ADClusterMapView.h */,
-				6F8000E216256BCE005D0263 /* ADClusterMapView.m */,
-				6F8000E316256BCE005D0263 /* ADMapCluster.h */,
-				6F8000E416256BCE005D0263 /* ADMapCluster.m */,
-				6F3C8B57162718D70081BF88 /* ADMapPointAnnotation.h */,
-				6F3C8B58162718D70081BF88 /* ADMapPointAnnotation.m */,
-				C597E8651A630AA1002DF26A /* CLLocation+Utilities.h */,
-				C597E8661A630AA1002DF26A /* CLLocation+Utilities.m */,
-				C597E8671A630AA1002DF26A /* NSDictionary+MKMapRect.h */,
-				C597E8681A630AA1002DF26A /* NSDictionary+MKMapRect.m */,
-				C597E8691A630AA1002DF26A /* TSRefreshedAnnotationView.h */,
-				C597E86A1A630AA1002DF26A /* TSRefreshedAnnotationView.m */,
-				C597E8CD1A677CCE002DF26A /* TSClusterAnnotationView.h */,
-				C597E8CE1A677CCE002DF26A /* TSClusterAnnotationView.m */,
-				C597E86B1A630AA1002DF26A /* TSClusterOperation.h */,
-				C597E86C1A630AA1002DF26A /* TSClusterOperation.m */,
+				C597E8D31A69885C002DF26A /* SubClass */,
+				C597E8D51A6988C7002DF26A /* Private */,
+				C597E8D61A6988FD002DF26A /* Helper */,
 			);
 			name = ADClusterMapView;
 			path = ../ADClusterMapView;
@@ -230,6 +218,55 @@
 			path = AnnotationViews;
 			sourceTree = SOURCE_ROOT;
 		};
+		C597E8D31A69885C002DF26A /* SubClass */ = {
+			isa = PBXGroup;
+			children = (
+				6F8000E116256BCE005D0263 /* ADClusterMapView.h */,
+				6F8000E216256BCE005D0263 /* ADClusterMapView.m */,
+				C597E8D41A6988A7002DF26A /* Optional */,
+			);
+			name = SubClass;
+			sourceTree = "<group>";
+		};
+		C597E8D41A6988A7002DF26A /* Optional */ = {
+			isa = PBXGroup;
+			children = (
+				C597E8691A630AA1002DF26A /* TSRefreshedAnnotationView.h */,
+				C597E86A1A630AA1002DF26A /* TSRefreshedAnnotationView.m */,
+			);
+			name = Optional;
+			sourceTree = "<group>";
+		};
+		C597E8D51A6988C7002DF26A /* Private */ = {
+			isa = PBXGroup;
+			children = (
+				6F8000DF16256BCE005D0263 /* ADClusterAnnotation.h */,
+				6F8000E016256BCE005D0263 /* ADClusterAnnotation.m */,
+				6F8000E316256BCE005D0263 /* ADMapCluster.h */,
+				6F8000E416256BCE005D0263 /* ADMapCluster.m */,
+				6F3C8B57162718D70081BF88 /* ADMapPointAnnotation.h */,
+				6F3C8B58162718D70081BF88 /* ADMapPointAnnotation.m */,
+				C597E8CD1A677CCE002DF26A /* TSClusterAnnotationView.h */,
+				C597E8CE1A677CCE002DF26A /* TSClusterAnnotationView.m */,
+				C597E86B1A630AA1002DF26A /* TSClusterOperation.h */,
+				C597E86C1A630AA1002DF26A /* TSClusterOperation.m */,
+				C597E8D01A69807F002DF26A /* TSClusterAnimationOptions.h */,
+				C597E8D11A698080002DF26A /* TSClusterAnimationOptions.m */,
+			);
+			name = Private;
+			sourceTree = "<group>";
+		};
+		C597E8D61A6988FD002DF26A /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				C597E8651A630AA1002DF26A /* CLLocation+Utilities.h */,
+				C597E8661A630AA1002DF26A /* CLLocation+Utilities.m */,
+				C597E8671A630AA1002DF26A /* NSDictionary+MKMapRect.h */,
+				C597E8681A630AA1002DF26A /* NSDictionary+MKMapRect.m */,
+			);
+			name = Helper;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -296,6 +333,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C597E8D21A698080002DF26A /* TSClusterAnimationOptions.m in Sources */,
 				6F8FE9E4162496B0001A0309 /* main.m in Sources */,
 				C597E8701A630AA1002DF26A /* TSClusterOperation.m in Sources */,
 				C597E8921A66173D002DF26A /* CDMapViewController.m in Sources */,

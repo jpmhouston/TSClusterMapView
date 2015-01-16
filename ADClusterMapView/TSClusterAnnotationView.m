@@ -8,10 +8,12 @@
 
 #import "TSClusterAnnotationView.h"
 #import "ADClusterAnnotation.h"
+#import "TSRefreshedAnnotationView.h"
 
 @interface TSClusterAnnotationView ()
 
 @property (strong, nonatomic) UIView *contentView;
+@property (weak, nonatomic) MKAnnotationView *addedView;
 
 @end
 
@@ -32,17 +34,14 @@
 
 - (MKAnnotationView *)updateWithAnnotationView:(MKAnnotationView *)annotationView {
     
-    MKAnnotationView *viewToCache;
-    for (MKAnnotationView *view in self.contentView.subviews) {
-        if ([view isKindOfClass:[MKAnnotationView class]]) {
-            viewToCache = view;
-            [view removeFromSuperview];
-        }
-    }
+    MKAnnotationView *viewToCache = _addedView;
+    [viewToCache removeFromSuperview];
     
     if (!annotationView) {
         return viewToCache;
     }
+    
+    _addedView = annotationView;
     
     annotationView.frame = annotationView.bounds;
     
@@ -78,5 +77,13 @@
         clusterAnnotation.annotationView = self;
     }
 }
+
+- (void)animateView {
+    
+    if ([_addedView isKindOfClass:[TSRefreshedAnnotationView class]]) {
+        [(TSRefreshedAnnotationView*)_addedView clusteringAnimation];
+    }
+}
+
 
 @end

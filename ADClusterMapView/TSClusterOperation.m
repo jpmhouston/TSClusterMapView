@@ -239,7 +239,8 @@ int nearestEvenInt(int to) {
             }
         }
         
-        [UIView animateWithDuration:0.3 delay:0.0 usingSpringWithDamping:0.7 initialSpringVelocity:0.5 options:UIViewAnimationOptionCurveEaseIn animations:^{
+        TSClusterAnimationOptions *options = _mapView.clusterAnimationOptions;
+        [UIView animateWithDuration:options.duration delay:0.0 usingSpringWithDamping:options.springDamping initialSpringVelocity:options.springVelocity options:options.viewAnimationOptions animations:^{
             for (ADClusterAnnotation * annotation in _annotationPool) {
                 if (annotation.cluster) {
                     if (annotation.popInAnimation) {
@@ -247,7 +248,7 @@ int nearestEvenInt(int to) {
                         annotation.popInAnimation = NO;
                     }
                     annotation.coordinate = annotation.cluster.clusterCoordinate;
-                    //                    [annotation.annotationView refreshView];
+                    [annotation.annotationView animateView];
                 }
             }        
         } completion:^(BOOL finished) {

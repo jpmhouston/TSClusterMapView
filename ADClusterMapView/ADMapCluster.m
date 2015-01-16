@@ -39,39 +39,33 @@
 
 + (void)rootClusterForAnnotations:(NSSet *)annotations discriminationPower:(double)gamma title:(NSString *)clusterTitle showSubtitle:(BOOL)showSubtitle completion:(KdtreeCompletionBlock)completion {
     
-    NSOperationQueue *queue = [NSOperationQueue currentQueue];
-    if (queue == [NSOperationQueue mainQueue]) {
-        queue = [NSOperationQueue new];
-    }
-    [queue addOperationWithBlock:^{
-        // KDTree
-        //NSLog(@"Computing KD-tree for %lu annotations...", (unsigned long)annotations.count);
-        
-        MKMapRect boundaries = MKMapRectMake(HUGE_VALF, HUGE_VALF, 0.0, 0.0);
-        
-        for (ADMapPointAnnotation * annotation in annotations) {
-            MKMapPoint point = annotation.mapPoint;
-            if (point.x < boundaries.origin.x) {
-                boundaries.origin.x = point.x;
-            }
-            if (point.y < boundaries.origin.y) {
-                boundaries.origin.y = point.y;
-            }
-            if (point.x > boundaries.origin.x + boundaries.size.width) {
-                boundaries.size.width = point.x - boundaries.origin.x;
-            }
-            if (point.y > boundaries.origin.y + boundaries.size.height) {
-                boundaries.size.height = point.y - boundaries.origin.y;
-            }
+    // KDTree
+    //NSLog(@"Computing KD-tree for %lu annotations...", (unsigned long)annotations.count);
+    
+    MKMapRect boundaries = MKMapRectMake(HUGE_VALF, HUGE_VALF, 0.0, 0.0);
+    
+    for (ADMapPointAnnotation * annotation in annotations) {
+        MKMapPoint point = annotation.mapPoint;
+        if (point.x < boundaries.origin.x) {
+            boundaries.origin.x = point.x;
         }
-        
-        
-        ADMapCluster * cluster = [[ADMapCluster alloc] initWithAnnotations:annotations atDepth:0 inMapRect:boundaries gamma:gamma clusterTitle:clusterTitle showSubtitle:showSubtitle parentCluster:nil];
-        
-        //NSLog(@"Computation done !");
-        
-        completion(cluster);
-    }];
+        if (point.y < boundaries.origin.y) {
+            boundaries.origin.y = point.y;
+        }
+        if (point.x > boundaries.origin.x + boundaries.size.width) {
+            boundaries.size.width = point.x - boundaries.origin.x;
+        }
+        if (point.y > boundaries.origin.y + boundaries.size.height) {
+            boundaries.size.height = point.y - boundaries.origin.y;
+        }
+    }
+    
+    
+    ADMapCluster * cluster = [[ADMapCluster alloc] initWithAnnotations:annotations atDepth:0 inMapRect:boundaries gamma:gamma clusterTitle:clusterTitle showSubtitle:showSubtitle parentCluster:nil];
+    
+    //NSLog(@"Computation done !");
+    
+    completion(cluster);
 }
 
 - (id)initWithAnnotations:(NSSet *)annotations atDepth:(NSInteger)depth inMapRect:(MKMapRect)mapRect gamma:(double)gamma clusterTitle:(NSString *)clusterTitle showSubtitle:(BOOL)showSubtitle parentCluster:(ADMapCluster *)parentCluster {
@@ -274,101 +268,96 @@
 
 - (void)mapView:(ADClusterMapView *)mapView addAnnotation:(ADMapPointAnnotation *)mapPointAnnotation completion:(void(^)(BOOL added))completion {
     
-    [mapView.treeOperationQueue addOperationWithBlock:^{
-        //NSLog(@"begin Adding single annotation");
+    //NSLog(@"begin Adding single annotation");
+    
+    //Outside original rect should do a full tree refresh
+    if (!MKMapRectContainsPoint(self.mapRect, mapPointAnnotation.mapPoint)) {
+        if (completion) {
+            completion(NO);
+        }
+    }
+    
+    //Find closest existing cluster
+    CLLocationDistance distance = MAXFLOAT;
+    ADMapCluster *closestCluster;
+    
+    NSSet *allChildClusters = self.allChildClusters;
+    for (ADMapCluster *existingCluster in allChildClusters) {
         
-        //Outside original rect should do a full tree refresh
-        if (!MKMapRectContainsPoint(self.mapRect, mapPointAnnotation.mapPoint)) {
-            if (completion) {
-                completion(NO);
-            }
+        if (existingCluster.depth < 2) {
+            continue;
         }
         
-        //Find closest existing cluster
-        CLLocationDistance distance = MAXFLOAT;
-        ADMapCluster *closestCluster;
+        CLLocationDistance pointDistance = MKMetersBetweenMapPoints(mapPointAnnotation.mapPoint, MKMapPointForCoordinate(existingCluster.clusterCoordinate));
         
-        NSSet *allChildClusters = self.allChildClusters;
-        for (ADMapCluster *existingCluster in allChildClusters) {
-            
-            if (existingCluster.depth < 2) {
-                continue;
-            }
-            
-            CLLocationDistance pointDistance = MKMetersBetweenMapPoints(mapPointAnnotation.mapPoint, MKMapPointForCoordinate(existingCluster.clusterCoordinate));
-            
-            if (pointDistance < distance) {
-                distance = pointDistance;
-                closestCluster = existingCluster;
-            }
+        if (pointDistance < distance) {
+            distance = pointDistance;
+            closestCluster = existingCluster;
+        }
+    }
+    
+    if (!closestCluster || !closestCluster.parentCluster.parentCluster) {
+        if (6) {
+            completion(NO);
+        }
+    }
+    
+    //Go up one cluster to ensure a more complete result
+    ADMapCluster *closestClusterParent = closestCluster.parentCluster;
+    NSMutableSet *annotationsToRecalculate = [[NSMutableSet alloc] initWithArray:closestClusterParent.originalMapPointAnnotations];
+    [annotationsToRecalculate addObject:mapPointAnnotation];
+    
+    closestClusterParent.clusterCount = 0;
+    
+    [ADMapCluster rootClusterForAnnotations:annotationsToRecalculate mapView:mapView completion:^(ADMapCluster *mapCluster) {
+        if (closestClusterParent.parentCluster.rightChild == closestClusterParent) {
+            closestClusterParent.parentCluster.rightChild = mapCluster;
+        }
+        else if (closestClusterParent.parentCluster.leftChild == closestClusterParent) {
+            closestClusterParent.parentCluster.leftChild = mapCluster;
         }
         
-        if (!closestCluster || !closestCluster.parentCluster.parentCluster) {
-            if (6) {
-                completion(NO);
-            }
+        mapCluster.parentCluster = closestClusterParent.parentCluster;
+        
+        if (completion) {
+            completion(YES);
         }
-        
-        //Go up one cluster to ensure a more complete result
-        ADMapCluster *closestClusterParent = closestCluster.parentCluster;
-        NSMutableSet *annotationsToRecalculate = [[NSMutableSet alloc] initWithArray:closestClusterParent.originalMapPointAnnotations];
-        [annotationsToRecalculate addObject:mapPointAnnotation];
-        
-        closestClusterParent.clusterCount = 0;
-        
-        [ADMapCluster rootClusterForAnnotations:annotationsToRecalculate mapView:mapView completion:^(ADMapCluster *mapCluster) {
-            if (closestClusterParent.parentCluster.rightChild == closestClusterParent) {
-                closestClusterParent.parentCluster.rightChild = mapCluster;
-            }
-            else if (closestClusterParent.parentCluster.leftChild == closestClusterParent) {
-                closestClusterParent.parentCluster.leftChild = mapCluster;
-            }
-            
-            mapCluster.parentCluster = closestClusterParent.parentCluster;
-            
-            if (completion) {
-                completion(YES);
-            }
-        }];
     }];
 }
 
 
 - (void)mapView:(ADClusterMapView *)mapView removeAnnotation:(id<MKAnnotation>)annotation completion:(void(^)(BOOL added))completion {
     
-    [mapView.treeOperationQueue addOperationWithBlock:^{
+    ADMapCluster *clusterToRemove = [self clusterForAnnotation:annotation];
+    
+    if (!clusterToRemove || clusterToRemove.depth < 3) {
+        if (completion) {
+            completion(NO);
+        }
+        return;
+    }
+    
+    //Go up two cluster to ensure a more complete result
+    ADMapCluster *clusterParent = clusterToRemove.parentCluster.parentCluster;
+    NSMutableSet *annotationsToRecalculate = [[NSMutableSet alloc] initWithArray:clusterParent.originalMapPointAnnotations];
+    [annotationsToRecalculate removeObject:clusterToRemove.annotation];
+    
+    clusterParent.clusterCount = 0;
+    
+    [ADMapCluster rootClusterForAnnotations:annotationsToRecalculate mapView:mapView completion:^(ADMapCluster *mapCluster) {
         
-        ADMapCluster *clusterToRemove = [self clusterForAnnotation:annotation];
-        
-        if (!clusterToRemove || clusterToRemove.depth < 3) {
-            if (completion) {
-                completion(NO);
-            }
-            return;
+        if (clusterParent.parentCluster.rightChild == clusterParent) {
+            clusterParent.parentCluster.rightChild = mapCluster;
+        }
+        else if (clusterParent.parentCluster.leftChild == clusterParent) {
+            clusterParent.parentCluster.leftChild = mapCluster;
         }
         
-        //Go up two cluster to ensure a more complete result
-        ADMapCluster *clusterParent = clusterToRemove.parentCluster.parentCluster;
-        NSMutableSet *annotationsToRecalculate = [[NSMutableSet alloc] initWithArray:clusterParent.originalMapPointAnnotations];
-        [annotationsToRecalculate removeObject:clusterToRemove.annotation];
+        mapCluster.parentCluster = clusterParent.parentCluster;
         
-        clusterParent.clusterCount = 0;
-        
-        [ADMapCluster rootClusterForAnnotations:annotationsToRecalculate mapView:mapView completion:^(ADMapCluster *mapCluster) {
-            
-            if (clusterParent.parentCluster.rightChild == clusterParent) {
-                clusterParent.parentCluster.rightChild = mapCluster;
-            }
-            else if (clusterParent.parentCluster.leftChild == clusterParent) {
-                clusterParent.parentCluster.leftChild = mapCluster;
-            }
-            
-            mapCluster.parentCluster = clusterParent.parentCluster;
-            
-            if (completion) {
-                completion(YES);
-            }
-        }];
+        if (completion) {
+            completion(YES);
+        }
     }];
 }
 

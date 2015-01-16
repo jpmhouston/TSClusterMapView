@@ -15,33 +15,17 @@
     self = [super initWithAnnotation:annotation reuseIdentifier:reuseIdentifier];
     if (self) {
         // Initialization code
-        self.accessibilityValue = @"";
-        self.accessibilityLabel = @"Map Annotation";
+        
     }
     return self;
     
 }
 
-- (void)setAnnotation:(id<MKAnnotation>)annotation {
-    
-    [super setAnnotation:annotation];
-    
-    [self refreshView];
-}
 
-- (void)prepareForReuse {
-    
-    [self refreshView];
-}
-
-- (void)refreshView {
+- (void)clusteringAnimation {
     
     //Subclass and add your cluster view updates here
 }
 
-- (NSString *)accessibilityValue {
-    
-    return self.annotation.title;
-}
 
 @end

@@ -11,6 +11,7 @@
 #import "ADMapCluster.h"
 #import "ADClusterAnnotation.h"
 #import "TSClusterAnnotationView.h"
+#import "TSClusterAnimationOptions.h"
 
 extern NSString * const TSMapViewWillChangeRegion;
 extern NSString * const TSMapViewDidChangeRegion;
@@ -71,6 +72,9 @@ extern NSString * const TSMapViewDidChangeRegion;
 @end
 
 
+/*!
+ * @discussion Using None will tell the operation to make clustering decisions based only on the visible region of the map. Large will add a full screen size in all directions to the region to cluster creating more accurate results.
+ */
 typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
     ADClusterBufferNone = 0,
     ADClusterBufferSmall = 2,
@@ -154,12 +158,16 @@ typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
 @property (strong, nonatomic) NSString *clusterTitle;
 
 /**
- If cluster annotation is selected it zooms in to show contents instead of a callout. Default: YES"
+ If cluster annotation is selected it zooms in to show contents instead of a callout. Default: YES
  */
 @property (assign, nonatomic) BOOL clusterZoomsOnTap;
 
 @property (assign, nonatomic) BOOL clusterAppearanceAnimated;
 
-@property (nonatomic, strong, readonly) NSOperationQueue *treeOperationQueue;
+/**
+ UIView animation block parameters for the clustering animations;
+ */
+@property (strong, nonatomic) TSClusterAnimationOptions *clusterAnimationOptions;
+
 
 @end

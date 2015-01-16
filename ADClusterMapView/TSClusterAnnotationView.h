@@ -18,4 +18,7 @@
 
 - (instancetype)initWithAnnotation:(id<MKAnnotation>)annotation reuseIdentifier:(NSString *)reuseIdentifier containingAnnotationView:(MKAnnotationView *)contentView;
 
+- (void)animateView;
+
+
 @end
