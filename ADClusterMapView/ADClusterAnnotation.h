@@ -64,6 +64,8 @@ typedef enum {
 
 @property (nonatomic, assign) BOOL needsRefresh;
 
+@property (nonatomic, assign) BOOL popInAnimation;
+
 - (void)shouldReset;
 @property (nonatomic, assign) CLLocationCoordinate2D coordinatePreAnimation;
 

@@ -40,10 +40,13 @@
         }
     }
     
+    if (!annotationView) {
+        return viewToCache;
+    }
+    
     annotationView.frame = annotationView.bounds;
     
     if (!CGRectEqualToRect(self.bounds, annotationView.bounds)) {
-        NSLog(@"%@",self);
         self.frame = annotationView.bounds;
         self.contentView.frame = annotationView.bounds;
     }
@@ -71,7 +74,8 @@
     [super setAnnotation:annotation];
     
     if ([annotation isKindOfClass:[ADClusterAnnotation class]]) {
-        ((ADClusterAnnotation *)annotation).annotationView = self;
+        ADClusterAnnotation *clusterAnnotation = annotation;
+        clusterAnnotation.annotationView = self;
     }
 }
 

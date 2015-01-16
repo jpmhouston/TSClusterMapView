@@ -119,6 +119,8 @@ int nearestEvenInt(int to) {
     NSMutableSet *parentClustersMatched = [[NSMutableSet alloc] initWithCapacity:_numberOfClusters];
     NSMutableSet *removeAfterAnimation = [[NSMutableSet alloc] initWithCapacity:_numberOfClusters];
     
+    NSMutableSet *stillNeedsMatch = [[NSMutableSet alloc] initWithCapacity:10];
+    
     for (ADClusterAnnotation *annotation in matchedAnnotations) {
         
         //These will start at cluster and split to their respective cluster coordinates
@@ -134,13 +136,18 @@ int nearestEvenInt(int to) {
             
             for (ADMapCluster *cluster in children) {
                 ADClusterAnnotation *clusterlessAnnotation = [unmatchedAnnotations anyObject];
-                clusterlessAnnotation.cluster = cluster;
-                clusterlessAnnotation.coordinatePreAnimation = annotation.coordinate;
                 
-
-                [unmatchedAnnotations removeObject:clusterlessAnnotation];
-
-                [unMatchedClusters removeObject:cluster];
+                if (clusterlessAnnotation) {
+                    clusterlessAnnotation.cluster = cluster;
+                    clusterlessAnnotation.coordinatePreAnimation = annotation.coordinate;
+                    
+                    [unmatchedAnnotations removeObject:clusterlessAnnotation];
+                    
+                    [unMatchedClusters removeObject:cluster];
+                }
+                else {
+                    [stillNeedsMatch addObject:@[cluster, annotation]];
+                }
             }
             
             continue;
@@ -169,6 +176,20 @@ int nearestEvenInt(int to) {
         [annotation shouldReset];
     }
     
+    if (stillNeedsMatch.count) {
+        for (NSArray *array in stillNeedsMatch) {
+            ADClusterAnnotation *clusterlessAnnotation = [unmatchedAnnotations anyObject];
+            
+            if (clusterlessAnnotation) {
+                clusterlessAnnotation.cluster = array[0];
+                clusterlessAnnotation.coordinatePreAnimation = ((ADClusterAnnotation *)array[1]).coordinate;
+                
+                [unmatchedAnnotations removeObject:clusterlessAnnotation];
+                [unMatchedClusters removeObject:clusterlessAnnotation.cluster];
+            }
+        }
+    }
+    
     //Annotations may not be on the map yet
     for (ADMapCluster *cluster in unMatchedClusters) {
         ADClusterAnnotation *annotation = [unmatchedAnnotations anyObject];
@@ -181,6 +202,7 @@ int nearestEvenInt(int to) {
         
         annotation.cluster = cluster;
         annotation.coordinatePreAnimation = cluster.clusterCoordinate;
+        annotation.popInAnimation = YES;
     }
     
     matchedAnnotations = [NSMutableSet setWithSet:_annotationPool];
@@ -206,20 +228,31 @@ int nearestEvenInt(int to) {
             if (annotation.cluster && annotation.needsRefresh) {
                 [_mapView refreshClusterAnnotation:annotation];
             }
+            
+            if (annotation.popInAnimation && _mapView.clusterAppearanceAnimated) {
+                CGAffineTransform t = CGAffineTransformMakeScale(0.001, 0.001);
+                t = CGAffineTransformTranslate(t, 0, -annotation.annotationView.frame.size.height);
+                annotation.annotationView.transform  = t;
+            }
+            else {
+                annotation.popInAnimation = NO;
+            }
         }
         
-        [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-            
+        [UIView animateWithDuration:0.3 delay:0.0 usingSpringWithDamping:0.7 initialSpringVelocity:0.5 options:UIViewAnimationOptionCurveEaseIn animations:^{
             for (ADClusterAnnotation * annotation in _annotationPool) {
                 if (annotation.cluster) {
+                    if (annotation.popInAnimation) {
+                        annotation.annotationView.transform = CGAffineTransformIdentity;
+                        annotation.popInAnimation = NO;
+                    }
                     annotation.coordinate = annotation.cluster.clusterCoordinate;
-//                    [annotation.annotationView refreshView];
+                    //                    [annotation.annotationView refreshView];
                 }
-            }
-            
+            }        
         } completion:^(BOOL finished) {
             
-            for (ADClusterAnnotation * annotation in [unmatchedAnnotations setByAddingObjectsFromSet:removeAfterAnimation]) {
+            for (ADClusterAnnotation *annotation in [unmatchedAnnotations setByAddingObjectsFromSet:removeAfterAnimation]) {
                 [annotation reset];
             }
             

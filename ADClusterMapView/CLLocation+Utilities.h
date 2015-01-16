@@ -19,5 +19,8 @@ CLLocationCoordinate2D CLLocationCoordinate2DRoundedLonLat(CLLocationCoordinate2
 
 BOOL MKMapRectSizeIsEqual(MKMapRect rect1, MKMapRect rect2);
 
+BOOL MKMapRectApproxEqual(MKMapRect rect1, MKMapRect rect2);
+
+BOOL MKMapRectSizeIsGreaterThanOrEqual(MKMapRect rect1, MKMapRect rect2);
 
 @end

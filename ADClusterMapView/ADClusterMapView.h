@@ -116,6 +116,8 @@ typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
  */
 - (void)refreshClusterAnnotation:(ADClusterAnnotation *)annotation;
 
+- (void)cacheAnnotationView:(MKAnnotationView *)annotationView;
+
 /**
  Visible cluster annotations. Will contain clusters just outside visible rect included in buffer zone.
  */
@@ -147,10 +149,16 @@ typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
 @property (assign, nonatomic) CLLocationDegrees clusterMinimumLongitudeDelta;
 
 /**
- Title for cluster annotations. Default @"%d elements"
+ Title for cluster annotations. Default: @"%d elements"
  */
 @property (strong, nonatomic) NSString *clusterTitle;
 
+/**
+ If cluster annotation is selected it zooms in to show contents instead of a callout. Default: YES"
+ */
+@property (assign, nonatomic) BOOL clusterZoomsOnTap;
+
+@property (assign, nonatomic) BOOL clusterAppearanceAnimated;
 
 @property (nonatomic, strong, readonly) NSOperationQueue *treeOperationQueue;
 

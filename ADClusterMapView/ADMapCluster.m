@@ -19,7 +19,6 @@
 @property (nonatomic, strong) ADMapCluster *leftChild;
 @property (nonatomic, strong) ADMapCluster *rightChild;
 @property (nonatomic, strong) NSString *clusterTitle;
-@property (nonatomic, assign) MKMapRect mapRect;
 
 @property (nonatomic, assign) double gamma;
 
@@ -639,6 +638,27 @@
         }
     }
     return nil;
+}
+
+- (MKMapRect)childMapRect {
+    
+    double XMin = MAXFLOAT, XMax = 0.0, YMin = MAXFLOAT, YMax = 0.0;
+    for (ADMapCluster * cluster in self.children) {
+        MKMapPoint point = MKMapPointForCoordinate(cluster.clusterCoordinate);
+        if (point.x > XMax) {
+            XMax = point.x;
+        }
+        if (point.y > YMax) {
+            YMax = point.y;
+        }
+        if (point.x < XMin) {
+            XMin = point.x;
+        }
+        if (point.y < YMin) {
+            YMin = point.y;
+        }
+    }
+    return MKMapRectMake(XMin, YMin, XMax - XMin, YMax - YMin);
 }
 
 @end

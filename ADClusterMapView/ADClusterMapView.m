@@ -104,6 +104,8 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
     self.clusterEdgeBufferSize = ADClusterBufferMedium;
     self.clusterMinimumLongitudeDelta = 0.005;
     self.clusterTitle = @"%d elements";
+    self.clusterZoomsOnTap = YES;
+    self.clusterAppearanceAnimated = YES;
 }
 
 - (void)setClusterEdgeBufferSize:(ADClusterBufferSize)clusterEdgeBufferSize {
@@ -257,7 +259,7 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
     
     MKAnnotationView *viewToAdd = [self refreshAnnotationViewForAnnotation:annotation];
     MKAnnotationView *viewToCache = [annotation.annotationView updateWithAnnotationView:viewToAdd];
-    [self addAnnotationViewToCache:viewToCache];
+    [self cacheAnnotationView:viewToCache];
 }
 
 - (NSArray *)visibleClusterAnnotations {
@@ -322,7 +324,7 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
     return view;
 }
 
-- (void)addAnnotationViewToCache:(MKAnnotationView *)annotationView {
+- (void)cacheAnnotationView:(MKAnnotationView *)annotationView {
     
     if (!annotationView) {
         return;
@@ -579,7 +581,7 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
     MKAnnotationView *delegateAnnotationView = [self refreshAnnotationViewForAnnotation:annotation];
     if (delegateAnnotationView) {
         view = (TSClusterAnnotationView *)[self dequeueReusableAnnotationViewWithIdentifier:NSStringFromClass([TSClusterAnnotationView class])];
-        [self addAnnotationViewToCache:[view updateWithAnnotationView:delegateAnnotationView]];
+        [self cacheAnnotationView:[view updateWithAnnotationView:delegateAnnotationView]];
         
         if (!view) {
             view = [[TSClusterAnnotationView alloc] initWithAnnotation:annotation
@@ -658,12 +660,20 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
 
 - (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view {
     
-    if ([view.annotation isKindOfClass:[ADClusterAnnotation class]]) {
-        if (((ADClusterAnnotation *)view.annotation).type == ADClusterAnnotationTypeLeaf &&
-            !_shouldReselectAnnotation &&
-            ((ADClusterAnnotation *)view.annotation).cluster) {
-            _previouslySelectedAnnotation = [((ADClusterAnnotation *)view.annotation).originalAnnotations firstObject];
+    if (_clusterZoomsOnTap &&
+        [view isKindOfClass:[TSClusterAnnotationView class]] &&
+        ((ADClusterAnnotation *)view.annotation).type == ADClusterAnnotationTypeCluster){
+        
+        [self deselectAnnotation:view.annotation animated:NO];
+        
+        MKMapRect zoomTo = ((ADClusterAnnotation *)view.annotation).cluster.mapRect;
+        zoomTo = [self mapRectThatFits:zoomTo edgePadding:UIEdgeInsetsMake(0, view.frame.size.width/2, 0, view.frame.size.width/2)];
+        
+        if (MKMapRectSizeIsGreaterThanOrEqual(zoomTo, self.visibleMapRect)) {
+            zoomTo = MKMapRectInset(zoomTo, zoomTo.size.width/4, zoomTo.size.width/4);
         }
+        
+        [self setVisibleMapRect:zoomTo animated:YES];
     }
     
     if ([_secondaryDelegate respondsToSelector:@selector(mapView:didSelectAnnotationView:)]) {

@@ -38,5 +38,19 @@ BOOL MKMapRectSizeIsEqual(MKMapRect rect1, MKMapRect rect2) {
             round(rect1.size.width) == round(rect2.size.width));
 }
 
+BOOL MKMapRectApproxEqual(MKMapRect rect1, MKMapRect rect2) {
+    
+    return (round(rect1.size.height) == round(rect2.size.height) &&
+            round(rect1.size.width) == round(rect2.size.width) &&
+            round(rect1.origin.x) == round(rect2.origin.x) &&
+            round(rect1.origin.y) == round(rect2.origin.y));
+}
+
+BOOL MKMapRectSizeIsGreaterThanOrEqual(MKMapRect rect1, MKMapRect rect2) {
+    
+    return (round(rect1.size.height) >= round(rect2.size.height) &&
+            round(rect1.size.width) >= round(rect2.size.width));
+}
+
 
 @end

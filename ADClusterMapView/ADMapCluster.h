@@ -20,6 +20,10 @@ typedef void(^KdtreeCompletionBlock)(ADMapCluster *mapCluster);
 
 @property (nonatomic, assign) CLLocationCoordinate2D clusterCoordinate;
 
+@property (nonatomic, assign) MKMapRect mapRect;
+
+@property (nonatomic, readonly) MKMapRect childMapRect;
+
 @property (nonatomic, assign) BOOL showSubtitle;
 
 @property (nonatomic, readonly) NSInteger depth;
