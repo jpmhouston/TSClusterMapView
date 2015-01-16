@@ -100,6 +100,13 @@ int nearestEvenInt(int to) {
         return;
     }
     
+    NSMutableSet *offscreenAnnotations = [[NSMutableSet alloc] initWithCapacity:_annotationPool.count];
+    for (ADClusterAnnotation *annotation in _annotationPool) {
+        if (ADClusterCoordinate2DIsOffscreen(annotation.coordinate)) {
+            [offscreenAnnotations addObject:annotation];
+        }
+    }
+    
     NSMutableSet *unmatchedAnnotations = [[NSMutableSet alloc] initWithCapacity:_annotationPool.count];
     for (ADClusterAnnotation *annotation in _annotationPool) {
         if (!annotation.cluster) {
@@ -135,17 +142,18 @@ int nearestEvenInt(int to) {
             [unMatchedClusters removeObject:cluster];
             
             for (ADMapCluster *cluster in children) {
-                ADClusterAnnotation *clusterlessAnnotation = [unmatchedAnnotations anyObject];
+                ADClusterAnnotation *clusterlessAnnotation = [offscreenAnnotations anyObject];
                 
                 if (clusterlessAnnotation) {
                     clusterlessAnnotation.cluster = cluster;
                     clusterlessAnnotation.coordinatePreAnimation = annotation.coordinate;
                     
                     [unmatchedAnnotations removeObject:clusterlessAnnotation];
+                    [offscreenAnnotations removeObject:clusterlessAnnotation];
                     
                     [unMatchedClusters removeObject:cluster];
                 }
-                else {
+                else if (offscreenAnnotations) {
                     [stillNeedsMatch addObject:@[cluster, annotation]];
                 }
             }
@@ -180,7 +188,6 @@ int nearestEvenInt(int to) {
     for (ADMapCluster *cluster in unMatchedClusters) {
         
         ADClusterAnnotation *annotation;
-        ADClusterAnnotation *resetAnnotation = [unmatchedAnnotations anyObject];
         
         MKMapRect mRect = _mapView.visibleMapRect;
         MKMapPoint eastMapPoint = MKMapPointMake(MKMapRectGetMinX(mRect), MKMapRectGetMidY(mRect));
@@ -188,12 +195,9 @@ int nearestEvenInt(int to) {
         //Don't want annotations flying across the map
         CLLocationDistance min = MKMetersBetweenMapPoints(eastMapPoint, westMapPoint)/2;
         
-        for (ADClusterAnnotation *checkAnnotation in unmatchedAnnotations) {
-            
-            if (ADClusterCoordinate2DIsOffscreen(checkAnnotation.coordinate)) {
-                resetAnnotation = checkAnnotation;
-                continue;
-            }
+        NSMutableSet *unmatchedOnScreen = [NSMutableSet setWithSet:unmatchedAnnotations];
+        [unmatchedOnScreen minusSet:offscreenAnnotations];
+        for (ADClusterAnnotation *checkAnnotation in unmatchedOnScreen) {
             
             if (CLLocationCoordinate2DIsApproxEqual(checkAnnotation.coordinate, cluster.clusterCoordinate, 0.00001)) {
                 annotation = checkAnnotation;
@@ -202,6 +206,7 @@ int nearestEvenInt(int to) {
             
             CLLocationDistance distance = MKMetersBetweenMapPoints(MKMapPointForCoordinate(checkAnnotation.coordinate), MKMapPointForCoordinate(cluster.clusterCoordinate));
             if (distance < min) {
+                min = distance;
                 annotation = checkAnnotation;
             }
         }
@@ -210,8 +215,8 @@ int nearestEvenInt(int to) {
             annotation.coordinatePreAnimation = annotation.coordinate;
             annotation.popInAnimation = NO;
         }
-        else if (resetAnnotation) {
-            annotation = resetAnnotation;
+        else if (offscreenAnnotations.count) {
+            annotation = [offscreenAnnotations anyObject];
             annotation.coordinatePreAnimation = cluster.clusterCoordinate;
             annotation.popInAnimation = YES;
         }
@@ -222,6 +227,7 @@ int nearestEvenInt(int to) {
         
         annotation.cluster = cluster;
         [unmatchedAnnotations removeObject:annotation];
+        [offscreenAnnotations removeObject:annotation];
     }
     
     //Still need unmatched for a split into multiple from cluster
@@ -234,6 +240,7 @@ int nearestEvenInt(int to) {
                 clusterlessAnnotation.coordinatePreAnimation = ((ADClusterAnnotation *)array[1]).coordinate;
                 
                 [unmatchedAnnotations removeObject:clusterlessAnnotation];
+                [offscreenAnnotations removeObject:clusterlessAnnotation];
                 [unMatchedClusters removeObject:clusterlessAnnotation.cluster];
             }
         }
@@ -247,9 +254,9 @@ int nearestEvenInt(int to) {
     
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         
-//        for (ADClusterAnnotation *annotation in unmatchedAnnotations) {
-//            [annotation reset];
-//        }
+        for (ADClusterAnnotation *annotation in unmatchedAnnotations) {
+            [annotation reset];
+        }
         
         //Make sure we close callout of cluster if needed
         NSArray *selectedAnnotations = _mapView.selectedAnnotations;
@@ -293,7 +300,7 @@ int nearestEvenInt(int to) {
             }
         } completion:^(BOOL finished) {
             
-            for (ADClusterAnnotation *annotation in [unmatchedAnnotations setByAddingObjectsFromSet:removeAfterAnimation]) {
+            for (ADClusterAnnotation *annotation in removeAfterAnimation) {
                 [annotation reset];
             }
             

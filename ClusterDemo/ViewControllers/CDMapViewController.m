@@ -33,6 +33,8 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
     [_tabBar setSelectedItem:_bathroomTabBarItem];
     
     [self parseJsonData];
+    
+    [self refreshBadges];
 }
 
 
@@ -147,6 +149,8 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
         _streetLightAnnotationsAdded = [NSMutableArray arrayWithArray:_streetLightAnnotations];
         _stepper.value = _streetLightAnnotationsAdded.count;
     }
+    
+    [self refreshBadges];
 }
 
 - (IBAction)removeAll:(id)sender {
@@ -159,6 +163,8 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
         [_mapView removeAnnotations:_streetLightAnnotationsAdded];
         [_streetLightAnnotationsAdded removeAllObjects];
     }
+    
+    [self refreshBadges];
 }
 
 - (IBAction)stepperValueChanged:(id)sender {
@@ -179,6 +185,14 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
             [self removeLastStreetLight];
         }
     }
+    
+    [self refreshBadges];
+}
+
+- (void)refreshBadges {
+    
+    _bathroomTabBarItem.badgeValue = [NSString stringWithFormat:@"%lu", (unsigned long)_bathroomAnnotationsAdded.count];
+    _streetLightsTabBarItem.badgeValue = [NSString stringWithFormat:@"%lu", (unsigned long)_streetLightAnnotationsAdded.count];
 }
 
 - (void)addNewBathroom {
