@@ -14,7 +14,10 @@
 #import "CLLocation+Utilities.h"
 #import "TSClusterOperation.h"
 
+#define DATA_REFRESH_MAX 1000
+
 static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewID-private";
+NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
 
 @interface ADClusterMapView ()
 
@@ -138,7 +141,7 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
     
     BOOL refresh = NO;
     
-    if (_clusterableAnnotationsAdded.count < 500) {
+    if (_clusterableAnnotationsAdded.count < DATA_REFRESH_MAX) {
         refresh = YES;
     }
     
@@ -211,7 +214,7 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
         [_clusterableAnnotationsAdded removeObject:annotation];
         
         //Small data set just rebuild
-        if (_clusterableAnnotationsAdded.count < 500 || _treeOperationQueue.operationCount > 3) {
+        if (_clusterableAnnotationsAdded.count < DATA_REFRESH_MAX || _treeOperationQueue.operationCount > 3) {
             [self needsRefresh];
         }
         else {
@@ -500,14 +503,12 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
     
     [self initAnnotationPools:[self numberOfClusters]];
     
-    if (_clusterOperation.isExecuting) {
-        [_clusterOperation cancel];
-    }
+    [_clusterOperationQueue cancelAllOperations];
     
     [self mapViewWillBeginClusteringAnimation:self];
     
     __weak ADClusterMapView *weakSelf = self;
-    _clusterOperation = [[TSClusterOperation alloc] initWithMapView:self
+    TSClusterOperation *operation = [[TSClusterOperation alloc] initWithMapView:self
                                                                rect:clusteredMapRect
                                                         rootCluster:_rootMapCluster
                                                showNumberOfClusters:[self numberOfClusters]
@@ -527,7 +528,7 @@ static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewI
                                                                  [strongSelf mapViewDidCancelClusteringAnimation:strongSelf];
                                                              }
                                                          }];
-    [_clusterOperationQueue addOperation:_clusterOperation];
+    [_clusterOperationQueue addOperation:operation];
     [_clusterOperationQueue setSuspended:NO];
 }
 

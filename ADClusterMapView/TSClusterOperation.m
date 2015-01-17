@@ -55,7 +55,7 @@
 }
 
 int nearestEvenInt(int to) {
-    return (to % 2 == 0) ? to : (to + 1);
+    return (to % 2 == 0) ? to : (to - 1);
 }
 
 - (void)clusterInMapRect:(MKMapRect)clusteredMapRect {
@@ -67,14 +67,17 @@ int nearestEvenInt(int to) {
     //
     //This helps distribute clusters more evenly by limiting clusters presented relative to viewable region.
     //Zooming all the way out will now cluster down to one single annotation if all clusters are within one grid rect.
+    NSDate *date = [NSDate date];
     NSUInteger numberOnScreen;
     if (_mapView.region.span.longitudeDelta > _mapView.clusterMinimumLongitudeDelta) {
         
-        NSSet *mapRects = [self mapRectsFromMaxNumberOfClusters:_numberOfClusters mapRect:clusteredMapRect];
-        
+        NSLog(@"Took %f seconds", -[date timeIntervalSinceNow]);
         //number of map rects that contain at least one annotation
-        numberOnScreen = [_rootMapCluster numberOfMapRectsContainingChildren:mapRects];
-        numberOnScreen = numberOnScreen * _numberOfClusters/mapRects.count;
+        //divide by two because there are two sets of map rects - original area and shifted aread
+        //to account for possible straddling of a rect border
+        NSSet *mapRects = [self mapRectsFromMaxNumberOfClusters:_numberOfClusters mapRect:clusteredMapRect];
+        numberOnScreen = [_rootMapCluster numberOfMapRectsContainingChildren:mapRects]/2;
+//        numberOnScreen = numberOnScreen * (_numberOfClusters/2)/(mapRects.count/2);
         if (numberOnScreen > 1) {
             numberOnScreen = nearestEvenInt((int)numberOnScreen);
         }
@@ -92,6 +95,15 @@ int nearestEvenInt(int to) {
         numberOnScreen = _numberOfClusters;
     }
     
+    if (self.isCancelled) {
+        if (_finishedBlock) {
+            _finishedBlock(clusteredMapRect, NO, nil);
+        }
+        return;
+    }
+    
+    //Clusters that need to be visible after the animation
+    NSSet *clustersToShowOnMap = [_rootMapCluster find:numberOnScreen childrenInMapRect:clusteredMapRect];
     
     if (self.isCancelled) {
         if (_finishedBlock) {
@@ -100,6 +112,7 @@ int nearestEvenInt(int to) {
         return;
     }
     
+    //Sort out the current annotations to get an idea of what you're working with
     NSMutableSet *offscreenAnnotations = [[NSMutableSet alloc] initWithCapacity:_annotationPool.count];
     for (ADClusterAnnotation *annotation in _annotationPool) {
         if (ADClusterCoordinate2DIsOffscreen(annotation.coordinate)) {
@@ -117,21 +130,35 @@ int nearestEvenInt(int to) {
     NSMutableSet *matchedAnnotations = [[NSMutableSet alloc] initWithSet:_annotationPool];
     [matchedAnnotations minusSet:unmatchedAnnotations];
     
-    //Clusters that need to be visible after the animation
-    NSSet *clustersToShowOnMap = [_rootMapCluster find:numberOnScreen childrenInMapRect:clusteredMapRect];
     
+    //
     NSMutableSet *unMatchedClusters = [[NSMutableSet alloc] initWithSet:clustersToShowOnMap];
     
-    //There will be only one annotation after clustering in so we want to know if the cluster was already matched to an annotation
+    //There will be only one annotation after clustering in so we want to know if the parent cluster was already matched to an annotation
     NSMutableSet *parentClustersMatched = [[NSMutableSet alloc] initWithCapacity:_numberOfClusters];
+    
+    //These will be the annotations that converge to a point and will no longer be needed
     NSMutableSet *removeAfterAnimation = [[NSMutableSet alloc] initWithCapacity:_numberOfClusters];
     
+    //These will be leftovers that didn't have any annotations available to match at the time.
+    //Some annotations should become free after further sorting and matching.
+    //At the end any unmatched annotations will be used.
     NSMutableSet *stillNeedsMatch = [[NSMutableSet alloc] initWithCapacity:10];
     
+    if (self.isCancelled) {
+        if (_finishedBlock) {
+            _finishedBlock(clusteredMapRect, NO, nil);
+        }
+        return;
+    }
+    
+    //Go through annotations that already have clusters and try and match them to new clusters
     for (ADClusterAnnotation *annotation in matchedAnnotations) {
         
-        //These will start at cluster and split to their respective cluster coordinates
         NSMutableSet *children = [annotation.cluster findChildrenForClusterInSet:clustersToShowOnMap];
+        
+        //Found children
+        //These will start at cluster and split to their respective cluster coordinates
         if (children.count) {
             
             ADMapCluster *cluster = [children anyObject];
@@ -141,6 +168,8 @@ int nearestEvenInt(int to) {
             [children removeObject:cluster];
             [unMatchedClusters removeObject:cluster];
             
+            //There should be more than one child if it splits so we'll need to grab unused annotations.
+            //Clusterless offscreen annotations will then start at the annotation on screen's point and split to the child coordinate.
             for (ADMapCluster *cluster in children) {
                 ADClusterAnnotation *clusterlessAnnotation = [offscreenAnnotations anyObject];
                 
@@ -153,7 +182,8 @@ int nearestEvenInt(int to) {
                     
                     [unMatchedClusters removeObject:cluster];
                 }
-                else if (offscreenAnnotations) {
+                else {
+                    //Ran out of annotations off screen we'll come back after more have been sorted and reassign one that is available
                     [stillNeedsMatch addObject:@[cluster, annotation]];
                 }
             }
@@ -161,9 +191,11 @@ int nearestEvenInt(int to) {
             continue;
         }
         
-        //These will start as individual annotations and cluster into a single annotations
+        
         ADMapCluster *cluster = [annotation.cluster findAncestorForClusterInSet:clustersToShowOnMap];
         
+        //Found an ancestor
+        //These will start as individual annotations and converge into a single annotation during animation
         if (cluster) {
             annotation.cluster = cluster;
             annotation.coordinatePreAnimation = annotation.coordinate;
@@ -179,12 +211,16 @@ int nearestEvenInt(int to) {
             continue;
         }
         
-        //No ancestor or child found probably off screen
+        //No ancestor or child found
+        //This will happen when the annotation is no longer in the visible map rect and
+        //the section of the cluster tree does not include this annotation
         [unmatchedAnnotations addObject:annotation];
         [annotation shouldReset];
     }
     
-    //Annotations may not be on the map yet if there are available nearby setup for animation to the new cluster coordinate
+    //Find annotations for remaining unmatched clusters
+    //If there are available nearby, set the available annotation to animate to cluster position and take over.
+    //After a full tree refresh all annotations will be unmatched but coordinates still may match up or be close by.
     for (ADMapCluster *cluster in unMatchedClusters) {
         
         ADClusterAnnotation *annotation;
@@ -199,12 +235,15 @@ int nearestEvenInt(int to) {
         [unmatchedOnScreen minusSet:offscreenAnnotations];
         for (ADClusterAnnotation *checkAnnotation in unmatchedOnScreen) {
             
+            //Could be same
             if (CLLocationCoordinate2DIsApproxEqual(checkAnnotation.coordinate, cluster.clusterCoordinate, 0.00001)) {
                 annotation = checkAnnotation;
                 break;
             }
             
-            CLLocationDistance distance = MKMetersBetweenMapPoints(MKMapPointForCoordinate(checkAnnotation.coordinate), MKMapPointForCoordinate(cluster.clusterCoordinate));
+            //Find closest
+            CLLocationDistance distance = MKMetersBetweenMapPoints(MKMapPointForCoordinate(checkAnnotation.coordinate),
+                                                                   MKMapPointForCoordinate(cluster.clusterCoordinate));
             if (distance < min) {
                 min = distance;
                 annotation = checkAnnotation;
@@ -214,11 +253,13 @@ int nearestEvenInt(int to) {
         if (annotation) {
             annotation.coordinatePreAnimation = annotation.coordinate;
             annotation.popInAnimation = NO;
+            //already visible don't animate appearance
         }
         else if (offscreenAnnotations.count) {
             annotation = [offscreenAnnotations anyObject];
             annotation.coordinatePreAnimation = cluster.clusterCoordinate;
             annotation.popInAnimation = YES;
+            //Not visible animate appearance
         }
         else {
             NSLog(@"Not enough annotations??");
@@ -254,6 +295,7 @@ int nearestEvenInt(int to) {
     
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         
+        //Make sure they are in the offscreen position
         for (ADClusterAnnotation *annotation in unmatchedAnnotations) {
             [annotation reset];
         }
@@ -270,17 +312,21 @@ int nearestEvenInt(int to) {
             }
         }
         
+        //Set pre animation position
         for (ADClusterAnnotation *annotation in _annotationPool) {
             if (CLLocationCoordinate2DIsValid(annotation.coordinatePreAnimation)) {
                 annotation.coordinate = annotation.coordinatePreAnimation;
             }
         }
         
+        
         for (ADClusterAnnotation * annotation in _annotationPool) {
+            //Get the new or cached view from delegate
             if (annotation.cluster && annotation.needsRefresh) {
                 [_mapView refreshClusterAnnotation:annotation];
             }
             
+            //Pre animation setup for popInAnimation
             if (annotation.popInAnimation && _mapView.clusterAppearanceAnimated) {
                 CGAffineTransform t = CGAffineTransformMakeScale(0.001, 0.001);
                 t = CGAffineTransformTranslate(t, 0, -annotation.annotationView.frame.size.height);
@@ -300,10 +346,12 @@ int nearestEvenInt(int to) {
             }
         } completion:^(BOOL finished) {
             
+            //Need to be removed after clustering they are no longer needed
             for (ADClusterAnnotation *annotation in removeAfterAnimation) {
                 [annotation reset];
             }
             
+            //If the number of clusters wanted on screen was reduced we can adjust the annotation pool accordingly to speed things up
             NSSet *toRemove = [self poolAnnotationsToRemove:_numberOfClusters freeAnnotations:[unmatchedAnnotations setByAddingObjectsFromSet:removeAfterAnimation]];
             
             if (_finishedBlock) {
@@ -430,6 +478,10 @@ int nearestEvenInt(int to) {
             double newY = y + rowHeight*(j);
             MKMapRect newRect = MKMapRectMake(newX, newY, columnWidth, rowHeight);
             [set addObject:[NSDictionary dictionaryFromMapRect:newRect]];
+            
+            //create a set of shifted rects to compare against so clusters straddling a line
+            //can be taken into account
+            MKMapRect shiftedRect = MKMapRectMake(newX+columnWidth/2, newY+rowHeight/2, columnWidth, rowHeight);
         }
     }
     

@@ -13,8 +13,7 @@
 #import "TSClusterAnnotationView.h"
 #import "TSClusterAnimationOptions.h"
 
-extern NSString * const TSMapViewWillChangeRegion;
-extern NSString * const TSMapViewDidChangeRegion;
+extern NSString * const KDTreeClusteringProgress;
 
 @class ADClusterMapView;
 @protocol ADClusterMapViewDelegate <MKMapViewDelegate, UIGestureRecognizerDelegate>
@@ -92,7 +91,7 @@ typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
 - (ADClusterAnnotation *)currentClusterAnnotationForAddedAnnotation:(id<MKAnnotation>)annotation;
 
 /*!
- * @discussion Adds an annotation to the map and clusters if needed (threadsafe). Only rebuilds entire cluster tree if there are less than 500 clustered annotations or the annotation coordinate is an outlier from current clustered data set.
+ * @discussion Adds an annotation to the map and clusters if needed (threadsafe). Only rebuilds entire cluster tree if there are less than 1000 clustered annotations or the annotation coordinate is an outlier from current clustered data set.
  * @param annotation The annotation to be added to map
  */
 - (void)addClusteredAnnotation:(id<MKAnnotation>)annotation;

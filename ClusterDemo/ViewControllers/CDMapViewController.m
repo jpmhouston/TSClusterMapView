@@ -18,16 +18,22 @@ static NSString * const kStreetLightAnnotationImage = @"StreetLightAnnotation";
 static NSString * const CDToiletJsonFile = @"CDToilets";
 static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
 
+@interface CDMapViewController ()
+
+@property (strong, nonatomic) NSDate *startTime;
+
+@end
+
+
 @implementation CDMapViewController
 
 #pragma mark - UIViewController
 
 - (void)viewDidLoad {
-    [super viewDidLoad];
     
-    _tabBar.tintColor = UIColorFromRGB(0x009fd6);
+    [super viewDidLoad];
 
-    _mapView.visibleMapRect = MKMapRectMake(135888858.533591, 92250098.902419, 190858.927912, 145995.678292);
+    [_mapView setRegion:MKCoordinateRegionMake(CLLocationCoordinate2DMake(48.857617, 2.338820), MKCoordinateSpanMake(1.0, 1.0))];
     _mapView.clusterDiscriminationPower = 1.8;
     
     [_tabBar setSelectedItem:_bathroomTabBarItem];
@@ -35,6 +41,13 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
     [self parseJsonData];
     
     [self refreshBadges];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(kdTreeLoadingProgress:)
+                                                 name:KDTreeClusteringProgress
+                                               object:nil];
+    
+    [_progressView setHidden:YES];
 }
 
 
@@ -82,13 +95,24 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
 }
 
 - (void)mapView:(ADClusterMapView *)mapView willBeginBuildingClusterTreeForMapPoints:(NSSet *)annotations {
-    
     NSLog(@"Kd-tree will begin mapping item count %lu", (unsigned long)annotations.count);
+    
+    _startTime = [NSDate date];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        if (annotations.count > 10000) {
+            [_progressView setHidden:NO];
+        }
+    }];
 }
 
 - (void)mapView:(ADClusterMapView *)mapView didFinishBuildingClusterTreeForMapPoints:(NSSet *)annotations {
-    
     NSLog(@"Kd-tree finished mapping item count %lu", (unsigned long)annotations.count);
+    NSLog(@"Took %f seconds", -[_startTime timeIntervalSinceNow]);
+    
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [_progressView setHidden:YES];
+        _progressView.progress = 0.0;
+    }];
 }
 
 - (void)mapViewWillBeginClusteringAnimation:(ADClusterMapView *)mapView{
@@ -140,11 +164,15 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
 - (IBAction)addAll:(id)sender {
     
     if (_tabBar.selectedItem == _bathroomTabBarItem) {
+        NSLog(@"Adding All %@", CDToiletJsonFile);
+        
         [_mapView addClusteredAnnotations:_bathroomAnnotations];
         _bathroomAnnotationsAdded = [NSMutableArray arrayWithArray:_bathroomAnnotations];
         _stepper.value = _bathroomAnnotationsAdded.count;
     }
     else if (_tabBar.selectedItem == _streetLightsTabBarItem) {
+        NSLog(@"Adding All %@", CDStreetLightJsonFile);
+        
         [_mapView addClusteredAnnotations:_streetLightAnnotations];
         _streetLightAnnotationsAdded = [NSMutableArray arrayWithArray:_streetLightAnnotations];
         _stepper.value = _streetLightAnnotationsAdded.count;
@@ -158,10 +186,14 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
     if (_tabBar.selectedItem == _bathroomTabBarItem) {
         [_mapView removeAnnotations:_bathroomAnnotationsAdded];
         [_bathroomAnnotationsAdded removeAllObjects];
+        
+        NSLog(@"Removing All %@", CDToiletJsonFile);
     }
     else if (_tabBar.selectedItem == _streetLightsTabBarItem) {
         [_mapView removeAnnotations:_streetLightAnnotationsAdded];
         [_streetLightAnnotationsAdded removeAllObjects];
+        
+        NSLog(@"Removing All %@", CDStreetLightJsonFile);
     }
     
     [self refreshBadges];
@@ -170,12 +202,15 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
 - (IBAction)stepperValueChanged:(id)sender {
     
     if (_tabBar.selectedItem == _bathroomTabBarItem) {
+        
         if (_stepper.value >= _bathroomAnnotationsAdded.count) {
             [self addNewBathroom];
         }
         else {
             [self removeLastBathroom];
         }
+        _stepper.maximumValue = _bathroomAnnotations.count;
+        _stepper.value = _bathroomAnnotationsAdded.count;
     }
     else if (_tabBar.selectedItem == _streetLightsTabBarItem) {
         if (_stepper.value >= _streetLightAnnotationsAdded.count) {
@@ -184,6 +219,8 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
         else {
             [self removeLastStreetLight];
         }
+        _stepper.maximumValue = _streetLightAnnotations.count;
+        _stepper.value = _streetLightAnnotationsAdded.count;
     }
     
     [self refreshBadges];
@@ -200,6 +237,9 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
     if (_bathroomAnnotationsAdded.count >= _bathroomAnnotations.count) {
         return;
     }
+    
+    NSLog(@"Adding 1 %@", CDToiletJsonFile);
+    
     TSBathroomAnnotation *annotation = [_bathroomAnnotations objectAtIndex:_bathroomAnnotationsAdded.count];
     [_bathroomAnnotationsAdded addObject:annotation];
     
@@ -211,6 +251,9 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
     if (_streetLightAnnotationsAdded.count >= _streetLightAnnotations.count) {
         return;
     }
+    
+    NSLog(@"Adding 1 %@", CDStreetLightJsonFile);
+    
     TSStreetLightAnnotation *annotation = [_streetLightAnnotations objectAtIndex:_streetLightAnnotationsAdded.count];
     [_streetLightAnnotationsAdded addObject:annotation];
     
@@ -219,12 +262,16 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
 
 - (void)removeLastBathroom {
     
+    NSLog(@"Removing 1 %@", CDToiletJsonFile);
+    
     TSBathroomAnnotation *annotation = [_bathroomAnnotationsAdded lastObject];
     [_bathroomAnnotationsAdded removeObject:annotation];
     [_mapView removeAnnotation:annotation];
 }
 
 - (void)removeLastStreetLight {
+    
+    NSLog(@"Removing 1 %@", CDStreetLightJsonFile);
     
     TSStreetLightAnnotation *annotation = [_streetLightAnnotationsAdded lastObject];
     [_streetLightAnnotationsAdded removeObject:annotation];
@@ -292,5 +339,13 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
     }];
 }
 
+
+- (void)kdTreeLoadingProgress:(NSNotification *)notification {
+    NSNumber *number = [notification object];
+    
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        _progressView.progress = number.floatValue;
+    }];
+}
 
 @end

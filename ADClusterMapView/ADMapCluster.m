@@ -21,6 +21,8 @@
 @property (nonatomic, strong) NSString *clusterTitle;
 
 @property (nonatomic, assign) double gamma;
+@property (nonatomic, assign) double progress;
+@property (nonatomic, assign) float percentage;
 
 @end
 
@@ -61,14 +63,14 @@
     }
     
     
-    ADMapCluster * cluster = [[ADMapCluster alloc] initWithAnnotations:annotations atDepth:0 inMapRect:boundaries gamma:gamma clusterTitle:clusterTitle showSubtitle:showSubtitle parentCluster:nil];
+    ADMapCluster * cluster = [[ADMapCluster alloc] initWithAnnotations:annotations atDepth:0 inMapRect:boundaries gamma:gamma clusterTitle:clusterTitle showSubtitle:showSubtitle parentCluster:nil rootCluster:nil];
     
     //NSLog(@"Computation done !");
     
     completion(cluster);
 }
 
-- (id)initWithAnnotations:(NSSet *)annotations atDepth:(NSInteger)depth inMapRect:(MKMapRect)mapRect gamma:(double)gamma clusterTitle:(NSString *)clusterTitle showSubtitle:(BOOL)showSubtitle parentCluster:(ADMapCluster *)parentCluster {
+- (id)initWithAnnotations:(NSSet *)annotations atDepth:(NSInteger)depth inMapRect:(MKMapRect)mapRect gamma:(double)gamma clusterTitle:(NSString *)clusterTitle showSubtitle:(BOOL)showSubtitle parentCluster:(ADMapCluster *)parentCluster rootCluster:(ADMapCluster *)rootCluster {
     self = [super init];
     if (self) {
         _depth = depth;
@@ -78,6 +80,11 @@
         _gamma = gamma;
         _parentCluster = parentCluster;
         _clusterCount = annotations.count;
+        _progress = 0;
+        
+        if (depth == 0) {
+            rootCluster = self;
+        }
         
         if (annotations.count == 0) {
             _leftChild = nil;
@@ -89,6 +96,7 @@
             _rightChild = nil;
             self.annotation = [annotations.allObjects lastObject];
             self.clusterCoordinate = self.annotation.annotation.coordinate;
+            [rootCluster annotationReached];
         } else {
             self.annotation = nil;
             
@@ -199,53 +207,38 @@
                 }
             }
             
-            MKMapRect leftMapRect = MKMapRectNull;
-            MKMapRect rightMapRect = MKMapRectNull;
-            
-            // compute map rects
-            double XMin = MAXFLOAT, XMax = 0.0, YMin = MAXFLOAT, YMax = 0.0;
-            for (ADMapPointAnnotation * annotation in leftAnnotations) {
-                const MKMapPoint point = annotation.mapPoint;
-                if (point.x > XMax) {
-                    XMax = point.x;
-                }
-                if (point.y > YMax) {
-                    YMax = point.y;
-                }
-                if (point.x < XMin) {
-                    XMin = point.x;
-                }
-                if (point.y < YMin) {
-                    YMin = point.y;
-                }
-            }
-            leftMapRect = MKMapRectMake(XMin, YMin, XMax - XMin, YMax - YMin);
-            
-            XMin = MAXFLOAT, XMax = 0.0, YMin = MAXFLOAT, YMax = 0.0;
-            for (ADMapPointAnnotation * annotation in rightAnnotations) {
-                const MKMapPoint point = annotation.mapPoint;
-                if (point.x > XMax) {
-                    XMax = point.x;
-                }
-                if (point.y > YMax) {
-                    YMax = point.y;
-                }
-                if (point.x < XMin) {
-                    XMin = point.x;
-                }
-                if (point.y < YMin) {
-                    YMin = point.y;
-                }
-            }
-            rightMapRect = MKMapRectMake(XMin, YMin, XMax - XMin, YMax - YMin);
+            MKMapRect leftMapRect = [ADMapCluster boundariesForAnnotations:leftAnnotations];
+            MKMapRect rightMapRect = [ADMapCluster boundariesForAnnotations:rightAnnotations];
             
             _clusterCoordinate = MKCoordinateForMapPoint(MKMapPointMake(XMean, YMean));
             
-            _leftChild = [[ADMapCluster alloc] initWithAnnotations:leftAnnotations atDepth:depth+1 inMapRect:leftMapRect gamma:gamma clusterTitle:clusterTitle showSubtitle:showSubtitle parentCluster:self];
-            _rightChild = [[ADMapCluster alloc] initWithAnnotations:rightAnnotations atDepth:depth+1 inMapRect:rightMapRect gamma:gamma clusterTitle:clusterTitle showSubtitle:showSubtitle parentCluster:self];
+            _leftChild = [[ADMapCluster alloc] initWithAnnotations:leftAnnotations atDepth:depth+1 inMapRect:leftMapRect gamma:gamma clusterTitle:clusterTitle showSubtitle:showSubtitle parentCluster:self rootCluster:rootCluster];
+            _rightChild = [[ADMapCluster alloc] initWithAnnotations:rightAnnotations atDepth:depth+1 inMapRect:rightMapRect gamma:gamma clusterTitle:clusterTitle showSubtitle:showSubtitle parentCluster:self rootCluster:rootCluster];
         }
     }
     return self;
+}
+
++ (MKMapRect)boundariesForAnnotations:(NSSet *)annotations
+{
+    double XMin = MAXFLOAT, XMax = 0.0, YMin = MAXFLOAT, YMax = 0.0;
+    for (ADMapPointAnnotation * annotation in annotations) {
+        const MKMapPoint point = annotation.mapPoint;
+        if (point.x > XMax) {
+            XMax = point.x;
+        }
+        if (point.y > YMax) {
+            YMax = point.y;
+        }
+        if (point.x < XMin) {
+            XMin = point.x;
+        }
+        if (point.y < YMin) {
+            YMin = point.y;
+        }
+    }
+    
+    return MKMapRectMake(XMin, YMin, XMax - XMin, YMax - YMin);
 }
 
 - (void)setParentCluster:(ADMapCluster *)parentCluster {
@@ -277,47 +270,28 @@
         }
     }
     
-    //Find closest existing cluster
-    CLLocationDistance distance = MAXFLOAT;
-    ADMapCluster *closestCluster;
+    ADMapCluster *closestCluster = closestCluster = [self childRectContainingPoint:mapPointAnnotation.mapPoint];
     
-    NSSet *allChildClusters = self.allChildClusters;
-    for (ADMapCluster *existingCluster in allChildClusters) {
-        
-        if (existingCluster.depth < 2) {
-            continue;
-        }
-        
-        CLLocationDistance pointDistance = MKMetersBetweenMapPoints(mapPointAnnotation.mapPoint, MKMapPointForCoordinate(existingCluster.clusterCoordinate));
-        
-        if (pointDistance < distance) {
-            distance = pointDistance;
-            closestCluster = existingCluster;
-        }
-    }
-    
-    if (!closestCluster || !closestCluster.parentCluster.parentCluster) {
-        if (6) {
+    if (!closestCluster || !closestCluster.parentCluster) {
+        if (completion) {
             completion(NO);
         }
     }
     
-    //Go up one cluster to ensure a more complete result
-    ADMapCluster *closestClusterParent = closestCluster.parentCluster;
-    NSMutableSet *annotationsToRecalculate = [[NSMutableSet alloc] initWithArray:closestClusterParent.originalMapPointAnnotations];
+    NSMutableSet *annotationsToRecalculate = [[NSMutableSet alloc] initWithArray:closestCluster.originalMapPointAnnotations];
     [annotationsToRecalculate addObject:mapPointAnnotation];
     
-    closestClusterParent.clusterCount = 0;
+    closestCluster.clusterCount = 0;
     
     [ADMapCluster rootClusterForAnnotations:annotationsToRecalculate mapView:mapView completion:^(ADMapCluster *mapCluster) {
-        if (closestClusterParent.parentCluster.rightChild == closestClusterParent) {
-            closestClusterParent.parentCluster.rightChild = mapCluster;
+        if (closestCluster.parentCluster.rightChild == closestCluster) {
+            closestCluster.parentCluster.rightChild = mapCluster;
         }
-        else if (closestClusterParent.parentCluster.leftChild == closestClusterParent) {
-            closestClusterParent.parentCluster.leftChild = mapCluster;
+        else if (closestCluster.parentCluster.leftChild == closestCluster) {
+            closestCluster.parentCluster.leftChild = mapCluster;
         }
         
-        mapCluster.parentCluster = closestClusterParent.parentCluster;
+        mapCluster.parentCluster = closestCluster.parentCluster;
         
         if (completion) {
             completion(YES);
@@ -330,7 +304,7 @@
     
     ADMapCluster *clusterToRemove = [self clusterForAnnotation:annotation];
     
-    if (!clusterToRemove || clusterToRemove.depth < 3) {
+    if (!clusterToRemove || clusterToRemove.depth < 2) {
         if (completion) {
             completion(NO);
         }
@@ -338,7 +312,7 @@
     }
     
     //Go up two cluster to ensure a more complete result
-    ADMapCluster *clusterParent = clusterToRemove.parentCluster.parentCluster;
+    ADMapCluster *clusterParent = clusterToRemove.parentCluster;
     NSMutableSet *annotationsToRecalculate = [[NSMutableSet alloc] initWithArray:clusterParent.originalMapPointAnnotations];
     [annotationsToRecalculate removeObject:clusterToRemove.annotation];
     
@@ -359,6 +333,33 @@
             completion(YES);
         }
     }];
+}
+
+- (ADMapCluster *)childRectContainingPoint:(MKMapPoint)point {
+    
+    ADMapCluster *cluster;
+    
+    if (MKMapRectContainsPoint(self.mapRect, point)) {
+        cluster = self;
+        ADMapCluster *leftCluster = [_leftChild childRectContainingPoint:point];
+        ADMapCluster *rightCluster = [_rightChild childRectContainingPoint:point];
+        
+        if (leftCluster) {
+            cluster = leftCluster;
+        }
+        
+        if (rightCluster) {
+            cluster = rightCluster;
+        }
+        
+        if (leftCluster && rightCluster) {
+            if (MKMapRectSizeIsGreaterThanOrEqual(rightCluster.mapRect, leftCluster.mapRect)) {
+                cluster = leftCluster;
+            }
+        }
+    }
+    
+    return cluster;
 }
 
 
@@ -574,15 +575,35 @@
 
 - (ADMapCluster *)clusterForAnnotation:(id<MKAnnotation>)annotation {
     
-    for (ADMapCluster *cluster in self.allChildClusters) {
-        if (cluster.annotation.annotation == annotation) {
-            return cluster;
-        }
+    ADMapCluster *matched = [self clusterMatched:annotation];
+    if (matched) {
+        return matched;
     }
     
     return nil;
 }
 
+- (ADMapCluster *)clusterMatched:(id<MKAnnotation>)annotation {
+    
+    if (self.annotation.annotation == annotation) {
+        return self;
+    }
+    
+    if (_leftChild) {
+        ADMapCluster *leftMatched = [_leftChild clusterMatched:annotation];
+        if (leftMatched) {
+            return leftMatched;
+        }
+    }
+    
+    if (_rightChild) {
+        ADMapCluster *rightMatched = [_rightChild clusterMatched:annotation];
+        if (rightMatched) {
+            return rightMatched;
+        }
+    }
+    return nil;
+}
 
 #pragma mark - Clean Clusters
 
@@ -648,6 +669,24 @@
         }
     }
     return MKMapRectMake(XMin, YMin, XMax - XMin, YMax - YMin);
+}
+
+
+- (void)annotationReached {
+    
+    _progress++;
+    
+    double percentage = _progress/_clusterCount;
+    
+    float progress = (round(percentage*100)) / 100.0;
+    
+    if (_percentage == progress) {
+        return;
+    }
+    
+    _percentage = progress;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:KDTreeClusteringProgress object:@(percentage)];
 }
 
 @end

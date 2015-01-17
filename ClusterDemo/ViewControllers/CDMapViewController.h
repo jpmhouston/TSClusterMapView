@@ -20,6 +20,7 @@
 @property (weak, nonatomic) IBOutlet UISegmentedControl *segmentedControl;
 @property (weak, nonatomic) IBOutlet UISlider *slider;
 @property (weak, nonatomic) IBOutlet UILabel *label;
+@property (weak, nonatomic) IBOutlet UIProgressView *progressView;
 
 - (IBAction)addAll:(id)sender;
 - (IBAction)removeAll:(id)sender;
