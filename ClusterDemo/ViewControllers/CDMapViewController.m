@@ -34,7 +34,7 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
     [super viewDidLoad];
 
     [_mapView setRegion:MKCoordinateRegionMake(CLLocationCoordinate2DMake(48.857617, 2.338820), MKCoordinateSpanMake(1.0, 1.0))];
-    _mapView.clusterDiscriminationPower = 1.8;
+    _mapView.clusterDiscriminationPower = 1.0;
     
     [_tabBar setSelectedItem:_bathroomTabBarItem];
     
@@ -46,8 +46,6 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
                                              selector:@selector(kdTreeLoadingProgress:)
                                                  name:KDTreeClusteringProgress
                                                object:nil];
-    
-    [_progressView setHidden:YES];
 }
 
 
@@ -101,6 +99,9 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         if (annotations.count > 10000) {
             [_progressView setHidden:NO];
+        }
+        else {
+            [_progressView setHidden:YES];
         }
     }];
 }

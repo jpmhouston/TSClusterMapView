@@ -161,7 +161,7 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
         _clusterableAnnotationsAdded = [[NSMutableSet alloc] initWithObjects:annotation, nil];
     }
     
-    if (refresh || _treeOperationQueue.operationCount > 3) {
+    if (refresh || _treeOperationQueue.operationCount > 10) {
         [self needsRefresh];
         return;
     }
@@ -214,7 +214,7 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
         [_clusterableAnnotationsAdded removeObject:annotation];
         
         //Small data set just rebuild
-        if (_clusterableAnnotationsAdded.count < DATA_REFRESH_MAX || _treeOperationQueue.operationCount > 3) {
+        if (_clusterableAnnotationsAdded.count < DATA_REFRESH_MAX || _treeOperationQueue.operationCount > 10) {
             [self needsRefresh];
         }
         else {

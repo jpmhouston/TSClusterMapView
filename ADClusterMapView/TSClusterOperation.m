@@ -54,10 +54,6 @@
     }
 }
 
-int nearestEvenInt(int to) {
-    return (to % 2 == 0) ? to : (to - 1);
-}
-
 - (void)clusterInMapRect:(MKMapRect)clusteredMapRect {
     
     //Creates grid to estimate number of clusters needed based on the spread of annotations across map rect
@@ -66,7 +62,7 @@ int nearestEvenInt(int to) {
     //and search to see if a cluster is contained in that rect.
     //
     //This helps distribute clusters more evenly by limiting clusters presented relative to viewable region.
-    //Zooming all the way out will now cluster down to one single annotation if all clusters are within one grid rect.
+    //Zooming all the way out will then be able to cluster down to one single annotation if all clusters are within one grid rect.
     NSDate *date = [NSDate date];
     NSUInteger numberOnScreen;
     if (_mapView.region.span.longitudeDelta > _mapView.clusterMinimumLongitudeDelta) {
@@ -77,11 +73,7 @@ int nearestEvenInt(int to) {
         //to account for possible straddling of a rect border
         NSSet *mapRects = [self mapRectsFromMaxNumberOfClusters:_numberOfClusters mapRect:clusteredMapRect];
         numberOnScreen = [_rootMapCluster numberOfMapRectsContainingChildren:mapRects]/2;
-//        numberOnScreen = numberOnScreen * (_numberOfClusters/2)/(mapRects.count/2);
-        if (numberOnScreen > 1) {
-            numberOnScreen = nearestEvenInt((int)numberOnScreen);
-        }
-        else {
+        if (numberOnScreen < 1) {
             numberOnScreen = 1;
         }
     }
@@ -221,7 +213,7 @@ int nearestEvenInt(int to) {
     //Find annotations for remaining unmatched clusters
     //If there are available nearby, set the available annotation to animate to cluster position and take over.
     //After a full tree refresh all annotations will be unmatched but coordinates still may match up or be close by.
-    for (ADMapCluster *cluster in unMatchedClusters) {
+    for (ADMapCluster *cluster in [unMatchedClusters copy]) {
         
         ADClusterAnnotation *annotation;
         
@@ -262,13 +254,14 @@ int nearestEvenInt(int to) {
             //Not visible animate appearance
         }
         else {
-            NSLog(@"Not enough annotations??");
+            NSLog(@"Not enough annotations?!");
             break;
         }
         
         annotation.cluster = cluster;
         [unmatchedAnnotations removeObject:annotation];
         [offscreenAnnotations removeObject:annotation];
+        [unMatchedClusters removeObject:cluster];
     }
     
     //Still need unmatched for a split into multiple from cluster
@@ -289,6 +282,10 @@ int nearestEvenInt(int to) {
     
     matchedAnnotations = [NSMutableSet setWithSet:_annotationPool];
     [matchedAnnotations minusSet:unmatchedAnnotations];
+    
+    if (unMatchedClusters.count) {
+        NSLog(@"Unmatched Clusters!?");
+    }
     
     //Create a circle around coordinate to display all single annotations that overlap
     [TSClusterOperation mutateCoordinatesOfClashingAnnotations:matchedAnnotations];
@@ -482,6 +479,7 @@ int nearestEvenInt(int to) {
             //create a set of shifted rects to compare against so clusters straddling a line
             //can be taken into account
             MKMapRect shiftedRect = MKMapRectMake(newX+columnWidth/2, newY+rowHeight/2, columnWidth, rowHeight);
+            [set addObject:[NSDictionary dictionaryFromMapRect:shiftedRect]];
         }
     }
     
