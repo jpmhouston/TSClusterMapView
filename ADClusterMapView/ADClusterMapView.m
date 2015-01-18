@@ -96,16 +96,13 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
 - (void)setDefaults {
     
     self.clusterPreferredCountVisible = 20;
-    self.clusterCenterWeight = 1.0;
+    self.clusterDiscrimination = 0.0;
     self.clusterShouldShowSubtitle = YES;
     self.clusterEdgeBufferSize = ADClusterBufferMedium;
     self.clusterMinimumLongitudeDelta = 0.005;
     self.clusterTitle = @"%d elements";
     self.clusterZoomsOnTap = YES;
     self.clusterAppearanceAnimated = YES;
-    
-    MKAnnotationView *annotationView = [self mapView:self viewForClusterAnnotation:[[ADClusterAnnotation alloc] init]];
-    self.clusterAnnotationViewSize = annotationView.frame.size;
 }
 
 - (void)setClusterEdgeBufferSize:(ADClusterBufferSize)clusterEdgeBufferSize {
@@ -122,6 +119,18 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
     _clusterPreferredCountVisible = clustersOnScreen;
     
     [self clusterVisibleMapRectForceRefresh:YES];
+}
+
+- (void)setClusterDiscrimination:(float)clusterDiscrimination {
+    
+    if (clusterDiscrimination > 1) {
+        clusterDiscrimination = 1;
+    }
+    else if (clusterDiscrimination < 0) {
+        clusterDiscrimination = 0;
+    }
+    
+    _clusterDiscrimination = clusterDiscrimination;
 }
 
 - (NSUInteger)numberOfClusters {
@@ -385,6 +394,9 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
     [super setDelegate:nil];
     _secondaryDelegate = delegate;
     [super setDelegate:self];
+    
+    MKAnnotationView *annotationView = [self mapView:self viewForClusterAnnotation:[[ADClusterAnnotation alloc] init]];
+    self.clusterAnnotationViewSize = annotationView.frame.size;
 }
 
 - (BOOL)respondsToSelector:(SEL)aSelector {

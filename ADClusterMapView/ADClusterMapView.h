@@ -137,9 +137,9 @@ typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
 @property (assign, nonatomic) ADClusterBufferSize clusterEdgeBufferSize;
 
 /** 
- This parameter emphasize the discrimination of annotations which are far away from the center of mass.  Default: 1.0 (no discrimination applied)
+ This parameter emphasize the discrimination of annotations which are far away from the center of mass. Could result in cluster tree mapping times doubling. Default: 0.0 (no discrimination applied) Max:1.0
  */
-@property (assign, nonatomic) double clusterCenterWeight;
+@property (assign, nonatomic) float clusterDiscrimination;
 
 /** 
  Cluster annotation creates subtitle from list of contained titles. Default: YES

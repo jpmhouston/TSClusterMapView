@@ -32,7 +32,7 @@
     
     [mapView mapView:mapView willBeginBuildingClusterTreeForMapPoints:annotations];
     
-    [ADMapCluster rootClusterForAnnotations:annotations centerWeight:mapView.clusterCenterWeight title:mapView.clusterTitle showSubtitle:mapView.clusterShouldShowSubtitle completion:^(ADMapCluster *mapCluster) {
+    [ADMapCluster rootClusterForAnnotations:annotations centerWeight:mapView.clusterDiscrimination title:mapView.clusterTitle showSubtitle:mapView.clusterShouldShowSubtitle completion:^(ADMapCluster *mapCluster) {
         [mapView mapView:mapView didFinishBuildingClusterTreeForMapPoints:annotations];
         
         completion(mapCluster);
@@ -207,35 +207,35 @@
     double XMean = XSum / (double)annotations.count;
     double YMean = YSum / (double)annotations.count;
     
-//    if (gamma != 1.0) {
-//        // take gamma weight into account
-//        double gammaSumX = 0.0;
-//        double gammaSumY = 0.0;
-//        
-//        double maxDistance = 0.0;
-//        MKMapPoint meanCenter = MKMapPointMake(XMean, YMean);
-//        for (ADMapPointAnnotation * annotation in annotations) {
-//            const double distance = MKMetersBetweenMapPoints(annotation.mapPoint, meanCenter);
-//            if (distance > maxDistance) {
-//                maxDistance = distance;
-//            }
-//        }
-//        
-//        double totalWeight = 0.0;
-//        for (ADMapPointAnnotation * annotation in annotations) {
-//            const MKMapPoint point = annotation.mapPoint;
-//            const double distance = MKMetersBetweenMapPoints(point, meanCenter);
-//            const double normalizedDistance = maxDistance != 0.0 ? distance/maxDistance : 1.0;
-//            
-//            double weight = pow(normalizedDistance, gamma-1.0);
-//            
-//            gammaSumX += point.x * weight;
-//            gammaSumY += point.y * weight;
-//            totalWeight += weight;
-//        }
-//        XMean = gammaSumX/totalWeight;
-//        YMean = gammaSumY/totalWeight;
-//    }
+    if (gamma) {
+        // take gamma weight into account
+        double gammaSumX = 0.0;
+        double gammaSumY = 0.0;
+        
+        double maxDistance = 0.0;
+        MKMapPoint meanCenter = MKMapPointMake(XMean, YMean);
+        for (ADMapPointAnnotation * annotation in annotations) {
+            const double distance = MKMetersBetweenMapPoints(annotation.mapPoint, meanCenter);
+            if (distance > maxDistance) {
+                maxDistance = distance;
+            }
+        }
+        
+        double totalWeight = 0.0;
+        for (ADMapPointAnnotation * annotation in annotations) {
+            const MKMapPoint point = annotation.mapPoint;
+            const double distance = MKMetersBetweenMapPoints(point, meanCenter);
+            const double normalizedDistance = maxDistance != 0.0 ? distance/maxDistance : 1.0;
+            
+            double weight = pow(normalizedDistance, gamma);
+            
+            gammaSumX += point.x * weight;
+            gammaSumY += point.y * weight;
+            totalWeight += weight;
+        }
+        XMean = gammaSumX/totalWeight;
+        YMean = gammaSumY/totalWeight;
+    }
     
     return MKMapPointMake(XMean, YMean);
 }
@@ -386,7 +386,7 @@
 
 #pragma mark - Cluster querying
 
-- (NSSet *)find:(NSInteger)N childrenInMapRect:(MKMapRect)mapRect {
+- (NSSet *)find:(NSInteger)N childrenInMapRect:(MKMapRect)mapRect annotationViewSize:(MKMapRect)annotationSizeRect {
     
     // Start from the root (self)
     // Adopt a breadth-first search strategy
@@ -416,6 +416,12 @@
             
             for (ADMapCluster * child in children) {
                 
+                if (children.count == 2) {
+                    if ([child overlapsClusterOnMap:[children lastObject] annotationViewMapRectSize:annotationSizeRect]) {
+                        [clusters addObject:cluster];
+                        break;
+                    }
+                }
                 if (child.annotation) {
                     [annotations addObject:child];
                 } else {
@@ -440,6 +446,25 @@
     [annotations unionSet:clusters];
     
     return annotations;
+}
+
+- (BOOL)overlapsClusterOnMap:(ADMapCluster *)cluster annotationViewMapRectSize:(MKMapRect)annotationViewRect {
+    
+    if (self == cluster) {
+        return NO;
+    }
+    
+    MKMapPoint thisPoint = MKMapPointForCoordinate(_clusterCoordinate);
+    MKMapPoint clusterPoint = MKMapPointForCoordinate(cluster.clusterCoordinate);
+    
+    MKMapRect thisRect = MKMapRectMake(thisPoint.x, thisPoint.y, annotationViewRect.size.width, annotationViewRect.size.height);
+    MKMapRect clusterRect = MKMapRectMake(clusterPoint.x, clusterPoint.y, annotationViewRect.size.width, annotationViewRect.size.height);
+    
+    if (MKMapRectIntersectsRect(thisRect, clusterRect)) {
+        return YES;
+    }
+    
+    return NO;
 }
 
 - (NSUInteger)numberOfMapRectsContainingChildren:(NSSet *)mapRects {

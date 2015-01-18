@@ -56,44 +56,8 @@
 
 - (void)clusterInMapRect:(MKMapRect)clusteredMapRect {
     
-    //Creates grid to estimate number of clusters needed based on the spread of annotations across map rect
-    //
-    //If there are should be 20 max clusters, we create 20 even rects (plus buffer rects) within the given map rect
-    //and search to see if a cluster is contained in that rect.
-    //
-    //This helps distribute clusters more evenly by limiting clusters presented relative to viewable region.
-    //Zooming all the way out will then be able to cluster down to one single annotation if all clusters are within one grid rect.
-    NSDate *date = [NSDate date];
-    NSUInteger numberOnScreen;
-    if (_mapView.region.span.longitudeDelta > _mapView.clusterMinimumLongitudeDelta) {
-        
-        NSLog(@"Took %f seconds", -[date timeIntervalSinceNow]);
-        //number of map rects that contain at least one annotation
-        //divide by two because there are two sets of map rects - original area and shifted aread
-        //to account for possible straddling of a rect border
-        NSSet *mapRects;
-        
-        if (!CGSizeEqualToSize(_mapView.clusterAnnotationViewSize, CGSizeZero)) {
-            mapRects = [self mapRectsForAnnotationViewSize:_mapView.clusterAnnotationViewSize mapRect:clusteredMapRect];
-        }
-        else {
-            mapRects = [self mapRectsFromMaxNumberOfClusters:_numberOfClusters mapRect:clusteredMapRect];
-        }
-        
-        numberOnScreen = [_rootMapCluster numberOfMapRectsContainingChildren:mapRects];
-        if (numberOnScreen < 1) {
-            numberOnScreen = 1;
-        }
-    }
-    else {
-        //Show maximum number of clusters we're at the minimum level set
-        numberOnScreen = _numberOfClusters;
-    }
     
-    //Can never have more than the available annotations in the pool
-    if (numberOnScreen > _numberOfClusters) {
-        numberOnScreen = _numberOfClusters;
-    }
+    NSUInteger numberOnScreen = _numberOfClusters;
     
     if (self.isCancelled) {
         if (_finishedBlock) {
@@ -103,7 +67,7 @@
     }
     
     //Clusters that need to be visible after the animation
-    NSSet *clustersToShowOnMap = [_rootMapCluster find:numberOnScreen childrenInMapRect:clusteredMapRect];
+    NSSet *clustersToShowOnMap = [_rootMapCluster find:numberOnScreen childrenInMapRect:clusteredMapRect annotationViewSize:[self mapRectAnnotationViewSize]];
     
     if (self.isCancelled) {
         if (_finishedBlock) {
@@ -461,8 +425,6 @@
     }
     
     
-    double x = rect.origin.x;
-    double y = rect.origin.y;
     double width = rect.size.width;
     double height = rect.size.height;
     
@@ -475,6 +437,9 @@
     double columnWidth = width/columns;
     double rowHeight = height/rows;
     
+    
+    double x = rect.origin.x;
+    double y = rect.origin.y;
     //build array of MKMapRects
     NSMutableSet* set = [[NSMutableSet alloc] initWithCapacity:rows*columns];
     for (int i=0; i< columns; i++) {
@@ -483,11 +448,6 @@
             double newY = y + rowHeight*(j);
             MKMapRect newRect = MKMapRectMake(newX, newY, columnWidth, rowHeight);
             [set addObject:[NSDictionary dictionaryFromMapRect:newRect]];
-            
-            //create a set of shifted rects to compare against so clusters straddling a line
-            //can be taken into account
-            MKMapRect shiftedRect = MKMapRectMake(newX+columnWidth/2, newY+rowHeight/2, columnWidth, rowHeight);
-            [set addObject:[NSDictionary dictionaryFromMapRect:shiftedRect]];
         }
     }
     
@@ -495,9 +455,9 @@
 }
 
 
-- (NSSet *)mapRectsForAnnotationViewSize:(CGSize)size mapRect:(MKMapRect)rect {
+- (NSSet *)mapRectsForAnnotationViewSizeInRect:(MKMapRect)rect {
     
-    MKMapRect viewRect = [self mapRectForRect:CGRectMake(0, 0, size.width, size.height)];
+    MKMapRect viewRect = [self mapRectAnnotationViewSize];
     
     double x = rect.origin.x;
     double y = rect.origin.y;
@@ -533,5 +493,56 @@
     return MKMapRectMake(topleftpoint.x, topleftpoint.y, bottomrightpoint.x - topleftpoint.x, bottomrightpoint.y - topleftpoint.y);
 }
 
+
+- (CGRect)annotationViewRect {
+    
+    return CGRectMake(0, 0, _mapView.clusterAnnotationViewSize.width, _mapView.clusterAnnotationViewSize.height);
+}
+
+- (MKMapRect)mapRectAnnotationViewSize {
+    
+    return [self mapRectForRect:[self annotationViewRect]];
+}
+
+
+- (NSUInteger)calculateNumberByGrid:(MKMapRect)clusteredMapRect {
+    
+    //This will be used if the size is unknown for cluster annotationViews
+    //Creates grid to estimate number of clusters needed based on the spread of annotations across map rect.
+    //
+    //If there are should be 20 max clusters, we create 20 even rects (plus buffer rects) within the given map rect
+    //and search to see if a cluster is contained in that rect.
+    //
+    //This helps distribute clusters more evenly by limiting clusters presented relative to viewable region.
+    //Zooming all the way out will then be able to cluster down to one single annotation if all clusters are within one grid rect.
+    
+    NSDate *date = [NSDate date];
+    NSUInteger numberOnScreen = _numberOfClusters;
+    
+    if (_mapView.region.span.longitudeDelta > _mapView.clusterMinimumLongitudeDelta) {
+        
+        //number of map rects that contain at least one annotation
+        //divide by two because there are two sets of map rects - original area and shifted aread
+        //to account for possible straddling of a rect border
+        NSSet *mapRects = [self mapRectsFromMaxNumberOfClusters:_numberOfClusters mapRect:clusteredMapRect];
+        
+        date = [NSDate date];
+        numberOnScreen = [_rootMapCluster numberOfMapRectsContainingChildren:mapRects];
+        if (numberOnScreen < 1) {
+            numberOnScreen = 1;
+        }
+    }
+    else {
+        //Show maximum number of clusters we're at the minimum level set
+        numberOnScreen = _numberOfClusters;
+    }
+    
+    //Can never have more than the available annotations in the pool
+    if (numberOnScreen > _numberOfClusters) {
+        numberOnScreen = _numberOfClusters;
+    }
+    
+    return numberOnScreen;
+}
 
 @end

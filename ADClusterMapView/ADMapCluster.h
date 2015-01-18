@@ -89,7 +89,7 @@ typedef void(^KdtreeCompletionBlock)(ADMapCluster *mapCluster);
  * @param mapRect MKMapRect to search within
  * @return A set containing children found in the rect. May return less than specified or none depending on results.
  */
-- (NSSet *)find:(NSInteger)number childrenInMapRect:(MKMapRect)mapRect;
+- (NSSet *)find:(NSInteger)N childrenInMapRect:(MKMapRect)mapRect annotationViewSize:(MKMapRect)annotationSizeRect;
 
 /*!
  * @discussion Checks the receiver to see how many of the given rects contain coordinates of children
