@@ -137,9 +137,9 @@ typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
 @property (assign, nonatomic) ADClusterBufferSize clusterEdgeBufferSize;
 
 /** 
- This parameter emphasize the discrimination of annotations which are far away from the center of mass. Default: 1.0 (no discrimination applied)
+ This parameter emphasize the discrimination of annotations which are far away from the center of mass.  Default: 1.0 (no discrimination applied)
  */
-@property (assign, nonatomic) double clusterDiscriminationPower;
+@property (assign, nonatomic) double clusterCenterWeight;
 
 /** 
  Cluster annotation creates subtitle from list of contained titles. Default: YES
@@ -167,6 +167,11 @@ typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
  UIView animation block parameters for the clustering animations;
  */
 @property (strong, nonatomic) TSClusterAnimationOptions *clusterAnimationOptions;
+
+/**
+ Annotation view size used to. Cluster animation will try to reduce overlaps using this size.
+ */
+@property (assign, nonatomic) CGSize clusterAnnotationViewSize;
 
 
 @end

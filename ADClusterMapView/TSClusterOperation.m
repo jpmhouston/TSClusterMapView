@@ -71,8 +71,16 @@
         //number of map rects that contain at least one annotation
         //divide by two because there are two sets of map rects - original area and shifted aread
         //to account for possible straddling of a rect border
-        NSSet *mapRects = [self mapRectsFromMaxNumberOfClusters:_numberOfClusters mapRect:clusteredMapRect];
-        numberOnScreen = [_rootMapCluster numberOfMapRectsContainingChildren:mapRects]/2;
+        NSSet *mapRects;
+        
+        if (!CGSizeEqualToSize(_mapView.clusterAnnotationViewSize, CGSizeZero)) {
+            mapRects = [self mapRectsForAnnotationViewSize:_mapView.clusterAnnotationViewSize mapRect:clusteredMapRect];
+        }
+        else {
+            mapRects = [self mapRectsFromMaxNumberOfClusters:_numberOfClusters mapRect:clusteredMapRect];
+        }
+        
+        numberOnScreen = [_rootMapCluster numberOfMapRectsContainingChildren:mapRects];
         if (numberOnScreen < 1) {
             numberOnScreen = 1;
         }
@@ -486,6 +494,44 @@
     return set;
 }
 
+
+- (NSSet *)mapRectsForAnnotationViewSize:(CGSize)size mapRect:(MKMapRect)rect {
+    
+    MKMapRect viewRect = [self mapRectForRect:CGRectMake(0, 0, size.width, size.height)];
+    
+    double x = rect.origin.x;
+    double y = rect.origin.y;
+    
+    //create basic cluster grid
+    double columnWidth = viewRect.size.width*2;
+    double rowHeight = viewRect.size.height*2;
+    
+    int columns = ceil(rect.size.width/columnWidth);
+    int rows = ceil(rect.size.height/rowHeight);
+    
+    //build array of MKMapRects
+    NSMutableSet* set = [[NSMutableSet alloc] initWithCapacity:rows*columns];
+    for (int i=0; i< columns; i++) {
+        double newX = x + columnWidth*(i);
+        for (int j=0; j< rows; j++) {
+            double newY = y + rowHeight*(j);
+            MKMapRect newRect = MKMapRectMake(newX, newY, columnWidth, rowHeight);
+            [set addObject:[NSDictionary dictionaryFromMapRect:newRect]];
+        }
+    }
+    
+    return set;
+}
+
+
+- (MKMapRect)mapRectForRect:(CGRect)rect {
+    CLLocationCoordinate2D topleft = [_mapView convertPoint:CGPointMake(rect.origin.x, rect.origin.y) toCoordinateFromView:_mapView];
+    CLLocationCoordinate2D bottomeright = [_mapView convertPoint:CGPointMake(CGRectGetMaxX(rect), CGRectGetMaxY(rect)) toCoordinateFromView:_mapView];
+    MKMapPoint topleftpoint = MKMapPointForCoordinate(topleft);
+    MKMapPoint bottomrightpoint = MKMapPointForCoordinate(bottomeright);
+    
+    return MKMapRectMake(topleftpoint.x, topleftpoint.y, bottomrightpoint.x - topleftpoint.x, bottomrightpoint.y - topleftpoint.y);
+}
 
 
 @end

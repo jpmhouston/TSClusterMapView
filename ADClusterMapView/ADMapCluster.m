@@ -32,14 +32,14 @@
     
     [mapView mapView:mapView willBeginBuildingClusterTreeForMapPoints:annotations];
     
-    [ADMapCluster rootClusterForAnnotations:annotations discriminationPower:mapView.clusterDiscriminationPower title:mapView.clusterTitle showSubtitle:mapView.clusterShouldShowSubtitle completion:^(ADMapCluster *mapCluster) {
+    [ADMapCluster rootClusterForAnnotations:annotations centerWeight:mapView.clusterCenterWeight title:mapView.clusterTitle showSubtitle:mapView.clusterShouldShowSubtitle completion:^(ADMapCluster *mapCluster) {
         [mapView mapView:mapView didFinishBuildingClusterTreeForMapPoints:annotations];
         
         completion(mapCluster);
     }];
 }
 
-+ (void)rootClusterForAnnotations:(NSSet *)annotations discriminationPower:(double)gamma title:(NSString *)clusterTitle showSubtitle:(BOOL)showSubtitle completion:(KdtreeCompletionBlock)completion {
++ (void)rootClusterForAnnotations:(NSSet *)annotations centerWeight:(double)gamma title:(NSString *)clusterTitle showSubtitle:(BOOL)showSubtitle completion:(KdtreeCompletionBlock)completion {
     
     // KDTree
     //NSLog(@"Computing KD-tree for %lu annotations...", (unsigned long)annotations.count);
@@ -86,7 +86,7 @@
             rootCluster = self;
         }
         
-        if (annotations.count == 0) {
+        if (!annotations.count) {
             _leftChild = nil;
             _rightChild = nil;
             self.annotation = nil;
@@ -120,7 +120,10 @@
             MKMapRect leftMapRect = [ADMapCluster boundariesForAnnotations:splitAnnotations[0]];
             MKMapRect rightMapRect = [ADMapCluster boundariesForAnnotations:splitAnnotations[1]];
             
-            _leftChild = [[ADMapCluster alloc] initWithAnnotations:splitAnnotations[0] atDepth:depth+1 inMapRect:leftMapRect gamma:gamma clusterTitle:clusterTitle showSubtitle:showSubtitle parentCluster:self rootCluster:rootCluster];
+            if (splitAnnotations[0]) {
+                _leftChild = [[ADMapCluster alloc] initWithAnnotations:splitAnnotations[0] atDepth:depth+1 inMapRect:leftMapRect gamma:gamma clusterTitle:clusterTitle showSubtitle:showSubtitle parentCluster:self rootCluster:rootCluster];
+            }
+            
             _rightChild = [[ADMapCluster alloc] initWithAnnotations:splitAnnotations[1] atDepth:depth+1 inMapRect:rightMapRect gamma:gamma clusterTitle:clusterTitle showSubtitle:showSubtitle parentCluster:self rootCluster:rootCluster];
         }
     }
@@ -156,8 +159,8 @@
         aY = sumXsquared > sumYsquared ? 0.0 : 1.0;
     }
     
-    NSMutableSet * leftAnnotations = nil;
-    NSMutableSet * rightAnnotations = nil;
+    NSMutableSet * leftAnnotations = [[NSMutableSet alloc] init];
+    NSMutableSet * rightAnnotations = [[NSMutableSet alloc] init];
     
     if (fabs(sumXsquared)/annotations.count < ADMapClusterDiscriminationPrecision || fabs(sumYsquared)/annotations.count < ADMapClusterDiscriminationPrecision) { // all X and Y are the same => same coordinates
         // then every x equals XMean and we have to arbitrarily choose where to put the pivotIndex
@@ -204,33 +207,35 @@
     double XMean = XSum / (double)annotations.count;
     double YMean = YSum / (double)annotations.count;
     
-    if (gamma != 1.0) {
-        // take gamma weight into account
-        double gammaSumX = 0.0;
-        double gammaSumY = 0.0;
-        
-        double maxDistance = 0.0;
-        MKMapPoint meanCenter = MKMapPointMake(XMean, YMean);
-        for (ADMapPointAnnotation * annotation in annotations) {
-            const double distance = MKMetersBetweenMapPoints(annotation.mapPoint, meanCenter);
-            if (distance > maxDistance) {
-                maxDistance = distance;
-            }
-        }
-        
-        double totalWeight = 0.0;
-        for (ADMapPointAnnotation * annotation in annotations) {
-            const MKMapPoint point = annotation.mapPoint;
-            const double distance = MKMetersBetweenMapPoints(point, meanCenter);
-            const double normalizedDistance = maxDistance != 0.0 ? distance/maxDistance : 1.0;
-            const double weight = pow(normalizedDistance, gamma-1.0);
-            gammaSumX += point.x * weight;
-            gammaSumY += point.y * weight;
-            totalWeight += weight;
-        }
-        XMean = gammaSumX/totalWeight;
-        YMean = gammaSumY/totalWeight;
-    }
+//    if (gamma != 1.0) {
+//        // take gamma weight into account
+//        double gammaSumX = 0.0;
+//        double gammaSumY = 0.0;
+//        
+//        double maxDistance = 0.0;
+//        MKMapPoint meanCenter = MKMapPointMake(XMean, YMean);
+//        for (ADMapPointAnnotation * annotation in annotations) {
+//            const double distance = MKMetersBetweenMapPoints(annotation.mapPoint, meanCenter);
+//            if (distance > maxDistance) {
+//                maxDistance = distance;
+//            }
+//        }
+//        
+//        double totalWeight = 0.0;
+//        for (ADMapPointAnnotation * annotation in annotations) {
+//            const MKMapPoint point = annotation.mapPoint;
+//            const double distance = MKMetersBetweenMapPoints(point, meanCenter);
+//            const double normalizedDistance = maxDistance != 0.0 ? distance/maxDistance : 1.0;
+//            
+//            double weight = pow(normalizedDistance, gamma-1.0);
+//            
+//            gammaSumX += point.x * weight;
+//            gammaSumY += point.y * weight;
+//            totalWeight += weight;
+//        }
+//        XMean = gammaSumX/totalWeight;
+//        YMean = gammaSumY/totalWeight;
+//    }
     
     return MKMapPointMake(XMean, YMean);
 }

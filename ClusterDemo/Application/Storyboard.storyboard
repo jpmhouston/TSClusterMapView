@@ -3,6 +3,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--Navigation Controller-->
@@ -104,19 +105,22 @@
                                     </barButtonItem>
                                 </items>
                             </toolbar>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="20" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yyq-po-JOS">
-                                <rect key="frame" x="262" y="442" width="42" height="21"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progressViewStyle="bar" translatesAutoresizingMaskIntoConstraints="NO" id="lE3-0p-jFP">
-                                <rect key="frame" x="0.0" y="429" width="320" height="3"/>
+                                <rect key="frame" x="0.0" y="431" width="320" height="3"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="320" id="e73-Zu-6pq"/>
                                     <constraint firstAttribute="height" constant="2" id="hQI-HC-Jby"/>
                                 </constraints>
                             </progressView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="20" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yyq-po-JOS">
+                                <rect key="frame" x="262" y="442" width="42" height="21"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="42" id="Gbk-nH-Zn5"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -124,11 +128,16 @@
                             <constraint firstItem="t7T-3w-Ldr" firstAttribute="top" secondItem="lE3-0p-jFP" secondAttribute="bottom" id="2aZ-RF-Fx6"/>
                             <constraint firstAttribute="trailing" secondItem="BFz-fq-RjB" secondAttribute="trailing" id="7si-cF-KBD"/>
                             <constraint firstItem="XdT-y2-VGv" firstAttribute="top" secondItem="t7T-3w-Ldr" secondAttribute="bottom" id="LRV-dB-Qeu"/>
+                            <constraint firstItem="Yyq-po-JOS" firstAttribute="top" secondItem="lE3-0p-jFP" secondAttribute="bottom" constant="9" id="RJB-yd-eVS"/>
+                            <constraint firstItem="Yyq-po-JOS" firstAttribute="top" secondItem="lE3-0p-jFP" secondAttribute="bottom" constant="9" id="TcM-d0-bp2"/>
                             <constraint firstAttribute="trailing" secondItem="kkO-TM-PwV" secondAttribute="trailing" id="TmS-ux-x3g"/>
                             <constraint firstItem="st3-K2-lqv" firstAttribute="top" secondItem="lE3-0p-jFP" secondAttribute="bottom" id="UXf-ZX-5xg"/>
+                            <constraint firstItem="kkO-TM-PwV" firstAttribute="top" secondItem="lE3-0p-jFP" secondAttribute="bottom" constant="42" id="WNm-Kk-PA0"/>
                             <constraint firstItem="kkO-TM-PwV" firstAttribute="top" secondItem="st3-K2-lqv" secondAttribute="bottom" id="XaW-pB-07H"/>
+                            <constraint firstItem="kkO-TM-PwV" firstAttribute="top" secondItem="Yyq-po-JOS" secondAttribute="bottom" constant="12" id="YUq-Xc-lAl"/>
                             <constraint firstAttribute="trailing" secondItem="t7T-3w-Ldr" secondAttribute="trailing" id="YW6-48-4Zt"/>
                             <constraint firstItem="BFz-fq-RjB" firstAttribute="top" secondItem="deA-x0-VJI" secondAttribute="top" id="eUd-g3-hkf"/>
+                            <constraint firstItem="Yyq-po-JOS" firstAttribute="trailing" secondItem="deA-x0-VJI" secondAttribute="trailingMargin" id="hJk-ed-W99"/>
                             <constraint firstAttribute="trailing" secondItem="lE3-0p-jFP" secondAttribute="trailing" id="jWV-va-TzU"/>
                             <constraint firstAttribute="trailing" secondItem="st3-K2-lqv" secondAttribute="trailing" id="kb7-k7-KAV"/>
                             <constraint firstItem="kkO-TM-PwV" firstAttribute="top" secondItem="st3-K2-lqv" secondAttribute="bottom" id="l8O-5T-EnL"/>
@@ -141,6 +150,8 @@
                         </constraints>
                         <variation key="default">
                             <mask key="constraints">
+                                <exclude reference="UXf-ZX-5xg"/>
+                                <exclude reference="RJB-yd-eVS"/>
                                 <exclude reference="2aZ-RF-Fx6"/>
                             </mask>
                         </variation>

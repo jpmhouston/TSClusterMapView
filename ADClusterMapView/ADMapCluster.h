@@ -64,7 +64,7 @@ typedef void(^KdtreeCompletionBlock)(ADMapCluster *mapCluster);
  * @param showSubtitle A Boolean to show subtitle from titles of children
  * @return A new ADMapCluster object.
  */
-+ (void)rootClusterForAnnotations:(NSSet *)annotations discriminationPower:(double)gamma title:(NSString *)clusterTitle showSubtitle:(BOOL)showSubtitle completion:(KdtreeCompletionBlock)completion ;
++ (void)rootClusterForAnnotations:(NSSet *)annotations centerWeight:(double)gamma title:(NSString *)clusterTitle showSubtitle:(BOOL)showSubtitle completion:(KdtreeCompletionBlock)completion ;
 
 /*!
  * @discussion Adds a single map point annotation to an existing KD-tree map cluster root

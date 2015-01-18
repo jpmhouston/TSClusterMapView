@@ -96,13 +96,16 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
 - (void)setDefaults {
     
     self.clusterPreferredCountVisible = 20;
-    self.clusterDiscriminationPower = 1.0;
+    self.clusterCenterWeight = 1.0;
     self.clusterShouldShowSubtitle = YES;
     self.clusterEdgeBufferSize = ADClusterBufferMedium;
     self.clusterMinimumLongitudeDelta = 0.005;
     self.clusterTitle = @"%d elements";
     self.clusterZoomsOnTap = YES;
     self.clusterAppearanceAnimated = YES;
+    
+    MKAnnotationView *annotationView = [self mapView:self viewForClusterAnnotation:[[ADClusterAnnotation alloc] init]];
+    self.clusterAnnotationViewSize = annotationView.frame.size;
 }
 
 - (void)setClusterEdgeBufferSize:(ADClusterBufferSize)clusterEdgeBufferSize {
@@ -566,6 +569,54 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
 
 
 #pragma mark - MKMapViewDelegate
+
+
+- (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated {
+    
+    if ([_secondaryDelegate respondsToSelector:@selector(mapView:regionWillChangeAnimated:)]) {
+        [_secondaryDelegate mapView:self regionWillChangeAnimated:animated];
+    }
+}
+
+- (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated {
+    
+    [self clusterVisibleMapRectForceRefresh:NO];
+    
+    if ([_secondaryDelegate respondsToSelector:@selector(mapView:regionDidChangeAnimated:)]) {
+        [_secondaryDelegate mapView:self regionDidChangeAnimated:animated];
+    }
+}
+
+- (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view {
+    
+    if (_clusterZoomsOnTap &&
+        [view isKindOfClass:[TSClusterAnnotationView class]] &&
+        ((ADClusterAnnotation *)view.annotation).type == ADClusterAnnotationTypeCluster){
+        
+        [self deselectAnnotation:view.annotation animated:NO];
+        
+        MKMapRect zoomTo = ((ADClusterAnnotation *)view.annotation).cluster.mapRect;
+        zoomTo = [self mapRectThatFits:zoomTo edgePadding:UIEdgeInsetsMake(0, view.frame.size.width, 0, view.frame.size.width)];
+        
+        if (MKMapRectSizeIsGreaterThanOrEqual(zoomTo, self.visibleMapRect)) {
+            zoomTo = MKMapRectInset(zoomTo, zoomTo.size.width/4, zoomTo.size.width/4);
+        }
+        
+        [self setVisibleMapRect:zoomTo animated:YES];
+    }
+    
+    if ([_secondaryDelegate respondsToSelector:@selector(mapView:didSelectAnnotationView:)]) {
+        [_secondaryDelegate mapView:mapView didSelectAnnotationView:view];
+    }
+}
+
+- (void)mapView:(MKMapView *)mapView didDeselectAnnotationView:(MKAnnotationView *)view {
+    
+    if ([_secondaryDelegate respondsToSelector:@selector(mapView:didDeselectAnnotationView:)]) {
+        [_secondaryDelegate mapView:mapView didDeselectAnnotationView:view];
+    }
+}
+
 - (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation {
     if (![annotation isKindOfClass:[ADClusterAnnotation class]]) {
         if ([_secondaryDelegate respondsToSelector:@selector(mapView:viewForAnnotation:)]) {
@@ -615,60 +666,10 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
         delegateAnnotationView.annotation = annotation;
     }
     
+    _clusterAnnotationViewSize = delegateAnnotationView.frame.size;
+    
     return delegateAnnotationView;
 }
-
-- (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated {
-    
-    if ([_secondaryDelegate respondsToSelector:@selector(mapView:regionWillChangeAnimated:)]) {
-        [_secondaryDelegate mapView:self regionWillChangeAnimated:animated];
-    }
-}
-
-- (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated {
-    
-//    if (MKMapRectContainsPoint(self.visibleMapRect, MKMapPointForCoordinate(kADCoordinate2DOffscreen))) {
-//        return;
-//    }
-    
-    [self clusterVisibleMapRectForceRefresh:NO];
-    
-    if ([_secondaryDelegate respondsToSelector:@selector(mapView:regionDidChangeAnimated:)]) {
-        [_secondaryDelegate mapView:self regionDidChangeAnimated:animated];
-    }
-}
-
-- (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view {
-    
-    if (_clusterZoomsOnTap &&
-        [view isKindOfClass:[TSClusterAnnotationView class]] &&
-        ((ADClusterAnnotation *)view.annotation).type == ADClusterAnnotationTypeCluster){
-        
-        [self deselectAnnotation:view.annotation animated:NO];
-        
-        MKMapRect zoomTo = ((ADClusterAnnotation *)view.annotation).cluster.mapRect;
-        zoomTo = [self mapRectThatFits:zoomTo edgePadding:UIEdgeInsetsMake(0, view.frame.size.width/2, 0, view.frame.size.width/2)];
-        
-        if (MKMapRectSizeIsGreaterThanOrEqual(zoomTo, self.visibleMapRect)) {
-            zoomTo = MKMapRectInset(zoomTo, zoomTo.size.width/4, zoomTo.size.width/4);
-        }
-        
-        [self setVisibleMapRect:zoomTo animated:YES];
-    }
-    
-    if ([_secondaryDelegate respondsToSelector:@selector(mapView:didSelectAnnotationView:)]) {
-        [_secondaryDelegate mapView:mapView didSelectAnnotationView:view];
-    }
-}
-
-- (void)mapView:(MKMapView *)mapView didDeselectAnnotationView:(MKAnnotationView *)view {
-    
-    if ([_secondaryDelegate respondsToSelector:@selector(mapView:didDeselectAnnotationView:)]) {
-        [_secondaryDelegate mapView:mapView didDeselectAnnotationView:view];
-    }
-}
-
-
 
 #pragma mark - ADClusterMapView Delegate
 
