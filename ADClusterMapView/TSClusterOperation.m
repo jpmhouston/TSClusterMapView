@@ -59,11 +59,8 @@
     
     NSUInteger numberOnScreen = _numberOfClusters;
     
-    if (self.isCancelled) {
-        if (_finishedBlock) {
-            _finishedBlock(clusteredMapRect, NO, nil);
-        }
-        return;
+    if (CGSizeEqualToSize(_mapView.clusterAnnotationViewSize, CGSizeZero)) {
+        numberOnScreen = [self calculateNumberByGrid:clusteredMapRect];
     }
     
     //Clusters that need to be visible after the animation
@@ -485,12 +482,37 @@
 
 
 - (MKMapRect)mapRectForRect:(CGRect)rect {
-    CLLocationCoordinate2D topleft = [_mapView convertPoint:CGPointMake(rect.origin.x, rect.origin.y) toCoordinateFromView:_mapView];
-    CLLocationCoordinate2D bottomeright = [_mapView convertPoint:CGPointMake(CGRectGetMaxX(rect), CGRectGetMaxY(rect)) toCoordinateFromView:_mapView];
-    MKMapPoint topleftpoint = MKMapPointForCoordinate(topleft);
-    MKMapPoint bottomrightpoint = MKMapPointForCoordinate(bottomeright);
+    //Because the map could rotate and MKMapRect does not, create a triangle with coordinates to get height and width then
+    //create the rect out of the height and width with a North South orientation.
+    CLLocationCoordinate2D topLeft = [_mapView convertPoint:CGPointMake(rect.origin.x, rect.origin.y) toCoordinateFromView:_mapView];
+    CLLocationCoordinate2D bottomRight = [_mapView convertPoint:CGPointMake(CGRectGetMaxX(rect), CGRectGetMaxY(rect)) toCoordinateFromView:_mapView];
     
-    return MKMapRectMake(topleftpoint.x, topleftpoint.y, bottomrightpoint.x - topleftpoint.x, bottomrightpoint.y - topleftpoint.y);
+    //Get Hypotenuse then calculate xA*xA + xB*xB = xC*xC = distance
+    CLLocationDistance distance = MKMetersBetweenMapPoints(MKMapPointForCoordinate(topLeft), MKMapPointForCoordinate(bottomRight));
+    double x = sqrt(distance*distance/(rect.size.width*rect.size.width + rect.size.height*rect.size.height));
+
+    CLLocationCoordinate2D translated = [self translateCoord:topLeft MetersLat:-x*rect.size.height MetersLong:x*rect.size.width];
+    
+    
+    MKMapPoint topLeftPoint = MKMapPointForCoordinate(topLeft);
+    MKMapPoint bottomRightPoint = MKMapPointForCoordinate(translated);
+    
+    MKMapRect mapRect = MKMapRectMake(topLeftPoint.x, topLeftPoint.y, bottomRightPoint.x - topLeftPoint.x, bottomRightPoint.y - topLeftPoint.y);
+    return mapRect;
+}
+
+- (CLLocationCoordinate2D)translateCoord:(CLLocationCoordinate2D)coord MetersLat:(double)metersLat MetersLong:(double)metersLong{
+    
+    CLLocationCoordinate2D tempCoord;
+    
+    MKCoordinateRegion tempRegion = MKCoordinateRegionMakeWithDistance(coord, metersLat, metersLong);
+    MKCoordinateSpan tempSpan = tempRegion.span;
+    
+    tempCoord.latitude = coord.latitude + tempSpan.latitudeDelta;
+    tempCoord.longitude = coord.longitude + tempSpan.longitudeDelta;
+    
+    return tempCoord;
+    
 }
 
 

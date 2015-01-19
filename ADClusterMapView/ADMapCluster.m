@@ -398,13 +398,13 @@
     NSMutableSet * annotations = [[NSMutableSet alloc] init];
     NSMutableSet * previousLevelClusters = nil;
     NSMutableSet * previousLevelAnnotations = nil;
-    BOOL clustersDidChange = YES; // prevents infinite loop at the bottom of the tree
-    while (clusters.count + annotations.count < N-1 && clusters.count > 0 && clustersDidChange) {
+    BOOL clustersDidAddChild = YES; // prevents infinite loop at the bottom of the tree
+    while (clusters.count + annotations.count < N-1 && clusters.count > 0 && clustersDidAddChild) {
         previousLevelAnnotations = [annotations mutableCopy];
         previousLevelClusters = [clusters mutableCopy];
         [clusters removeAllObjects];
         
-        clustersDidChange = NO;
+        clustersDidAddChild = NO;
         for (ADMapCluster * cluster in [previousLevelClusters copy]) {
             
             NSArray *children = [cluster children];
@@ -412,6 +412,10 @@
             if (children.count + clusters.count + annotations.count + previousLevelClusters.count > N) {
                 [clusters unionSet:previousLevelClusters];
                 break;
+            }
+            
+            if (!children.count) {
+                [clusters addObject:self];
             }
             
             for (ADMapCluster * child in children) {
@@ -427,7 +431,7 @@
                 } else {
                     if (MKMapRectIntersectsRect(mapRect, child.mapRect)) {
                         [clusters addObject:child];
-                        clustersDidChange = YES;
+                        clustersDidAddChild = YES;
                     }
                 }
             }
