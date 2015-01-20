@@ -36,7 +36,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="BFz-fq-RjB" customClass="ADClusterMapView">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="431"/>
                                 <connections>
                                     <outlet property="delegate" destination="bV8-3H-Edx" id="wrQ-Vn-2Oe"/>
                                 </connections>
@@ -141,6 +141,7 @@
                             <constraint firstAttribute="trailing" secondItem="lE3-0p-jFP" secondAttribute="trailing" id="jWV-va-TzU"/>
                             <constraint firstAttribute="trailing" secondItem="st3-K2-lqv" secondAttribute="trailing" id="kb7-k7-KAV"/>
                             <constraint firstItem="kkO-TM-PwV" firstAttribute="top" secondItem="st3-K2-lqv" secondAttribute="bottom" id="l8O-5T-EnL"/>
+                            <constraint firstItem="lE3-0p-jFP" firstAttribute="top" secondItem="BFz-fq-RjB" secondAttribute="bottom" id="lMd-YB-Cjp"/>
                             <constraint firstItem="kkO-TM-PwV" firstAttribute="leading" secondItem="deA-x0-VJI" secondAttribute="leading" id="pnd-PQ-GJR"/>
                             <constraint firstItem="st3-K2-lqv" firstAttribute="leading" secondItem="deA-x0-VJI" secondAttribute="leading" id="qL0-8g-XCX"/>
                             <constraint firstItem="lE3-0p-jFP" firstAttribute="leading" secondItem="deA-x0-VJI" secondAttribute="leading" id="sAZ-NB-urX"/>
@@ -153,6 +154,7 @@
                                 <exclude reference="UXf-ZX-5xg"/>
                                 <exclude reference="RJB-yd-eVS"/>
                                 <exclude reference="2aZ-RF-Fx6"/>
+                                <exclude reference="ykZ-b3-E1A"/>
                             </mask>
                         </variation>
                     </view>

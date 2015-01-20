@@ -147,11 +147,6 @@ typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
 @property (assign, nonatomic) BOOL clusterShouldShowSubtitle;
 
 /**
- Will alway show max number of clusters past this span delta level (zoom). Default: .005
- */
-@property (assign, nonatomic) CLLocationDegrees clusterMinimumLongitudeDelta;
-
-/**
  Title for cluster annotations. Default: @"%d elements"
  */
 @property (strong, nonatomic) NSString *clusterTitle;
@@ -161,15 +156,18 @@ typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
  */
 @property (assign, nonatomic) BOOL clusterZoomsOnTap;
 
+/**
+ If YES any new clusters that need to be shown that don't have a previous location to animate from will appear with a scale animation.
+ */
 @property (assign, nonatomic) BOOL clusterAppearanceAnimated;
 
 /**
- UIView animation block parameters for the clustering animations;
+ UIView animation block parameters for the clustering animations.
  */
 @property (strong, nonatomic) TSClusterAnimationOptions *clusterAnimationOptions;
 
 /**
- Annotation view size used to. Cluster animation will try to reduce overlaps using this size.
+ Will be automatically calculated after setting delegate from mapView:viewForClusterAnnotation: if available. Cluster animation will try to eliminate annotation overlaps using this size.
  */
 @property (assign, nonatomic) CGSize clusterAnnotationViewSize;
 

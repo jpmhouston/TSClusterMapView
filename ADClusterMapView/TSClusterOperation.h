@@ -15,6 +15,8 @@ typedef void(^ClusterOperationCompletionBlock)(MKMapRect clusteredRect, BOOL fin
 
 @property (nonatomic, copy) ClusterOperationCompletionBlock finishedBlock;
 
-- (instancetype)initWithMapView:(ADClusterMapView *)mapView rect:(MKMapRect)rect rootCluster:(ADMapCluster *)rootCluster showNumberOfClusters:(NSUInteger)numberOfClusters clusterAnnotations:(NSSet *)clusterAnnotations completion:(ClusterOperationCompletionBlock)completion;
++ (instancetype)mapView:(ADClusterMapView *)mapView rect:(MKMapRect)rect rootCluster:(ADMapCluster *)rootCluster showNumberOfClusters:(NSUInteger)numberOfClusters clusterAnnotations:(NSSet *)clusterAnnotations completion:(ClusterOperationCompletionBlock)completion;
+
++ (instancetype)mapView:(ADClusterMapView *)mapView splitCluster:(ADMapCluster *)splitCluster clusterAnnotationsPool:(NSSet *)clusterAnnotations;
 
 @end

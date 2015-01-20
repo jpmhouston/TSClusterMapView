@@ -22,8 +22,6 @@ typedef void(^KdtreeCompletionBlock)(ADMapCluster *mapCluster);
 
 @property (nonatomic, assign) MKMapRect mapRect;
 
-@property (nonatomic, readonly) MKMapRect childMapRect;
-
 @property (nonatomic, assign) BOOL showSubtitle;
 
 @property (nonatomic, readonly) NSInteger depth;
@@ -46,6 +44,7 @@ typedef void(^KdtreeCompletionBlock)(ADMapCluster *mapCluster);
 
 @property (weak, nonatomic) ADMapCluster *parentCluster;
 
+@property (readonly) NSSet *clustersWithAnnotations;
 
 /*!
  * @discussion Creates a KD-tree of clusters http://en.wikipedia.org/wiki/K-d_tree
@@ -86,10 +85,12 @@ typedef void(^KdtreeCompletionBlock)(ADMapCluster *mapCluster);
 /*!
  * @discussion Get a set number of children contained within a map rect
  * @param number Max number of children to be returned
- * @param mapRect MKMapRect to search within
+ * @param mapRect The mapr ect to search within
+ * @param annotationSizeRect Map rect containing the size of an annotation view at the current region
+ * @param overlap If YES annotation view size will not be accounted and clusters will overlap
  * @return A set containing children found in the rect. May return less than specified or none depending on results.
  */
-- (NSSet *)find:(NSInteger)N childrenInMapRect:(MKMapRect)mapRect annotationViewSize:(MKMapRect)annotationSizeRect;
+- (NSSet *)find:(NSInteger)N childrenInMapRect:(MKMapRect)mapRect annotationViewSize:(MKMapRect)annotationSizeRect allowOverlap:(BOOL)overlap;
 
 /*!
  * @discussion Checks the receiver to see how many of the given rects contain coordinates of children
