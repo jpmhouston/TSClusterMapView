@@ -10,7 +10,7 @@
 #import <MapKit/MapKit.h>
 #import "ADMapPointAnnotation.h"
 
-@class ADClusterMapView;
+@class TSClusterMapView;
 
 @interface ADMapCluster : NSObject
 
@@ -52,7 +52,7 @@ typedef void(^KdtreeCompletionBlock)(ADMapCluster *mapCluster);
  * @param mapView The ADClusterMapView that will send the delegate callback
  * @param completion A new ADMapCluster object.
  */
-+ (void)rootClusterForAnnotations:(NSSet *)annotations mapView:(ADClusterMapView *)mapView completion:(KdtreeCompletionBlock)completion ;
++ (void)rootClusterForAnnotations:(NSSet *)annotations mapView:(TSClusterMapView *)mapView completion:(KdtreeCompletionBlock)completion ;
 
 
 /*!
@@ -71,7 +71,7 @@ typedef void(^KdtreeCompletionBlock)(ADMapCluster *mapCluster);
  * @param mapPointAnnotation A single ADMapPointAnnotation object
  * @param completion Yes if tree was updated, NO if full root should be updated
  */
-- (void)mapView:(ADClusterMapView *)mapView addAnnotation:(ADMapPointAnnotation *)mapPointAnnotation completion:(void(^)(BOOL added))completion;
+- (void)mapView:(TSClusterMapView *)mapView addAnnotation:(ADMapPointAnnotation *)mapPointAnnotation completion:(void(^)(BOOL added))completion;
 
 
 /*!
@@ -80,7 +80,7 @@ typedef void(^KdtreeCompletionBlock)(ADMapCluster *mapCluster);
  * @param annotation A single ADMapPointAnnotation object
  * @param completion YES if tree was updated, NO if full root should be updated
  */
-- (void)mapView:(ADClusterMapView *)mapView removeAnnotation:(id<MKAnnotation>)annotation completion:(void(^)(BOOL added))completion;;
+- (void)mapView:(TSClusterMapView *)mapView removeAnnotation:(id<MKAnnotation>)annotation completion:(void(^)(BOOL added))completion;;
 
 /*!
  * @discussion Get a set number of children contained within a map rect

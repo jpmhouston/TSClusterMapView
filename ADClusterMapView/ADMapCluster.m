@@ -10,7 +10,7 @@
 #import "ADMapPointAnnotation.h"
 #import "NSDictionary+MKMapRect.h"
 #import "CLLocation+Utilities.h"
-#import "ADClusterMapView.h"
+#import "TSClusterMapView.h"
 
 #define ADMapClusterDiscriminationPrecision 1E-4
 
@@ -30,7 +30,7 @@
 
 #pragma mark - Init
 
-+ (void)rootClusterForAnnotations:(NSSet *)annotations mapView:(ADClusterMapView *)mapView completion:(KdtreeCompletionBlock)completion {
++ (void)rootClusterForAnnotations:(NSSet *)annotations mapView:(TSClusterMapView *)mapView completion:(KdtreeCompletionBlock)completion {
     
     [mapView mapView:mapView willBeginBuildingClusterTreeForMapPoints:annotations];
     
@@ -269,7 +269,7 @@
 
 #pragma mark - Add/Remove
 
-- (void)mapView:(ADClusterMapView *)mapView addAnnotation:(ADMapPointAnnotation *)mapPointAnnotation completion:(void(^)(BOOL added))completion {
+- (void)mapView:(TSClusterMapView *)mapView addAnnotation:(ADMapPointAnnotation *)mapPointAnnotation completion:(void(^)(BOOL added))completion {
     
     //NSLog(@"begin Adding single annotation");
     
@@ -310,7 +310,7 @@
 }
 
 
-- (void)mapView:(ADClusterMapView *)mapView removeAnnotation:(id<MKAnnotation>)annotation completion:(void(^)(BOOL added))completion {
+- (void)mapView:(TSClusterMapView *)mapView removeAnnotation:(id<MKAnnotation>)annotation completion:(void(^)(BOOL added))completion {
     
     ADMapCluster *clusterToRemove = [self clusterForAnnotation:annotation];
     

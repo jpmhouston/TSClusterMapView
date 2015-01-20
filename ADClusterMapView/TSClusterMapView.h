@@ -16,8 +16,8 @@
 // Progress of cluster tree notification
 extern NSString * const KDTreeClusteringProgress;
 
-@class ADClusterMapView;
-@protocol ADClusterMapViewDelegate <MKMapViewDelegate, UIGestureRecognizerDelegate>
+@class TSClusterMapView;
+@protocol TSClusterMapViewDelegate <MKMapViewDelegate, UIGestureRecognizerDelegate>
 @optional
 
 /*!
@@ -26,48 +26,48 @@ extern NSString * const KDTreeClusteringProgress;
  * @param annotation The object representing the annotation that is about to be displayed.
  * @return The annotation view to display for the specified annotation or nil if you want to display a standard annotation view.
  */
-- (MKAnnotationView *)mapView:(ADClusterMapView *)mapView viewForClusterAnnotation:(id <MKAnnotation>)annotation;
+- (MKAnnotationView *)mapView:(TSClusterMapView *)mapView viewForClusterAnnotation:(id <MKAnnotation>)annotation;
 
 /*!
  * @discussion MapView will begin creating Kd-tree from new annotations. Use this delegate to alert the user of a refresh for large data sets with long build times.
  * @param mapView The map view that will begin clustering.
  */
-- (void)mapView:(ADClusterMapView *)mapView willBeginBuildingClusterTreeForMapPoints:(NSSet *)annotations;
+- (void)mapView:(TSClusterMapView *)mapView willBeginBuildingClusterTreeForMapPoints:(NSSet *)annotations;
 
 /*!
  * @discussion MapView did finish creating Kd-tree from new annotations. Remove any UI associated with loading annotations, cluster animation will begin.
  * @param mapView The map view that will begin clustering.
  */
-- (void)mapView:(ADClusterMapView *)mapView didFinishBuildingClusterTreeForMapPoints:(NSSet *)annotations;
+- (void)mapView:(TSClusterMapView *)mapView didFinishBuildingClusterTreeForMapPoints:(NSSet *)annotations;
 
 /*!
  * @discussion Animation operation will begin for mapView. Follows a mapView:regionDidChangeAnimated: or mapViewDidFinishBuildingClusterTree. Operation may cancel before finishing from new clustering parameters.
  * @param mapView The map view that will begin clustering.
  */
-- (void)mapViewWillBeginClusteringAnimation:(ADClusterMapView *)mapView;
+- (void)mapViewWillBeginClusteringAnimation:(TSClusterMapView *)mapView;
 
 /*!
  * @discussion Animation operation was cancelled due to map movement or new tree.
  * @param mapView The map view that did cancel clustering.
  */
-- (void)mapViewDidCancelClusteringAnimation:(ADClusterMapView *)mapView;
+- (void)mapViewDidCancelClusteringAnimation:(TSClusterMapView *)mapView;
 
 /*!
  * @discussion Animation operation did finish successfully.
  * @param mapView The map view that did finish clustering.
  */
-- (void)mapViewDidFinishClusteringAnimation:(ADClusterMapView *)mapView;
+- (void)mapViewDidFinishClusteringAnimation:(TSClusterMapView *)mapView;
 
 /*!
  * @discussion Convenience delegate to determine if map will pan by user gesture
  * @param mapView The map view that will begin panning.
  */
-- (void)userWillPanMapView:(ADClusterMapView *)mapView;
+- (void)userWillPanMapView:(TSClusterMapView *)mapView;
 /*!
  * @discussion Convenience delegate to determine if map did pan by user gesture
  * @param mapView The map view that did finish panning.
  */
-- (void)userDidPanMapView:(ADClusterMapView *)mapView;
+- (void)userDidPanMapView:(TSClusterMapView *)mapView;
 
 @end
 
@@ -82,7 +82,7 @@ typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
     ADClusterBufferLarge = 8
 };
 
-@interface ADClusterMapView : MKMapView <MKMapViewDelegate, UIGestureRecognizerDelegate, ADClusterMapViewDelegate>
+@interface TSClusterMapView : MKMapView <MKMapViewDelegate, UIGestureRecognizerDelegate, TSClusterMapViewDelegate>
 
 /*!
  * @discussion Finds the cluster visible on the map that contains a single annotation

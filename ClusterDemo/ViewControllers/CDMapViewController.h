@@ -7,11 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "ADClusterMapView.h"
+#import "TSClusterMapView.h"
 
-@interface CDMapViewController : UIViewController <ADClusterMapViewDelegate, UITabBarDelegate>
+@interface CDMapViewController : UIViewController <TSClusterMapViewDelegate, UITabBarDelegate>
 
-@property (strong, nonatomic) IBOutlet ADClusterMapView * mapView;
+@property (strong, nonatomic) IBOutlet TSClusterMapView * mapView;
 
 @property (weak, nonatomic) IBOutlet UITabBar *tabBar;
 @property (weak, nonatomic) IBOutlet UITabBarItem *bathroomTabBarItem;

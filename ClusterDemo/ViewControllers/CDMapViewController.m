@@ -81,7 +81,7 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
 
 #pragma mark - ADClusterMapView Delegate
 
-- (MKAnnotationView *)mapView:(ADClusterMapView *)mapView viewForClusterAnnotation:(id<MKAnnotation>)annotation {
+- (MKAnnotationView *)mapView:(TSClusterMapView *)mapView viewForClusterAnnotation:(id<MKAnnotation>)annotation {
     
     TSDemoClusteredAnnotationView * view = (TSDemoClusteredAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:NSStringFromClass([TSDemoClusteredAnnotationView class])];
     if (!view) {
@@ -92,7 +92,7 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
     return view;
 }
 
-- (void)mapView:(ADClusterMapView *)mapView willBeginBuildingClusterTreeForMapPoints:(NSSet *)annotations {
+- (void)mapView:(TSClusterMapView *)mapView willBeginBuildingClusterTreeForMapPoints:(NSSet *)annotations {
     NSLog(@"Kd-tree will begin mapping item count %lu", (unsigned long)annotations.count);
     
     _startTime = [NSDate date];
@@ -106,7 +106,7 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
     }];
 }
 
-- (void)mapView:(ADClusterMapView *)mapView didFinishBuildingClusterTreeForMapPoints:(NSSet *)annotations {
+- (void)mapView:(TSClusterMapView *)mapView didFinishBuildingClusterTreeForMapPoints:(NSSet *)annotations {
     NSLog(@"Kd-tree finished mapping item count %lu", (unsigned long)annotations.count);
     NSLog(@"Took %f seconds", -[_startTime timeIntervalSinceNow]);
     
@@ -116,27 +116,27 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
     }];
 }
 
-- (void)mapViewWillBeginClusteringAnimation:(ADClusterMapView *)mapView{
+- (void)mapViewWillBeginClusteringAnimation:(TSClusterMapView *)mapView{
     
      NSLog(@"Animation operation will begin");
 }
 
-- (void)mapViewDidCancelClusteringAnimation:(ADClusterMapView *)mapView {
+- (void)mapViewDidCancelClusteringAnimation:(TSClusterMapView *)mapView {
     
     NSLog(@"Animation operation cancelled");
 }
 
-- (void)mapViewDidFinishClusteringAnimation:(ADClusterMapView *)mapView{
+- (void)mapViewDidFinishClusteringAnimation:(TSClusterMapView *)mapView{
     
     NSLog(@"Animation operation finished");
 }
 
-- (void)userWillPanMapView:(ADClusterMapView *)mapView {
+- (void)userWillPanMapView:(TSClusterMapView *)mapView {
     
     NSLog(@"Map will pan from user interaction");
 }
 
-- (void)userDidPanMapView:(ADClusterMapView *)mapView {
+- (void)userDidPanMapView:(TSClusterMapView *)mapView {
     
     NSLog(@"Map did pan from user interaction");
 }

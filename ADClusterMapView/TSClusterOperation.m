@@ -15,12 +15,12 @@
 #import "ADMapPointAnnotation.h"
 #import "NSDictionary+MKMapRect.h"
 #import "CLLocation+Utilities.h"
-#import "ADClusterMapView.h"
+#import "TSClusterMapView.h"
 #import "TSRefreshedAnnotationView.h"
 
 @interface TSClusterOperation ()
 
-@property (weak, nonatomic) ADClusterMapView *mapView;
+@property (weak, nonatomic) TSClusterMapView *mapView;
 @property (strong, nonatomic) ADMapCluster *rootMapCluster;
 
 @property (assign, nonatomic) NSUInteger numberOfClusters;
@@ -50,7 +50,7 @@
 
 #pragma mark - Initializers
 
-+ (instancetype)mapView:(ADClusterMapView *)mapView rect:(MKMapRect)rect rootCluster:(ADMapCluster *)rootCluster showNumberOfClusters:(NSUInteger)numberOfClusters clusterAnnotations:(NSSet *)clusterAnnotations completion:(ClusterOperationCompletionBlock)completion {
++ (instancetype)mapView:(TSClusterMapView *)mapView rect:(MKMapRect)rect rootCluster:(ADMapCluster *)rootCluster showNumberOfClusters:(NSUInteger)numberOfClusters clusterAnnotations:(NSSet *)clusterAnnotations completion:(ClusterOperationCompletionBlock)completion {
     
     return [[TSClusterOperation alloc] initWithMapView:mapView
                                                   rect:rect
@@ -60,7 +60,7 @@
                                             completion:completion];
 }
 
-- (instancetype)initWithMapView:(ADClusterMapView *)mapView rect:(MKMapRect)rect rootCluster:(ADMapCluster *)rootCluster showNumberOfClusters:(NSUInteger)numberOfClusters clusterAnnotations:(NSSet *)clusterAnnotations completion:(ClusterOperationCompletionBlock)completion
+- (instancetype)initWithMapView:(TSClusterMapView *)mapView rect:(MKMapRect)rect rootCluster:(ADMapCluster *)rootCluster showNumberOfClusters:(NSUInteger)numberOfClusters clusterAnnotations:(NSSet *)clusterAnnotations completion:(ClusterOperationCompletionBlock)completion
 {
     self = [super init];
     if (self) {
@@ -74,14 +74,14 @@
     return self;
 }
 
-+ (instancetype)mapView:(ADClusterMapView *)mapView splitCluster:(ADMapCluster *)splitCluster clusterAnnotationsPool:(NSSet *)clusterAnnotations {
++ (instancetype)mapView:(TSClusterMapView *)mapView splitCluster:(ADMapCluster *)splitCluster clusterAnnotationsPool:(NSSet *)clusterAnnotations {
     
     return [[TSClusterOperation alloc] initWithMapView:mapView
                                           splitCluster:splitCluster
                                     clusterAnnotations:clusterAnnotations];
 }
 
-- (instancetype)initWithMapView:(ADClusterMapView *)mapView splitCluster:(ADMapCluster *)splitCluster clusterAnnotations:(NSSet *)clusterAnnotations
+- (instancetype)initWithMapView:(TSClusterMapView *)mapView splitCluster:(ADMapCluster *)splitCluster clusterAnnotations:(NSSet *)clusterAnnotations
 {
     self = [super init];
     if (self) {

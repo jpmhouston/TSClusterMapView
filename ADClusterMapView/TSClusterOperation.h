@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ADClusterMapView.h"
+#import "TSClusterMapView.h"
 
 typedef void(^ClusterOperationCompletionBlock)(MKMapRect clusteredRect, BOOL finished, NSSet *poolAnnotationsToRemove);
 
@@ -16,8 +16,8 @@ typedef void(^ClusterOperationCompletionBlock)(MKMapRect clusteredRect, BOOL fin
 @property (nonatomic, copy) ClusterOperationCompletionBlock finishedBlock;
 
 
-+ (instancetype)mapView:(ADClusterMapView *)mapView rect:(MKMapRect)rect rootCluster:(ADMapCluster *)rootCluster showNumberOfClusters:(NSUInteger)numberOfClusters clusterAnnotations:(NSSet *)clusterAnnotations completion:(ClusterOperationCompletionBlock)completion;
++ (instancetype)mapView:(TSClusterMapView *)mapView rect:(MKMapRect)rect rootCluster:(ADMapCluster *)rootCluster showNumberOfClusters:(NSUInteger)numberOfClusters clusterAnnotations:(NSSet *)clusterAnnotations completion:(ClusterOperationCompletionBlock)completion;
 
-+ (instancetype)mapView:(ADClusterMapView *)mapView splitCluster:(ADMapCluster *)splitCluster clusterAnnotationsPool:(NSSet *)clusterAnnotations;
++ (instancetype)mapView:(TSClusterMapView *)mapView splitCluster:(ADMapCluster *)splitCluster clusterAnnotationsPool:(NSSet *)clusterAnnotations;
 
 @end

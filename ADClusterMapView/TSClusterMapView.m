@@ -7,7 +7,7 @@
 //
 
 #import <QuartzCore/CoreAnimation.h>
-#import "ADClusterMapView.h"
+#import "TSClusterMapView.h"
 #import "ADClusterAnnotation.h"
 #import "ADMapPointAnnotation.h"
 #import "NSDictionary+MKMapRect.h"
@@ -19,9 +19,9 @@
 static NSString * const kTSClusterAnnotationViewID = @"kTSClusterAnnotationViewID-private";
 NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
 
-@interface ADClusterMapView ()
+@interface TSClusterMapView ()
 
-@property (nonatomic, weak) id <ADClusterMapViewDelegate>  secondaryDelegate;
+@property (nonatomic, weak) id <TSClusterMapViewDelegate>  secondaryDelegate;
 
 //Clustering
 @property (nonatomic, strong) ADMapCluster *rootMapCluster;
@@ -39,7 +39,7 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
 
 @end
 
-@implementation ADClusterMapView
+@implementation TSClusterMapView
 
 - (instancetype)initWithCoder:(NSCoder *)coder
 {
@@ -176,12 +176,12 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
     }
     
     
-    __weak ADClusterMapView *weakSelf = self;
+    __weak TSClusterMapView *weakSelf = self;
     [_treeOperationQueue addOperationWithBlock:^{
         //Attempt to insert in existing root cluster - will fail if small data set or an outlier
         [_rootMapCluster mapView:self addAnnotation:[[ADMapPointAnnotation alloc] initWithAnnotation:annotation] completion:^(BOOL added) {
             
-            ADClusterMapView *strongSelf = weakSelf;
+            TSClusterMapView *strongSelf = weakSelf;
             
             if (added) {
                 [strongSelf clusterVisibleMapRectForceRefresh:YES];
@@ -229,11 +229,11 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
         else {
             
             
-            __weak ADClusterMapView *weakSelf = self;
+            __weak TSClusterMapView *weakSelf = self;
             [_treeOperationQueue addOperationWithBlock:^{
                 [weakSelf.rootMapCluster mapView:self removeAnnotation:annotation completion:^(BOOL removed) {
                     
-                    ADClusterMapView *strongSelf = weakSelf;
+                    TSClusterMapView *strongSelf = weakSelf;
                     
                     if (removed) {
                         [strongSelf clusterVisibleMapRectForceRefresh:YES];
@@ -381,7 +381,7 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
 
 
 #pragma mark - Objective-C Runtime and subclassing methods
-- (void)setDelegate:(id<ADClusterMapViewDelegate>)delegate {
+- (void)setDelegate:(id<TSClusterMapViewDelegate>)delegate {
     /*
      For an undefined reason, setDelegate is called multiple times. The first time, it is called with delegate = nil
      Therefore _secondaryDelegate may be nil when [_secondaryDelegate respondsToSelector:aSelector] is called (result : NO)
@@ -422,7 +422,7 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
     
     [_treeOperationQueue cancelAllOperations];
     
-    __weak ADClusterMapView *weakSelf = self;
+    __weak TSClusterMapView *weakSelf = self;
     [_treeOperationQueue addOperationWithBlock:^{
         
         // use wrapper annotations that expose a MKMapPoint property instead of a CLLocationCoordinate2D property
@@ -434,7 +434,7 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
         
         [ADMapCluster rootClusterForAnnotations:mapPointAnnotations mapView:self completion:^(ADMapCluster *mapCluster) {
             
-            ADClusterMapView *strongSelf = weakSelf;
+            TSClusterMapView *strongSelf = weakSelf;
             
             strongSelf.rootMapCluster = mapCluster;
             
@@ -526,7 +526,7 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
     
     [self mapViewWillBeginClusteringAnimation:self];
     
-    __weak ADClusterMapView *weakSelf = self;
+    __weak TSClusterMapView *weakSelf = self;
     TSClusterOperation *operation = [TSClusterOperation mapView:self
                                                            rect:clusteredMapRect
                                                     rootCluster:_rootMapCluster
@@ -534,7 +534,7 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
                                              clusterAnnotations:self.clusterAnnotationsPool
                                                      completion:^(MKMapRect clusteredRect, BOOL finished, NSSet *poolAnnotationsToRemove) {
                                                          
-                                                         ADClusterMapView *strongSelf = weakSelf;
+                                                         TSClusterMapView *strongSelf = weakSelf;
                                                          
                                                          [strongSelf poolAnnotationsToRemove:poolAnnotationsToRemove];
                                                          
@@ -700,7 +700,7 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
 
 #pragma mark - ADClusterMapView Delegate
 
-- (MKAnnotationView *)mapView:(ADClusterMapView *)mapView viewForClusterAnnotation:(id <MKAnnotation>)annotation {
+- (MKAnnotationView *)mapView:(TSClusterMapView *)mapView viewForClusterAnnotation:(id <MKAnnotation>)annotation {
     
     if ([_secondaryDelegate respondsToSelector:@selector(mapView:viewForClusterAnnotation:)]) {
         return [_secondaryDelegate mapView:self viewForClusterAnnotation:annotation];
@@ -709,49 +709,49 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
     return nil;
 }
 
-- (void)mapView:(ADClusterMapView *)mapView willBeginBuildingClusterTreeForMapPoints:(NSSet *)annotations {
+- (void)mapView:(TSClusterMapView *)mapView willBeginBuildingClusterTreeForMapPoints:(NSSet *)annotations {
     
     if ([_secondaryDelegate respondsToSelector:@selector(mapView:willBeginBuildingClusterTreeForMapPoints:)]) {
         [_secondaryDelegate mapView:mapView willBeginBuildingClusterTreeForMapPoints:annotations];
     }
 }
 
-- (void)mapView:(ADClusterMapView *)mapView didFinishBuildingClusterTreeForMapPoints:(NSSet *)annotations {
+- (void)mapView:(TSClusterMapView *)mapView didFinishBuildingClusterTreeForMapPoints:(NSSet *)annotations {
     
     if ([_secondaryDelegate respondsToSelector:@selector(mapView:didFinishBuildingClusterTreeForMapPoints:)]) {
         [_secondaryDelegate mapView:mapView didFinishBuildingClusterTreeForMapPoints:annotations];
     }
 }
 
-- (void)mapViewWillBeginClusteringAnimation:(ADClusterMapView *)mapView{
+- (void)mapViewWillBeginClusteringAnimation:(TSClusterMapView *)mapView{
     
     if ([_secondaryDelegate respondsToSelector:@selector(mapViewWillBeginClusteringAnimation:)]) {
         [_secondaryDelegate mapViewWillBeginClusteringAnimation:mapView];
     }
 }
 
-- (void)mapViewDidCancelClusteringAnimation:(ADClusterMapView *)mapView {
+- (void)mapViewDidCancelClusteringAnimation:(TSClusterMapView *)mapView {
     
     if ([_secondaryDelegate respondsToSelector:@selector(mapViewDidCancelClusteringAnimation:)]) {
         [_secondaryDelegate mapViewDidCancelClusteringAnimation:mapView];
     }
 }
 
-- (void)mapViewDidFinishClusteringAnimation:(ADClusterMapView *)mapView{
+- (void)mapViewDidFinishClusteringAnimation:(TSClusterMapView *)mapView{
     
     if ([_secondaryDelegate respondsToSelector:@selector(mapViewDidFinishClusteringAnimation:)]) {
         [_secondaryDelegate mapViewDidFinishClusteringAnimation:mapView];
     }
 }
 
-- (void)userWillPanMapView:(ADClusterMapView *)mapView {
+- (void)userWillPanMapView:(TSClusterMapView *)mapView {
     
     if ([_secondaryDelegate respondsToSelector:@selector(userWillPanMapView:)]) {
         [_secondaryDelegate userWillPanMapView:mapView];
     }
 }
 
-- (void)userDidPanMapView:(ADClusterMapView *)mapView {
+- (void)userDidPanMapView:(TSClusterMapView *)mapView {
     
     if ([_secondaryDelegate respondsToSelector:@selector(userDidPanMapView:)]) {
         [_secondaryDelegate userDidPanMapView:mapView];
