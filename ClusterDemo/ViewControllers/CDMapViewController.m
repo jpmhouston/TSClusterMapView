@@ -35,7 +35,6 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
 
     [_mapView setRegion:MKCoordinateRegionMake(CLLocationCoordinate2DMake(48.857617, 2.338820), MKCoordinateSpanMake(1.0, 1.0))];
     _mapView.clusterDiscrimination = 1.0;
-    _mapView.clusterZoomsOnTap = NO;
     
     [_tabBar setSelectedItem:_bathroomTabBarItem];
     
@@ -306,8 +305,8 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
 
 - (IBAction)sliderValueChanged:(id)sender {
     
-    _mapView.clusterPreferredCountVisible = roundf(_slider.value);
-    _label.text = [NSString stringWithFormat:@"%lu", (unsigned long)_mapView.clusterPreferredCountVisible];
+    _mapView.clusterPreferredVisibleCount = roundf(_slider.value);
+    _label.text = [NSString stringWithFormat:@"%lu", (unsigned long)_mapView.clusterPreferredVisibleCount];
 }
 
 - (void)parseJsonData {

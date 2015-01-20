@@ -311,6 +311,43 @@
     //Create a circle around coordinate to display all single annotations that overlap
     [TSClusterOperation mutateCoordinatesOfClashingAnnotations:matchedAnnotations];
     
+    
+    ADClusterAnnotation *selectedAnnotation = [_mapView.selectedAnnotations firstObject];
+    ADClusterAnnotation *annotationToSelect;
+    
+    
+    if (selectedAnnotation && [selectedAnnotation isKindOfClass:[ADClusterAnnotation class]]) {
+        for (ADClusterAnnotation *annotation in matchedAnnotations) {
+            if (annotation.cluster == selectedAnnotation.cluster || [annotation.cluster isAncestorOf:selectedAnnotation.cluster]) {
+                annotationToSelect = annotation;
+                break;
+            }
+            
+            if ((annotation.type == ADClusterAnnotationTypeCluster &&
+                 CLLocationCoordinate2DIsApproxEqual(annotation.coordinate, selectedAnnotation.coordinate, .000001)) ||
+                ![removeAfterAnimation containsObject:annotation]) {
+                annotationToSelect = annotation;
+            }
+        }
+    }
+    
+    if (!MKMapRectContainsPoint(_mapView.visibleMapRect, MKMapPointForCoordinate(annotationToSelect.coordinate))) {
+        annotationToSelect = nil;
+    }
+    
+//    //Make sure we close callout of cluster if needed
+//    NSArray *selectedAnnotations = _mapView.selectedAnnotations;
+//    for (ADClusterAnnotation *annotation in selectedAnnotations) {
+//        if ([annotation isKindOfClass:[ADClusterAnnotation class]]) {
+//            if ((annotation.type == ADClusterAnnotationTypeCluster &&
+//                 !CLLocationCoordinate2DIsApproxEqual(annotation.coordinate, annotation.coordinatePreAnimation, .000001)) ||
+//                [removeAfterAnimation containsObject:annotation]) {
+//                [_mapView deselectAnnotation:annotation animated:NO];
+//            }
+//        }
+//    }
+    
+    
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         
         //Make sure they are in the offscreen position
@@ -353,6 +390,14 @@
             annotation.popInAnimation = NO;
         }
         
+        //Selected if needed
+        if (annotationToSelect) {
+            [_mapView selectAnnotation:annotationToSelect animated:YES];
+        }
+        else if (selectedAnnotation) {
+            [_mapView deselectAnnotation:selectedAnnotation animated:NO];
+        }
+        
         TSClusterAnimationOptions *options = _mapView.clusterAnimationOptions;
         [UIView animateWithDuration:options.duration delay:0.0 usingSpringWithDamping:options.springDamping initialSpringVelocity:options.springVelocity options:options.viewAnimationOptions animations:^{
             for (ADClusterAnnotation * annotation in _annotationPool) {
@@ -363,6 +408,11 @@
                 annotation.annotationView.transform = CGAffineTransformIdentity;
             }
         } completion:^(BOOL finished) {
+            
+            //Make sure selected if was previously offscreen
+            if (annotationToSelect) {
+                [_mapView selectAnnotation:annotationToSelect animated:YES];
+            }
             
             //Need to be removed after clustering they are no longer needed
             for (ADClusterAnnotation *annotation in removeAfterAnimation) {

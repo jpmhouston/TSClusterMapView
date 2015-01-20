@@ -93,7 +93,7 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
 
 - (void)setDefaults {
     
-    self.clusterPreferredCountVisible = 20;
+    self.clusterPreferredVisibleCount = 20;
     self.clusterDiscrimination = 0.0;
     self.clusterShouldShowSubtitle = YES;
     self.clusterEdgeBufferSize = ADClusterBufferMedium;
@@ -111,9 +111,9 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
     _clusterEdgeBufferSize = clusterEdgeBufferSize;
 }
 
-- (void)setClusterPreferredCountVisible:(NSUInteger)clustersOnScreen {
+- (void)setClusterPreferredVisibleCount:(NSUInteger)clustersOnScreen {
     
-    _clusterPreferredCountVisible = clustersOnScreen;
+    _clusterPreferredVisibleCount = clustersOnScreen;
     
     [self clusterVisibleMapRectForceRefresh:YES];
 }
@@ -132,11 +132,11 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
 
 - (NSUInteger)numberOfClusters {
     
-    NSUInteger adjusted = _clusterPreferredCountVisible + (_clusterPreferredCountVisible*_clusterEdgeBufferSize);
-    if (_clusterPreferredCountVisible > 6) {
+    NSUInteger adjusted = _clusterPreferredVisibleCount + (_clusterPreferredVisibleCount*_clusterEdgeBufferSize);
+    if (_clusterPreferredVisibleCount > 6) {
         return adjusted;
     }
-    return _clusterPreferredCountVisible;
+    return _clusterPreferredVisibleCount;
 }
 
 - (void)needsRefresh {

@@ -24,7 +24,7 @@
 
 - (void)clusteringAnimation {
     
-    //Subclass and add your cluster view updates here
+    //Subclass and add your cluster view updates to be animated here
 }
 
 

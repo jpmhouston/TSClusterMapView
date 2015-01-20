@@ -34,6 +34,10 @@
  */
 @property (nonatomic, assign) UIViewAnimationOptions viewAnimationOptions;
 
+
+/**
+ * Returns a TSClusterAnimationOptions object with the default animation settings
+ */
 + (instancetype)defaultOptions;
 
 @end

@@ -13,6 +13,7 @@
 #import "TSClusterAnnotationView.h"
 #import "TSClusterAnimationOptions.h"
 
+// Progress of cluster tree notification
 extern NSString * const KDTreeClusteringProgress;
 
 @class ADClusterMapView;
@@ -126,9 +127,9 @@ typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
 @property (readonly) NSArray * visibleClusterAnnotations;
 
 /*!
- * @discussion Suggested number of clusterable annotations visible at once. May exceed if buffer size not set to none. Default: 20
+ * @discussion Suggested number of clusterable annotations visible at once. More may be visible if buffer size not set to none. Less will be visible if clusters overlap.  Default: 20
  */
-@property (assign, nonatomic) NSUInteger clusterPreferredCountVisible;
+@property (assign, nonatomic) NSUInteger clusterPreferredVisibleCount;
 
 /*!
  * @discussion Creates a buffer zone surrounding visible map of clustered annotations. This helps simulate seemless loading of annotations and helps prevent annotations from appearing and dissapearing close to the edge. NOTE: For older devices or larger data sets try reducing the buffer size Default: ADClusterBufferMedium
