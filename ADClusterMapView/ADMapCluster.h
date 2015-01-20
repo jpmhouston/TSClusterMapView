@@ -50,7 +50,7 @@ typedef void(^KdtreeCompletionBlock)(ADMapCluster *mapCluster);
  * @discussion Creates a KD-tree of clusters http://en.wikipedia.org/wiki/K-d_tree
  * @param annotations Set of ADMapPointAnnotation objects
  * @param mapView The ADClusterMapView that will send the delegate callback
- * @return A new ADMapCluster object.
+ * @param completion A new ADMapCluster object.
  */
 + (void)rootClusterForAnnotations:(NSSet *)annotations mapView:(ADClusterMapView *)mapView completion:(KdtreeCompletionBlock)completion ;
 
@@ -59,9 +59,9 @@ typedef void(^KdtreeCompletionBlock)(ADMapCluster *mapCluster);
  * @discussion Creates a KD-tree of clusters http://en.wikipedia.org/wiki/K-d_tree
  * @param annotations Set of ADMapPointAnnotation objects
  * @param gamma Descrimination power
- * @param title Title of cluster
+ * @param clusterTitle Title of cluster
  * @param showSubtitle A Boolean to show subtitle from titles of children
- * @return A new ADMapCluster object.
+ * @param completion A new ADMapCluster object.
  */
 + (void)rootClusterForAnnotations:(NSSet *)annotations centerWeight:(double)gamma title:(NSString *)clusterTitle showSubtitle:(BOOL)showSubtitle completion:(KdtreeCompletionBlock)completion ;
 
@@ -69,7 +69,7 @@ typedef void(^KdtreeCompletionBlock)(ADMapCluster *mapCluster);
  * @discussion Adds a single map point annotation to an existing KD-tree map cluster root
  * @param mapView The ADClusterMapView that will send the delegate callback
  * @param mapPointAnnotation A single ADMapPointAnnotation object
- * @return YES if tree was updated, NO if full root should be updated
+ * @param completion Yes if tree was updated, NO if full root should be updated
  */
 - (void)mapView:(ADClusterMapView *)mapView addAnnotation:(ADMapPointAnnotation *)mapPointAnnotation completion:(void(^)(BOOL added))completion;
 
@@ -77,8 +77,8 @@ typedef void(^KdtreeCompletionBlock)(ADMapCluster *mapCluster);
 /*!
  * @discussion Removes a single map point annotation to an existing KD-tree map cluster root
  * @param mapView The ADClusterMapView that will send the delegate callback
- * @param mapPointAnnotation A single ADMapPointAnnotation object
- * @return YES if tree was updated, NO if full root should be updated
+ * @param annotation A single ADMapPointAnnotation object
+ * @param completion YES if tree was updated, NO if full root should be updated
  */
 - (void)mapView:(ADClusterMapView *)mapView removeAnnotation:(id<MKAnnotation>)annotation completion:(void(^)(BOOL added))completion;;
 
@@ -90,7 +90,7 @@ typedef void(^KdtreeCompletionBlock)(ADMapCluster *mapCluster);
  * @param overlap If YES annotation view size will not be accounted and clusters will overlap
  * @return A set containing children found in the rect. May return less than specified or none depending on results.
  */
-- (NSSet *)find:(NSInteger)N childrenInMapRect:(MKMapRect)mapRect annotationViewSize:(MKMapRect)annotationSizeRect allowOverlap:(BOOL)overlap;
+- (NSSet *)find:(NSInteger)number childrenInMapRect:(MKMapRect)mapRect annotationViewSize:(MKMapRect)annotationSizeRect allowOverlap:(BOOL)overlap;
 
 /*!
  * @discussion Checks the receiver to see how many of the given rects contain coordinates of children
@@ -121,7 +121,19 @@ typedef void(^KdtreeCompletionBlock)(ADMapCluster *mapCluster);
 - (ADMapCluster *)clusterForAnnotation:(id<MKAnnotation>)annotation;
 
 
-- (NSMutableSet *)findChildrenForClusterInSet:(NSSet *)set;
-- (ADMapCluster *)findAncestorForClusterInSet:(NSSet *)set;
+/*!
+ * @discussion Finds the children of the receiver that are contained in a set.
+ * @param clusters The clusters that need to be sorted.
+ * @return Set of clusters that are all children of the receiver.
+ */
+- (NSMutableSet *)findChildrenForClusterInSet:(NSSet *)clusters;
+
+
+/*!
+ * @discussion Finds the ancestor of the receiver that is included in a set. Assumes there will only be one.
+ * @param clusters The clusters to search.
+ * @return The cluster that is an ancestor of the receiver or nil if there are none.
+ */
+- (ADMapCluster *)findAncestorForClusterInSet:(NSSet *)clusters;
 
 @end

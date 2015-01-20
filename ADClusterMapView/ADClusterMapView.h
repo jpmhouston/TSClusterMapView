@@ -110,39 +110,38 @@ typedef NS_ENUM(NSInteger, ADClusterBufferSize) {
 - (void)addClusteredAnnotation:(id<MKAnnotation>)annotation clusterTreeRefresh:(BOOL)refresh;
 
 /*!
- * @discussion Force a refresh of clustering tree
+ * @discussion Force a refresh of clustering tree.
  */
 - (void)needsRefresh;
 
 /*!
  * @discussion Asks delegate for a new MKAnnotationView. Used before cluster animation to update annotation views.
+ * @param annotation The annotation that needs to be refreshed.
  */
 - (void)refreshClusterAnnotation:(ADClusterAnnotation *)annotation;
 
-- (void)cacheAnnotationView:(MKAnnotationView *)annotationView;
-
-/**
- Visible cluster annotations. Will contain clusters just outside visible rect included in buffer zone.
+/*!
+ * @discussion Visible cluster annotations. Will contain clusters just outside visible rect included in buffer zone.
  */
 @property (readonly) NSArray * visibleClusterAnnotations;
 
-/**
- Suggested number of clusterable annotations visible at once. May exceed if buffer size not set to none. Default: 20
+/*!
+ * @discussion Suggested number of clusterable annotations visible at once. May exceed if buffer size not set to none. Default: 20
  */
 @property (assign, nonatomic) NSUInteger clusterPreferredCountVisible;
 
-/**
- Creates a buffer zone surrounding visible map of clustered annotations. This helps simulate seemless loading of annotations and helps prevent annotations from appearing and dissapearing close to the edge. NOTE: For older devices or larger data sets try reducing the buffer size Default: ADClusterBufferMedium
+/*!
+ * @discussion Creates a buffer zone surrounding visible map of clustered annotations. This helps simulate seemless loading of annotations and helps prevent annotations from appearing and dissapearing close to the edge. NOTE: For older devices or larger data sets try reducing the buffer size Default: ADClusterBufferMedium
  */
 @property (assign, nonatomic) ADClusterBufferSize clusterEdgeBufferSize;
 
-/** 
- This parameter emphasize the discrimination of annotations which are far away from the center of mass. Could result in cluster tree mapping times doubling. Default: 0.0 (no discrimination applied) Max:1.0
+/*!
+ * @discussion This parameter emphasize the discrimination of annotations which are far away from the center of mass. Could result in cluster tree mapping times doubling. Default: 0.0 (no discrimination applied) Max:1.0
  */
 @property (assign, nonatomic) float clusterDiscrimination;
 
-/** 
- Cluster annotation creates subtitle from list of contained titles. Default: YES
+/*!
+ * @discussion Cluster annotation creates subtitle from list of contained titles. Default: YES
  */
 @property (assign, nonatomic) BOOL clusterShouldShowSubtitle;
 

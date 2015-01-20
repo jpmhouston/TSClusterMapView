@@ -532,7 +532,20 @@
     return annotations;
 }
 
-- (NSSet *)findClustersInMapRect:(MKMapRect)mapRect {
+
+#pragma mark Map Location
+
+- (NSUInteger)numberOfMapRectsContainingChildren:(NSSet *)mapRects {
+    
+    NSMutableSet * mutableSet = [[NSMutableSet alloc] init];
+    for (NSDictionary *dictionary in mapRects) {
+        [mutableSet unionSet:[self clustersInMapRect:[dictionary mapRectForDictionary]]];
+    }
+    
+    return mutableSet.count;
+}
+
+- (NSSet *)clustersInMapRect:(MKMapRect)mapRect {
     
     NSMutableSet * clusters = [[NSMutableSet alloc] initWithObjects:self, nil];
     NSMutableSet * clustersWithCoordinateInMapRect = [[NSMutableSet alloc] init];
@@ -572,47 +585,10 @@
     return annotations;
 }
 
-- (NSMutableSet *)findChildrenForClusterInSet:(NSSet *)set {
+- (BOOL)isInMapRect:(MKMapRect)mapRect {
     
-    NSMutableSet *children = [[NSMutableSet alloc] initWithCapacity:set.count];
-    for (ADMapCluster *cluster in set) {
-        if ([self isAncestorOf:cluster]) {
-            [children addObject:cluster];
-        }
-    }
-    
-    return children;
+    return MKMapRectContainsPoint(mapRect, MKMapPointForCoordinate(self.clusterCoordinate));
 }
-
-- (ADMapCluster *)findAncestorForClusterInSet:(NSSet *)set {
-    for (ADMapCluster *cluster in set) {
-        if ([cluster isAncestorOf:self] || [cluster isEqual:self]) {
-            return cluster;
-        }
-    }
-    return nil;
-}
-
-
-- (BOOL)overlapsClusterOnMap:(ADMapCluster *)cluster annotationViewMapRectSize:(MKMapRect)annotationViewRect {
-    
-    if (self == cluster) {
-        return NO;
-    }
-    
-    MKMapPoint thisPoint = MKMapPointForCoordinate(_clusterCoordinate);
-    MKMapPoint clusterPoint = MKMapPointForCoordinate(cluster.clusterCoordinate);
-    
-    MKMapRect thisRect = MKMapRectMake(thisPoint.x, thisPoint.y, annotationViewRect.size.width, annotationViewRect.size.height);
-    MKMapRect clusterRect = MKMapRectMake(clusterPoint.x, clusterPoint.y, annotationViewRect.size.width, annotationViewRect.size.height);
-    
-    if (MKMapRectIntersectsRect(thisRect, clusterRect)) {
-        return YES;
-    }
-    
-    return NO;
-}
-
 
 - (ADMapCluster *)childRectContainingPoint:(MKMapPoint)point {
     
@@ -641,20 +617,26 @@
     return cluster;
 }
 
-- (NSUInteger)numberOfMapRectsContainingChildren:(NSSet *)mapRects {
+- (BOOL)overlapsClusterOnMap:(ADMapCluster *)cluster annotationViewMapRectSize:(MKMapRect)annotationViewRect {
     
-    NSMutableSet * mutableSet = [[NSMutableSet alloc] init];
-    for (NSDictionary *dictionary in mapRects) {
-        [mutableSet unionSet:[self findClustersInMapRect:[dictionary mapRectForDictionary]]];
+    if (self == cluster) {
+        return NO;
     }
     
-    return mutableSet.count;
+    MKMapPoint thisPoint = MKMapPointForCoordinate(_clusterCoordinate);
+    MKMapPoint clusterPoint = MKMapPointForCoordinate(cluster.clusterCoordinate);
+    
+    MKMapRect thisRect = MKMapRectMake(thisPoint.x, thisPoint.y, annotationViewRect.size.width, annotationViewRect.size.height);
+    MKMapRect clusterRect = MKMapRectMake(clusterPoint.x, clusterPoint.y, annotationViewRect.size.width, annotationViewRect.size.height);
+    
+    if (MKMapRectIntersectsRect(thisRect, clusterRect)) {
+        return YES;
+    }
+    
+    return NO;
 }
 
-- (BOOL)isInMapRect:(MKMapRect)mapRect {
-    
-    return MKMapRectContainsPoint(mapRect, MKMapPointForCoordinate(self.clusterCoordinate));
-}
+#pragma mark Tree Relations
 
 - (BOOL)isAncestorOf:(ADMapCluster *)mapCluster {
     return _depth < mapCluster.depth && (_leftChild == mapCluster || _rightChild == mapCluster || [_leftChild isAncestorOf:mapCluster] || [_rightChild isAncestorOf:mapCluster]);
@@ -664,6 +646,26 @@
     return _annotation.annotation == annotation || [_leftChild isRootClusterForAnnotation:annotation] || [_rightChild isRootClusterForAnnotation:annotation];
 }
 
+- (NSMutableSet *)findChildrenForClusterInSet:(NSSet *)set {
+    
+    NSMutableSet *children = [[NSMutableSet alloc] initWithCapacity:set.count];
+    for (ADMapCluster *cluster in set) {
+        if ([self isAncestorOf:cluster]) {
+            [children addObject:cluster];
+        }
+    }
+    
+    return children;
+}
+
+- (ADMapCluster *)findAncestorForClusterInSet:(NSSet *)set {
+    for (ADMapCluster *cluster in set) {
+        if ([cluster isAncestorOf:self] || [cluster isEqual:self]) {
+            return cluster;
+        }
+    }
+    return nil;
+}
 
 - (NSArray *)clusteredAnnotationTitles {
     if (self.annotation) {

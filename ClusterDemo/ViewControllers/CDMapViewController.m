@@ -35,6 +35,7 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
 
     [_mapView setRegion:MKCoordinateRegionMake(CLLocationCoordinate2DMake(48.857617, 2.338820), MKCoordinateSpanMake(1.0, 1.0))];
     _mapView.clusterDiscrimination = 1.0;
+    _mapView.clusterZoomsOnTap = NO;
     
     [_tabBar setSelectedItem:_bathroomTabBarItem];
     

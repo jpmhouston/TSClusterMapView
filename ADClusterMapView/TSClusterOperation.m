@@ -35,6 +35,21 @@
 @implementation TSClusterOperation
 
 
+- (void)main {
+    
+    @autoreleasepool {
+        
+        if (_splitCluster) {
+            [self splitSingleCluster:_splitCluster];
+        }
+        else {
+            [self clusterInMapRect:_clusteringRect];
+        }
+    }
+}
+
+#pragma mark - Initializers
+
 + (instancetype)mapView:(ADClusterMapView *)mapView rect:(MKMapRect)rect rootCluster:(ADMapCluster *)rootCluster showNumberOfClusters:(NSUInteger)numberOfClusters clusterAnnotations:(NSSet *)clusterAnnotations completion:(ClusterOperationCompletionBlock)completion {
     
     return [[TSClusterOperation alloc] initWithMapView:mapView
@@ -77,18 +92,8 @@
     return self;
 }
 
-- (void)main {
-    
-    @autoreleasepool {
-        
-        if (_splitCluster) {
-            [self splitSingleCluster:_splitCluster];
-        }
-        else {
-            [self clusterInMapRect:_clusteringRect];
-        }
-    }
-}
+
+#pragma mark - Full Cluster Operation
 
 - (void)clusterInMapRect:(MKMapRect)clusteredMapRect {
     
@@ -374,249 +379,7 @@
     }];
 }
 
-- (NSSet *)poolAnnotationsToRemove:(NSInteger)numberOfAnnotationsInPool freeAnnotations:(NSSet *)annotations {
-    
-    NSInteger difference = _annotationPool.count - (numberOfAnnotationsInPool*2);
-    
-    if (difference > 0) {
-        if (annotations.count >= difference) {
-            return [NSSet setWithArray:[annotations.allObjects subarrayWithRange:NSMakeRange(0, difference)]];
-        }
-    }
-    
-    return nil;
-}
-
-#pragma mark - Spread close annotations
-
-+ (void)mutateCoordinatesOfClashingAnnotations:(NSSet *)annotations {
-    
-    NSDictionary *coordinateValuesToAnnotations = [self groupAnnotationsByLocationValue:annotations];
-
-    for (NSValue *coordinateValue in coordinateValuesToAnnotations.allKeys) {
-        NSMutableArray *outletsAtLocation = coordinateValuesToAnnotations[coordinateValue];
-        if (outletsAtLocation.count > 1) {
-            CLLocationCoordinate2D coordinate;
-            [coordinateValue getValue:&coordinate];
-            [self repositionAnnotations:[[NSMutableSet alloc] initWithArray:outletsAtLocation]
-             toAvoidClashAtCoordination:coordinate];
-        }
-    }
-}
-
-+ (NSDictionary *)groupAnnotationsByLocationValue:(NSSet *)annotations {
-    
-    NSMutableDictionary *result = [NSMutableDictionary dictionary];
-
-    for (ADClusterAnnotation *pin in annotations) {
-        
-        if (!pin.cluster) {
-            continue;
-        }
-        
-        CLLocationCoordinate2D coordinate = CLLocationCoordinate2DRoundedLonLat(pin.cluster.clusterCoordinate, 5);
-        NSValue *coordinateValue = [NSValue valueWithBytes:&coordinate objCType:@encode(CLLocationCoordinate2D)];
-        
-        NSMutableArray *annotationsAtLocation = result[coordinateValue];
-        if (!annotationsAtLocation) {
-            annotationsAtLocation = [NSMutableArray array];
-            result[coordinateValue] = annotationsAtLocation;
-        }
-        
-        [annotationsAtLocation addObject:pin];
-    }
-    return result;
-}
-
-+ (void)repositionAnnotations:(NSMutableSet *)annotations toAvoidClashAtCoordination:(CLLocationCoordinate2D)coordinate {
-    
-    double distance = 3 * annotations.count / 2.0;
-    double radiansBetweenAnnotations = (M_PI * 2) / annotations.count;
-    
-    int i = 0;
-
-    for (ADClusterAnnotation *annotation in annotations) {
-        
-        double heading = radiansBetweenAnnotations * i;
-        CLLocationCoordinate2D newCoordinate = [self calculateCoordinateFrom:coordinate onBearing:heading atDistance:distance];
-        
-        annotation.cluster.clusterCoordinate = newCoordinate;
-        
-        i++;
-    }
-}
-
-+ (CLLocationCoordinate2D)calculateCoordinateFrom:(CLLocationCoordinate2D)coordinate onBearing:(double)bearingInRadians atDistance:(double)distanceInMetres {
-    
-    double coordinateLatitudeInRadians = coordinate.latitude * M_PI / 180;
-    double coordinateLongitudeInRadians = coordinate.longitude * M_PI / 180;
-    
-    double distanceComparedToEarth = distanceInMetres / 6378100;
-    
-    double resultLatitudeInRadians = asin(sin(coordinateLatitudeInRadians) * cos(distanceComparedToEarth) + cos(coordinateLatitudeInRadians) * sin(distanceComparedToEarth) * cos(bearingInRadians));
-    double resultLongitudeInRadians = coordinateLongitudeInRadians + atan2(sin(bearingInRadians) * sin(distanceComparedToEarth) * cos(coordinateLatitudeInRadians), cos(distanceComparedToEarth) - sin(coordinateLatitudeInRadians) * sin(resultLatitudeInRadians));
-    
-    CLLocationCoordinate2D result;
-    result.latitude = resultLatitudeInRadians * 180 / M_PI;
-    result.longitude = resultLongitudeInRadians * 180 / M_PI;
-    return result;
-}
-
-- (NSSet *)mapRectsFromMaxNumberOfClusters:(NSUInteger)amount mapRect:(MKMapRect)rect {
-    
-    if (amount == 0) {
-        return [NSSet setWithObject:[NSDictionary dictionaryFromMapRect:rect]];
-    }
-    
-    
-    double width = rect.size.width;
-    double height = rect.size.height;
-    
-    float weight = width/height;
-    
-    int columns = round(sqrt(amount*weight));
-    int rows = ceil(amount / (double)columns);
-    
-    //create basic cluster grid
-    double columnWidth = width/columns;
-    double rowHeight = height/rows;
-    
-    
-    double x = rect.origin.x;
-    double y = rect.origin.y;
-    //build array of MKMapRects
-    NSMutableSet* set = [[NSMutableSet alloc] initWithCapacity:rows*columns];
-    for (int i=0; i< columns; i++) {
-        double newX = x + columnWidth*(i);
-        for (int j=0; j< rows; j++) {
-            double newY = y + rowHeight*(j);
-            MKMapRect newRect = MKMapRectMake(newX, newY, columnWidth, rowHeight);
-            [set addObject:[NSDictionary dictionaryFromMapRect:newRect]];
-        }
-    }
-    
-    return set;
-}
-
-
-- (NSSet *)mapRectsForAnnotationViewSizeInRect:(MKMapRect)rect {
-    
-    MKMapRect viewRect = [self mapRectAnnotationViewSize];
-    
-    double x = rect.origin.x;
-    double y = rect.origin.y;
-    
-    //create basic cluster grid
-    double columnWidth = viewRect.size.width*2;
-    double rowHeight = viewRect.size.height*2;
-    
-    int columns = ceil(rect.size.width/columnWidth);
-    int rows = ceil(rect.size.height/rowHeight);
-    
-    //build array of MKMapRects
-    NSMutableSet* set = [[NSMutableSet alloc] initWithCapacity:rows*columns];
-    for (int i=0; i< columns; i++) {
-        double newX = x + columnWidth*(i);
-        for (int j=0; j< rows; j++) {
-            double newY = y + rowHeight*(j);
-            MKMapRect newRect = MKMapRectMake(newX, newY, columnWidth, rowHeight);
-            [set addObject:[NSDictionary dictionaryFromMapRect:newRect]];
-        }
-    }
-    
-    return set;
-}
-
-
-- (MKMapRect)mapRectForRect:(CGRect)rect {
-    if (CGRectIsEmpty(rect)) {
-        return MKMapRectNull;
-    }
-    
-    //Because the map could rotate and MKMapRect does not, create a triangle with coordinates to get height and width then
-    //create the rect out of the height and width with a North South orientation.
-    CLLocationCoordinate2D topLeft = [_mapView convertPoint:CGPointMake(rect.origin.x, rect.origin.y) toCoordinateFromView:_mapView];
-    CLLocationCoordinate2D bottomRight = [_mapView convertPoint:CGPointMake(CGRectGetMaxX(rect), CGRectGetMaxY(rect)) toCoordinateFromView:_mapView];
-    
-    //Get Hypotenuse then calculate xA*xA + xB*xB = xC*xC = distance
-    CLLocationDistance distance = MKMetersBetweenMapPoints(MKMapPointForCoordinate(topLeft), MKMapPointForCoordinate(bottomRight));
-    double x = sqrt(distance*distance/(rect.size.width*rect.size.width + rect.size.height*rect.size.height));
-
-    CLLocationCoordinate2D translated = [self translateCoord:topLeft MetersLat:-x*rect.size.height MetersLong:x*rect.size.width];
-    
-    
-    MKMapPoint topLeftPoint = MKMapPointForCoordinate(topLeft);
-    MKMapPoint bottomRightPoint = MKMapPointForCoordinate(translated);
-    
-    MKMapRect mapRect = MKMapRectMake(topLeftPoint.x, topLeftPoint.y, bottomRightPoint.x - topLeftPoint.x, bottomRightPoint.y - topLeftPoint.y);
-    return mapRect;
-}
-
-- (CLLocationCoordinate2D)translateCoord:(CLLocationCoordinate2D)coord MetersLat:(double)metersLat MetersLong:(double)metersLong{
-    
-    CLLocationCoordinate2D tempCoord;
-    
-    MKCoordinateRegion tempRegion = MKCoordinateRegionMakeWithDistance(coord, metersLat, metersLong);
-    MKCoordinateSpan tempSpan = tempRegion.span;
-    
-    tempCoord.latitude = coord.latitude + tempSpan.latitudeDelta;
-    tempCoord.longitude = coord.longitude + tempSpan.longitudeDelta;
-    
-    return tempCoord;
-    
-}
-
-
-- (CGRect)annotationViewRect {
-    
-    return CGRectMake(0, 0, _mapView.clusterAnnotationViewSize.width, _mapView.clusterAnnotationViewSize.height);
-}
-
-- (MKMapRect)mapRectAnnotationViewSize {
-    
-    return [self mapRectForRect:[self annotationViewRect]];
-}
-
-
-- (NSUInteger)calculateNumberByGrid:(MKMapRect)clusteredMapRect {
-    
-    //This will be used if the size is unknown for cluster annotationViews
-    //Creates grid to estimate number of clusters needed based on the spread of annotations across map rect.
-    //
-    //If there are should be 20 max clusters, we create 20 even rects (plus buffer rects) within the given map rect
-    //and search to see if a cluster is contained in that rect.
-    //
-    //This helps distribute clusters more evenly by limiting clusters presented relative to viewable region.
-    //Zooming all the way out will then be able to cluster down to one single annotation if all clusters are within one grid rect.
-    
-    NSDate *date = [NSDate date];
-    NSUInteger numberOnScreen = _numberOfClusters;
-    
-    if (_mapView.camera.altitude > 1000) {
-        
-        //number of map rects that contain at least one annotation
-        //divide by two because there are two sets of map rects - original area and shifted aread
-        //to account for possible straddling of a rect border
-        NSSet *mapRects = [self mapRectsFromMaxNumberOfClusters:_numberOfClusters mapRect:clusteredMapRect];
-        
-        date = [NSDate date];
-        numberOnScreen = [_rootMapCluster numberOfMapRectsContainingChildren:mapRects];
-        if (numberOnScreen < 1) {
-            numberOnScreen = 1;
-        }
-    }
-    else {
-        //Show maximum number of clusters we're at the minimum level set
-        numberOnScreen = _numberOfClusters;
-    }
-    
-    //Can never have more than the available annotations in the pool
-    if (numberOnScreen > _numberOfClusters) {
-        numberOnScreen = _numberOfClusters;
-    }
-    
-    return numberOnScreen;
-}
+#pragma mark - Split Operation
 
 - (void)splitSingleCluster:(ADMapCluster *)cluster {
     
@@ -655,7 +418,7 @@
         [unmatchedAnnotations removeObject:annotation];
         [matchedAnnotations addObject:annotation];
     }
-
+    
     //Create a circle around coordinate to display all single annotations that overlap
     [TSClusterOperation mutateCoordinatesOfClashingAnnotations:matchedAnnotations];
     
@@ -684,6 +447,224 @@
             }
         } completion:nil];
     }];
+}
+
+#pragma mark - Helpers
+
+- (NSSet *)poolAnnotationsToRemove:(NSInteger)numberOfAnnotationsInPool freeAnnotations:(NSSet *)annotations {
+    
+    NSInteger difference = _annotationPool.count - (numberOfAnnotationsInPool*2);
+    
+    if (difference > 0) {
+        if (annotations.count >= difference) {
+            return [NSSet setWithArray:[annotations.allObjects subarrayWithRange:NSMakeRange(0, difference)]];
+        }
+    }
+    
+    return nil;
+}
+
+
+#pragma mark - Annotation View Rect Conversions
+
+- (MKMapRect)mapRectForRect:(CGRect)rect {
+    if (CGRectIsEmpty(rect)) {
+        return MKMapRectNull;
+    }
+    
+    //Because the map could rotate and MKMapRect does not, create a triangle with coordinates to get height and width then
+    //create the rect out of the height and width with a North South orientation.
+    CLLocationCoordinate2D topLeft = [_mapView convertPoint:CGPointMake(rect.origin.x, rect.origin.y) toCoordinateFromView:_mapView];
+    CLLocationCoordinate2D bottomRight = [_mapView convertPoint:CGPointMake(CGRectGetMaxX(rect), CGRectGetMaxY(rect)) toCoordinateFromView:_mapView];
+    
+    //Get Hypotenuse then calculate xA*xA + xB*xB = xC*xC = distance
+    CLLocationDistance distance = MKMetersBetweenMapPoints(MKMapPointForCoordinate(topLeft), MKMapPointForCoordinate(bottomRight));
+    double x = sqrt(distance*distance/(rect.size.width*rect.size.width + rect.size.height*rect.size.height));
+
+    CLLocationCoordinate2D translated = [self translateCoord:topLeft MetersLat:-x*rect.size.height MetersLong:x*rect.size.width];
+    
+    MKMapPoint topLeftPoint = MKMapPointForCoordinate(topLeft);
+    MKMapPoint bottomRightPoint = MKMapPointForCoordinate(translated);
+    
+    MKMapRect mapRect = MKMapRectMake(topLeftPoint.x, topLeftPoint.y, bottomRightPoint.x - topLeftPoint.x, bottomRightPoint.y - topLeftPoint.y);
+    return mapRect;
+}
+
+- (CLLocationCoordinate2D)translateCoord:(CLLocationCoordinate2D)coord MetersLat:(double)metersLat MetersLong:(double)metersLong{
+    
+    CLLocationCoordinate2D tempCoord;
+    
+    MKCoordinateRegion tempRegion = MKCoordinateRegionMakeWithDistance(coord, metersLat, metersLong);
+    MKCoordinateSpan tempSpan = tempRegion.span;
+    
+    tempCoord.latitude = coord.latitude + tempSpan.latitudeDelta;
+    tempCoord.longitude = coord.longitude + tempSpan.longitudeDelta;
+    
+    return tempCoord;
+    
+}
+
+- (CGRect)annotationViewRect {
+    
+    return CGRectMake(0, 0, _mapView.clusterAnnotationViewSize.width, _mapView.clusterAnnotationViewSize.height);
+}
+
+- (MKMapRect)mapRectAnnotationViewSize {
+    
+    return [self mapRectForRect:[self annotationViewRect]];
+}
+
+#pragma mark - Grid clusters
+
+- (NSUInteger)calculateNumberByGrid:(MKMapRect)clusteredMapRect {
+    
+    //This will be used if the size is unknown for cluster annotationViews
+    //Creates grid to estimate number of clusters needed based on the spread of annotations across map rect.
+    //
+    //If there are should be 20 max clusters, we create 20 even rects (plus buffer rects) within the given map rect
+    //and search to see if a cluster is contained in that rect.
+    //
+    //This helps distribute clusters more evenly by limiting clusters presented relative to viewable region.
+    //Zooming all the way out will then be able to cluster down to one single annotation if all clusters are within one grid rect.
+    
+    NSDate *date = [NSDate date];
+    NSUInteger numberOnScreen = _numberOfClusters;
+    
+    if (_mapView.camera.altitude > 1000) {
+        
+        //Number of map rects that contain at least one annotation
+        NSSet *mapRects = [self mapRectsFromMaxNumberOfClusters:_numberOfClusters mapRect:clusteredMapRect];
+        
+        date = [NSDate date];
+        numberOnScreen = [_rootMapCluster numberOfMapRectsContainingChildren:mapRects];
+        if (numberOnScreen < 1) {
+            numberOnScreen = 1;
+        }
+    }
+    else {
+        //Show maximum number of clusters we're at the minimum level set
+        numberOnScreen = _numberOfClusters;
+    }
+    
+    //Can never have more than the available annotations in the pool
+    if (numberOnScreen > _numberOfClusters) {
+        numberOnScreen = _numberOfClusters;
+    }
+    
+    return numberOnScreen;
+}
+
+
+- (NSSet *)mapRectsFromMaxNumberOfClusters:(NSUInteger)amount mapRect:(MKMapRect)rect {
+    
+    if (amount == 0) {
+        return [NSSet setWithObject:[NSDictionary dictionaryFromMapRect:rect]];
+    }
+    
+    //Create equal sized rects based on the amount of clusters wanted
+    double width = rect.size.width;
+    double height = rect.size.height;
+    
+    float weight = width/height;
+    
+    int columns = round(sqrt(amount*weight));
+    int rows = ceil(amount / (double)columns);
+    
+    //create basic cluster grid
+    double columnWidth = width/columns;
+    double rowHeight = height/rows;
+    
+    
+    double x = rect.origin.x;
+    double y = rect.origin.y;
+    //build array of MKMapRects
+    NSMutableSet* set = [[NSMutableSet alloc] initWithCapacity:rows*columns];
+    for (int i=0; i< columns; i++) {
+        double newX = x + columnWidth*(i);
+        for (int j=0; j< rows; j++) {
+            double newY = y + rowHeight*(j);
+            MKMapRect newRect = MKMapRectMake(newX, newY, columnWidth, rowHeight);
+            [set addObject:[NSDictionary dictionaryFromMapRect:newRect]];
+        }
+    }
+    
+    return set;
+}
+
+
+#pragma mark - Spread close annotations
+
++ (void)mutateCoordinatesOfClashingAnnotations:(NSSet *)annotations {
+    
+    NSDictionary *coordinateValuesToAnnotations = [self groupAnnotationsByLocationValue:annotations];
+    
+    for (NSValue *coordinateValue in coordinateValuesToAnnotations.allKeys) {
+        NSMutableArray *outletsAtLocation = coordinateValuesToAnnotations[coordinateValue];
+        if (outletsAtLocation.count > 1) {
+            CLLocationCoordinate2D coordinate;
+            [coordinateValue getValue:&coordinate];
+            [self repositionAnnotations:[[NSMutableSet alloc] initWithArray:outletsAtLocation]
+             toAvoidClashAtCoordination:coordinate];
+        }
+    }
+}
+
++ (NSDictionary *)groupAnnotationsByLocationValue:(NSSet *)annotations {
+    
+    NSMutableDictionary *result = [NSMutableDictionary dictionary];
+    
+    for (ADClusterAnnotation *pin in annotations) {
+        
+        if (!pin.cluster) {
+            continue;
+        }
+        
+        CLLocationCoordinate2D coordinate = CLLocationCoordinate2DRoundedLonLat(pin.cluster.clusterCoordinate, 5);
+        NSValue *coordinateValue = [NSValue valueWithBytes:&coordinate objCType:@encode(CLLocationCoordinate2D)];
+        
+        NSMutableArray *annotationsAtLocation = result[coordinateValue];
+        if (!annotationsAtLocation) {
+            annotationsAtLocation = [NSMutableArray array];
+            result[coordinateValue] = annotationsAtLocation;
+        }
+        
+        [annotationsAtLocation addObject:pin];
+    }
+    return result;
+}
+
++ (void)repositionAnnotations:(NSMutableSet *)annotations toAvoidClashAtCoordination:(CLLocationCoordinate2D)coordinate {
+    
+    double distance = 3 * annotations.count / 2.0;
+    double radiansBetweenAnnotations = (M_PI * 2) / annotations.count;
+    
+    int i = 0;
+    
+    for (ADClusterAnnotation *annotation in annotations) {
+        
+        double heading = radiansBetweenAnnotations * i;
+        CLLocationCoordinate2D newCoordinate = [self calculateCoordinateFrom:coordinate onBearing:heading atDistance:distance];
+        
+        annotation.cluster.clusterCoordinate = newCoordinate;
+        
+        i++;
+    }
+}
+
++ (CLLocationCoordinate2D)calculateCoordinateFrom:(CLLocationCoordinate2D)coordinate onBearing:(double)bearingInRadians atDistance:(double)distanceInMetres {
+    
+    double coordinateLatitudeInRadians = coordinate.latitude * M_PI / 180;
+    double coordinateLongitudeInRadians = coordinate.longitude * M_PI / 180;
+    
+    double distanceComparedToEarth = distanceInMetres / 6378100;
+    
+    double resultLatitudeInRadians = asin(sin(coordinateLatitudeInRadians) * cos(distanceComparedToEarth) + cos(coordinateLatitudeInRadians) * sin(distanceComparedToEarth) * cos(bearingInRadians));
+    double resultLongitudeInRadians = coordinateLongitudeInRadians + atan2(sin(bearingInRadians) * sin(distanceComparedToEarth) * cos(coordinateLatitudeInRadians), cos(distanceComparedToEarth) - sin(coordinateLatitudeInRadians) * sin(resultLatitudeInRadians));
+    
+    CLLocationCoordinate2D result;
+    result.latitude = resultLatitudeInRadians * 180 / M_PI;
+    result.longitude = resultLongitudeInRadians * 180 / M_PI;
+    return result;
 }
 
 @end

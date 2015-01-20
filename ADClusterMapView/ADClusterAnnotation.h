@@ -21,8 +21,8 @@ typedef enum {
     ADClusterAnnotationTypeCluster = 2
 } ADClusterAnnotationType;
 
-/*!
- * @discussion Do not subclass or directly modify. This MKAnnotation is a wrapper to keep the annotation static during clustering.
+/**
+ * Do not subclass or directly modify. This MKAnnotation is a wrapper to keep the annotation static during clustering.
  */
 @interface ADClusterAnnotation : NSObject <MKAnnotation>
 
@@ -62,13 +62,29 @@ typedef enum {
  */
 @property (nonatomic, readonly) NSUInteger clusterCount;
 
+/*!
+ * @discussion Needs to have the annotationView refreshed
+ */
 @property (nonatomic, assign) BOOL needsRefresh;
 
+/**
+ * @discussion Should animate scale to pop in onto map
+ */
 @property (nonatomic, assign) BOOL popInAnimation;
 
-- (void)shouldReset;
+/**
+ * @discussion Should animate scale to pop in onto map
+ */
 @property (nonatomic, assign) CLLocationCoordinate2D coordinatePreAnimation;
 
+/**
+ * @discussion Remove cluster and make available or reset after animation
+ */
+- (void)shouldReset;
+
+/**
+ * @discussion Remove cluster and move to off-screen position
+ */
 - (void)reset;
 
 @end
