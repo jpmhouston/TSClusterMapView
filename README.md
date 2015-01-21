@@ -28,7 +28,7 @@ Subclass TSClusterMapView with your new or existing MKMapView
 #import "TSClusterMapView.h"
 
 @interface YourMapView : TSClusterMapView <MKMapViewDelegate, TSClusterMapViewDelegate>
-``
+```
 
 Add annotations to be clustered using the add clustered annotation methods and single annotations using the standard add annotation.
 
@@ -36,7 +36,7 @@ Add annotations to be clustered using the add clustered annotation methods and s
 - (void)addClusteredAnnotation:(id<MKAnnotation>)annotation;
 
 - (void)addClusteredAnnotations:(NSArray *)annotations;
-``
+```
 
 
 
