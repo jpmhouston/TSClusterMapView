@@ -15,16 +15,16 @@
 		6F8FE99D16249223001A0309 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F8FE99C16249223001A0309 /* Foundation.framework */; };
 		6F8FE99F16249223001A0309 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F8FE99E16249223001A0309 /* CoreGraphics.framework */; };
 		6F8FE9E4162496B0001A0309 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F8FE9E3162496AE001A0309 /* main.m */; };
-		C56C088C1A6F6DEF00FEDD45 /* CLLocation+Utilities.m in Sources */ = {isa = PBXBuildFile; fileRef = C56C08761A6F6DEF00FEDD45 /* CLLocation+Utilities.m */; };
-		C56C088D1A6F6DEF00FEDD45 /* NSDictionary+MKMapRect.m in Sources */ = {isa = PBXBuildFile; fileRef = C56C08781A6F6DEF00FEDD45 /* NSDictionary+MKMapRect.m */; };
-		C56C088E1A6F6DEF00FEDD45 /* ADClusterAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = C56C087B1A6F6DEF00FEDD45 /* ADClusterAnnotation.m */; };
-		C56C088F1A6F6DEF00FEDD45 /* ADMapCluster.m in Sources */ = {isa = PBXBuildFile; fileRef = C56C087D1A6F6DEF00FEDD45 /* ADMapCluster.m */; };
-		C56C08901A6F6DEF00FEDD45 /* ADMapPointAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = C56C087F1A6F6DEF00FEDD45 /* ADMapPointAnnotation.m */; };
-		C56C08911A6F6DEF00FEDD45 /* TSClusterAnimationOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C56C08811A6F6DEF00FEDD45 /* TSClusterAnimationOptions.m */; };
-		C56C08921A6F6DEF00FEDD45 /* TSClusterAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = C56C08831A6F6DEF00FEDD45 /* TSClusterAnnotationView.m */; };
-		C56C08931A6F6DEF00FEDD45 /* TSClusterOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C56C08851A6F6DEF00FEDD45 /* TSClusterOperation.m */; };
-		C56C08941A6F6DEF00FEDD45 /* TSRefreshedAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = C56C08891A6F6DEF00FEDD45 /* TSRefreshedAnnotationView.m */; };
-		C56C08951A6F6DEF00FEDD45 /* TSClusterMapView.m in Sources */ = {isa = PBXBuildFile; fileRef = C56C088B1A6F6DEF00FEDD45 /* TSClusterMapView.m */; };
+		C56C08AF1A6F84C300FEDD45 /* CLLocation+Utilities.m in Sources */ = {isa = PBXBuildFile; fileRef = C56C08991A6F84C300FEDD45 /* CLLocation+Utilities.m */; };
+		C56C08B01A6F84C300FEDD45 /* NSDictionary+MKMapRect.m in Sources */ = {isa = PBXBuildFile; fileRef = C56C089B1A6F84C300FEDD45 /* NSDictionary+MKMapRect.m */; };
+		C56C08B11A6F84C300FEDD45 /* ADClusterAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = C56C089E1A6F84C300FEDD45 /* ADClusterAnnotation.m */; };
+		C56C08B21A6F84C300FEDD45 /* ADMapCluster.m in Sources */ = {isa = PBXBuildFile; fileRef = C56C08A01A6F84C300FEDD45 /* ADMapCluster.m */; };
+		C56C08B31A6F84C300FEDD45 /* ADMapPointAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = C56C08A21A6F84C300FEDD45 /* ADMapPointAnnotation.m */; };
+		C56C08B41A6F84C300FEDD45 /* TSClusterAnimationOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C56C08A41A6F84C300FEDD45 /* TSClusterAnimationOptions.m */; };
+		C56C08B51A6F84C300FEDD45 /* TSClusterAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = C56C08A61A6F84C300FEDD45 /* TSClusterAnnotationView.m */; };
+		C56C08B61A6F84C300FEDD45 /* TSClusterOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C56C08A81A6F84C300FEDD45 /* TSClusterOperation.m */; };
+		C56C08B71A6F84C300FEDD45 /* TSRefreshedAnnotationView.m in Sources */ = {isa = PBXBuildFile; fileRef = C56C08AC1A6F84C300FEDD45 /* TSRefreshedAnnotationView.m */; };
+		C56C08B81A6F84C300FEDD45 /* TSClusterMapView.m in Sources */ = {isa = PBXBuildFile; fileRef = C56C08AE1A6F84C300FEDD45 /* TSClusterMapView.m */; };
 		C597E8741A65FECC002DF26A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C597E8731A65FECC002DF26A /* Images.xcassets */; };
 		C597E88D1A66173D002DF26A /* ADBaseAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E87D1A66173D002DF26A /* ADBaseAnnotation.m */; };
 		C597E88E1A66173D002DF26A /* TSBathroomAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = C597E87F1A66173D002DF26A /* TSBathroomAnnotation.m */; };
@@ -48,26 +48,26 @@
 		6F8FE99C16249223001A0309 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		6F8FE99E16249223001A0309 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		6F8FE9E3162496AE001A0309 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = SOURCE_ROOT; };
-		C56C08751A6F6DEF00FEDD45 /* CLLocation+Utilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CLLocation+Utilities.h"; sourceTree = "<group>"; };
-		C56C08761A6F6DEF00FEDD45 /* CLLocation+Utilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CLLocation+Utilities.m"; sourceTree = "<group>"; };
-		C56C08771A6F6DEF00FEDD45 /* NSDictionary+MKMapRect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+MKMapRect.h"; sourceTree = "<group>"; };
-		C56C08781A6F6DEF00FEDD45 /* NSDictionary+MKMapRect.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+MKMapRect.m"; sourceTree = "<group>"; };
-		C56C087A1A6F6DEF00FEDD45 /* ADClusterAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ADClusterAnnotation.h; sourceTree = "<group>"; };
-		C56C087B1A6F6DEF00FEDD45 /* ADClusterAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ADClusterAnnotation.m; sourceTree = "<group>"; };
-		C56C087C1A6F6DEF00FEDD45 /* ADMapCluster.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ADMapCluster.h; sourceTree = "<group>"; };
-		C56C087D1A6F6DEF00FEDD45 /* ADMapCluster.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ADMapCluster.m; sourceTree = "<group>"; };
-		C56C087E1A6F6DEF00FEDD45 /* ADMapPointAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ADMapPointAnnotation.h; sourceTree = "<group>"; };
-		C56C087F1A6F6DEF00FEDD45 /* ADMapPointAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ADMapPointAnnotation.m; sourceTree = "<group>"; };
-		C56C08801A6F6DEF00FEDD45 /* TSClusterAnimationOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSClusterAnimationOptions.h; sourceTree = "<group>"; };
-		C56C08811A6F6DEF00FEDD45 /* TSClusterAnimationOptions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSClusterAnimationOptions.m; sourceTree = "<group>"; };
-		C56C08821A6F6DEF00FEDD45 /* TSClusterAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSClusterAnnotationView.h; sourceTree = "<group>"; };
-		C56C08831A6F6DEF00FEDD45 /* TSClusterAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSClusterAnnotationView.m; sourceTree = "<group>"; };
-		C56C08841A6F6DEF00FEDD45 /* TSClusterOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSClusterOperation.h; sourceTree = "<group>"; };
-		C56C08851A6F6DEF00FEDD45 /* TSClusterOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSClusterOperation.m; sourceTree = "<group>"; };
-		C56C08881A6F6DEF00FEDD45 /* TSRefreshedAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSRefreshedAnnotationView.h; sourceTree = "<group>"; };
-		C56C08891A6F6DEF00FEDD45 /* TSRefreshedAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSRefreshedAnnotationView.m; sourceTree = "<group>"; };
-		C56C088A1A6F6DEF00FEDD45 /* TSClusterMapView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSClusterMapView.h; sourceTree = "<group>"; };
-		C56C088B1A6F6DEF00FEDD45 /* TSClusterMapView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSClusterMapView.m; sourceTree = "<group>"; };
+		C56C08981A6F84C300FEDD45 /* CLLocation+Utilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CLLocation+Utilities.h"; sourceTree = "<group>"; };
+		C56C08991A6F84C300FEDD45 /* CLLocation+Utilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CLLocation+Utilities.m"; sourceTree = "<group>"; };
+		C56C089A1A6F84C300FEDD45 /* NSDictionary+MKMapRect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+MKMapRect.h"; sourceTree = "<group>"; };
+		C56C089B1A6F84C300FEDD45 /* NSDictionary+MKMapRect.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+MKMapRect.m"; sourceTree = "<group>"; };
+		C56C089D1A6F84C300FEDD45 /* ADClusterAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ADClusterAnnotation.h; sourceTree = "<group>"; };
+		C56C089E1A6F84C300FEDD45 /* ADClusterAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ADClusterAnnotation.m; sourceTree = "<group>"; };
+		C56C089F1A6F84C300FEDD45 /* ADMapCluster.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ADMapCluster.h; sourceTree = "<group>"; };
+		C56C08A01A6F84C300FEDD45 /* ADMapCluster.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ADMapCluster.m; sourceTree = "<group>"; };
+		C56C08A11A6F84C300FEDD45 /* ADMapPointAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ADMapPointAnnotation.h; sourceTree = "<group>"; };
+		C56C08A21A6F84C300FEDD45 /* ADMapPointAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ADMapPointAnnotation.m; sourceTree = "<group>"; };
+		C56C08A31A6F84C300FEDD45 /* TSClusterAnimationOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSClusterAnimationOptions.h; sourceTree = "<group>"; };
+		C56C08A41A6F84C300FEDD45 /* TSClusterAnimationOptions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSClusterAnimationOptions.m; sourceTree = "<group>"; };
+		C56C08A51A6F84C300FEDD45 /* TSClusterAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSClusterAnnotationView.h; sourceTree = "<group>"; };
+		C56C08A61A6F84C300FEDD45 /* TSClusterAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSClusterAnnotationView.m; sourceTree = "<group>"; };
+		C56C08A71A6F84C300FEDD45 /* TSClusterOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSClusterOperation.h; sourceTree = "<group>"; };
+		C56C08A81A6F84C300FEDD45 /* TSClusterOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSClusterOperation.m; sourceTree = "<group>"; };
+		C56C08AB1A6F84C300FEDD45 /* TSRefreshedAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSRefreshedAnnotationView.h; sourceTree = "<group>"; };
+		C56C08AC1A6F84C300FEDD45 /* TSRefreshedAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSRefreshedAnnotationView.m; sourceTree = "<group>"; };
+		C56C08AD1A6F84C300FEDD45 /* TSClusterMapView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSClusterMapView.h; sourceTree = "<group>"; };
+		C56C08AE1A6F84C300FEDD45 /* TSClusterMapView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSClusterMapView.m; sourceTree = "<group>"; };
 		C597E8731A65FECC002DF26A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Resources/Images.xcassets; sourceTree = SOURCE_ROOT; };
 		C597E87C1A66173D002DF26A /* ADBaseAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ADBaseAnnotation.h; sourceTree = "<group>"; };
 		C597E87D1A66173D002DF26A /* ADBaseAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ADBaseAnnotation.m; sourceTree = "<group>"; };
@@ -102,21 +102,10 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		6F8000DE16256BCE005D0263 /* TSClusterMapView */ = {
-			isa = PBXGroup;
-			children = (
-				C56C08741A6F6DEF00FEDD45 /* Helper */,
-				C56C08791A6F6DEF00FEDD45 /* Private */,
-				C56C08861A6F6DEF00FEDD45 /* Subclass */,
-			);
-			name = TSClusterMapView;
-			path = ../ADClusterMapView;
-			sourceTree = "<group>";
-		};
 		6F8FE98B16249223001A0309 = {
 			isa = PBXGroup;
 			children = (
-				6F8000DE16256BCE005D0263 /* TSClusterMapView */,
+				C56C08961A6F84C300FEDD45 /* TSClusterMapView */,
 				6F8FE9A016249223001A0309 /* ClusterDemo */,
 				6F8FE99916249223001A0309 /* Frameworks */,
 				6F8FE99716249223001A0309 /* Products */,
@@ -177,51 +166,62 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
-		C56C08741A6F6DEF00FEDD45 /* Helper */ = {
+		C56C08961A6F84C300FEDD45 /* TSClusterMapView */ = {
 			isa = PBXGroup;
 			children = (
-				C56C08751A6F6DEF00FEDD45 /* CLLocation+Utilities.h */,
-				C56C08761A6F6DEF00FEDD45 /* CLLocation+Utilities.m */,
-				C56C08771A6F6DEF00FEDD45 /* NSDictionary+MKMapRect.h */,
-				C56C08781A6F6DEF00FEDD45 /* NSDictionary+MKMapRect.m */,
+				C56C08971A6F84C300FEDD45 /* Helper */,
+				C56C089C1A6F84C300FEDD45 /* Private */,
+				C56C08A91A6F84C300FEDD45 /* Subclass */,
+			);
+			name = TSClusterMapView;
+			path = ../TSClusterMapView;
+			sourceTree = "<group>";
+		};
+		C56C08971A6F84C300FEDD45 /* Helper */ = {
+			isa = PBXGroup;
+			children = (
+				C56C08981A6F84C300FEDD45 /* CLLocation+Utilities.h */,
+				C56C08991A6F84C300FEDD45 /* CLLocation+Utilities.m */,
+				C56C089A1A6F84C300FEDD45 /* NSDictionary+MKMapRect.h */,
+				C56C089B1A6F84C300FEDD45 /* NSDictionary+MKMapRect.m */,
 			);
 			path = Helper;
 			sourceTree = "<group>";
 		};
-		C56C08791A6F6DEF00FEDD45 /* Private */ = {
+		C56C089C1A6F84C300FEDD45 /* Private */ = {
 			isa = PBXGroup;
 			children = (
-				C56C087A1A6F6DEF00FEDD45 /* ADClusterAnnotation.h */,
-				C56C087B1A6F6DEF00FEDD45 /* ADClusterAnnotation.m */,
-				C56C087C1A6F6DEF00FEDD45 /* ADMapCluster.h */,
-				C56C087D1A6F6DEF00FEDD45 /* ADMapCluster.m */,
-				C56C087E1A6F6DEF00FEDD45 /* ADMapPointAnnotation.h */,
-				C56C087F1A6F6DEF00FEDD45 /* ADMapPointAnnotation.m */,
-				C56C08801A6F6DEF00FEDD45 /* TSClusterAnimationOptions.h */,
-				C56C08811A6F6DEF00FEDD45 /* TSClusterAnimationOptions.m */,
-				C56C08821A6F6DEF00FEDD45 /* TSClusterAnnotationView.h */,
-				C56C08831A6F6DEF00FEDD45 /* TSClusterAnnotationView.m */,
-				C56C08841A6F6DEF00FEDD45 /* TSClusterOperation.h */,
-				C56C08851A6F6DEF00FEDD45 /* TSClusterOperation.m */,
+				C56C089D1A6F84C300FEDD45 /* ADClusterAnnotation.h */,
+				C56C089E1A6F84C300FEDD45 /* ADClusterAnnotation.m */,
+				C56C089F1A6F84C300FEDD45 /* ADMapCluster.h */,
+				C56C08A01A6F84C300FEDD45 /* ADMapCluster.m */,
+				C56C08A11A6F84C300FEDD45 /* ADMapPointAnnotation.h */,
+				C56C08A21A6F84C300FEDD45 /* ADMapPointAnnotation.m */,
+				C56C08A31A6F84C300FEDD45 /* TSClusterAnimationOptions.h */,
+				C56C08A41A6F84C300FEDD45 /* TSClusterAnimationOptions.m */,
+				C56C08A51A6F84C300FEDD45 /* TSClusterAnnotationView.h */,
+				C56C08A61A6F84C300FEDD45 /* TSClusterAnnotationView.m */,
+				C56C08A71A6F84C300FEDD45 /* TSClusterOperation.h */,
+				C56C08A81A6F84C300FEDD45 /* TSClusterOperation.m */,
 			);
 			path = Private;
 			sourceTree = "<group>";
 		};
-		C56C08861A6F6DEF00FEDD45 /* Subclass */ = {
+		C56C08A91A6F84C300FEDD45 /* Subclass */ = {
 			isa = PBXGroup;
 			children = (
-				C56C08871A6F6DEF00FEDD45 /* Optional */,
-				C56C088A1A6F6DEF00FEDD45 /* TSClusterMapView.h */,
-				C56C088B1A6F6DEF00FEDD45 /* TSClusterMapView.m */,
+				C56C08AA1A6F84C300FEDD45 /* Optional */,
+				C56C08AD1A6F84C300FEDD45 /* TSClusterMapView.h */,
+				C56C08AE1A6F84C300FEDD45 /* TSClusterMapView.m */,
 			);
 			path = Subclass;
 			sourceTree = "<group>";
 		};
-		C56C08871A6F6DEF00FEDD45 /* Optional */ = {
+		C56C08AA1A6F84C300FEDD45 /* Optional */ = {
 			isa = PBXGroup;
 			children = (
-				C56C08881A6F6DEF00FEDD45 /* TSRefreshedAnnotationView.h */,
-				C56C08891A6F6DEF00FEDD45 /* TSRefreshedAnnotationView.m */,
+				C56C08AB1A6F84C300FEDD45 /* TSRefreshedAnnotationView.h */,
+				C56C08AC1A6F84C300FEDD45 /* TSRefreshedAnnotationView.m */,
 			);
 			path = Optional;
 			sourceTree = "<group>";
@@ -333,19 +333,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C56C088C1A6F6DEF00FEDD45 /* CLLocation+Utilities.m in Sources */,
-				C56C08921A6F6DEF00FEDD45 /* TSClusterAnnotationView.m in Sources */,
-				C56C08901A6F6DEF00FEDD45 /* ADMapPointAnnotation.m in Sources */,
+				C56C08AF1A6F84C300FEDD45 /* CLLocation+Utilities.m in Sources */,
+				C56C08B51A6F84C300FEDD45 /* TSClusterAnnotationView.m in Sources */,
+				C56C08B31A6F84C300FEDD45 /* ADMapPointAnnotation.m in Sources */,
 				6F8FE9E4162496B0001A0309 /* main.m in Sources */,
-				C56C088F1A6F6DEF00FEDD45 /* ADMapCluster.m in Sources */,
-				C56C08951A6F6DEF00FEDD45 /* TSClusterMapView.m in Sources */,
-				C56C08931A6F6DEF00FEDD45 /* TSClusterOperation.m in Sources */,
-				C56C088E1A6F6DEF00FEDD45 /* ADClusterAnnotation.m in Sources */,
-				C56C088D1A6F6DEF00FEDD45 /* NSDictionary+MKMapRect.m in Sources */,
+				C56C08B21A6F84C300FEDD45 /* ADMapCluster.m in Sources */,
+				C56C08B81A6F84C300FEDD45 /* TSClusterMapView.m in Sources */,
+				C56C08B61A6F84C300FEDD45 /* TSClusterOperation.m in Sources */,
+				C56C08B11A6F84C300FEDD45 /* ADClusterAnnotation.m in Sources */,
+				C56C08B01A6F84C300FEDD45 /* NSDictionary+MKMapRect.m in Sources */,
 				C597E8921A66173D002DF26A /* CDMapViewController.m in Sources */,
-				C56C08911A6F6DEF00FEDD45 /* TSClusterAnimationOptions.m in Sources */,
+				C56C08B41A6F84C300FEDD45 /* TSClusterAnimationOptions.m in Sources */,
 				C597E88E1A66173D002DF26A /* TSBathroomAnnotation.m in Sources */,
-				C56C08941A6F6DEF00FEDD45 /* TSRefreshedAnnotationView.m in Sources */,
+				C56C08B71A6F84C300FEDD45 /* TSRefreshedAnnotationView.m in Sources */,
 				C597E88F1A66173D002DF26A /* TSStreetLightAnnotation.m in Sources */,
 				C597E8901A66173D002DF26A /* CDAppDelegate.m in Sources */,
 				C597E88D1A66173D002DF26A /* ADBaseAnnotation.m in Sources */,
