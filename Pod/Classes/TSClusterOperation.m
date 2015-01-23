@@ -331,21 +331,15 @@
         }
     }
     
+    //Don't select if cluster is outside visible region and would move map
     if (!MKMapRectContainsPoint(_mapView.visibleMapRect, MKMapPointForCoordinate(annotationToSelect.coordinate))) {
         annotationToSelect = nil;
     }
     
-//    //Make sure we close callout of cluster if needed
-//    NSArray *selectedAnnotations = _mapView.selectedAnnotations;
-//    for (ADClusterAnnotation *annotation in selectedAnnotations) {
-//        if ([annotation isKindOfClass:[ADClusterAnnotation class]]) {
-//            if ((annotation.type == ADClusterAnnotationTypeCluster &&
-//                 !CLLocationCoordinate2DIsApproxEqual(annotation.coordinate, annotation.coordinatePreAnimation, .000001)) ||
-//                [removeAfterAnimation containsObject:annotation]) {
-//                [_mapView deselectAnnotation:annotation animated:NO];
-//            }
-//        }
-//    }
+    //Don't select if cluster would zoom after selection
+    if (annotationToSelect.type == ADClusterAnnotationTypeCluster && _mapView.clusterZoomsOnTap) {
+        annotationToSelect = nil;
+    }
     
     
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
