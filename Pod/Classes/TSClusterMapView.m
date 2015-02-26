@@ -623,7 +623,7 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
         [self deselectAnnotation:view.annotation animated:NO];
         
         MKMapRect zoomTo = ((ADClusterAnnotation *)view.annotation).cluster.mapRect;
-        zoomTo = [self mapRectThatFits:zoomTo edgePadding:UIEdgeInsetsMake(0, view.frame.size.width, 0, view.frame.size.width)];
+        zoomTo = [self mapRectThatFits:zoomTo edgePadding:UIEdgeInsetsMake(view.frame.size.height, view.frame.size.width, view.frame.size.height, view.frame.size.width)];
         
         if (MKMapRectSizeIsGreaterThanOrEqual(zoomTo, self.visibleMapRect)) {
             zoomTo = MKMapRectInset(zoomTo, zoomTo.size.width/4, zoomTo.size.width/4);
