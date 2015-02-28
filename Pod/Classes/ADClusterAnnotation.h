@@ -15,11 +15,11 @@
 
 BOOL ADClusterCoordinate2DIsOffscreen(CLLocationCoordinate2D coord);
 
-typedef enum {
-    ADClusterAnnotationTypeUnknown = 0,
-    ADClusterAnnotationTypeLeaf = 1,
-    ADClusterAnnotationTypeCluster = 2
-} ADClusterAnnotationType;
+typedef NS_ENUM(NSUInteger, ADClusterAnnotationType) {
+	ADClusterAnnotationTypeUnknown = 0,
+	ADClusterAnnotationTypeLeaf = 1,
+	ADClusterAnnotationTypeCluster = 2
+};
 
 /**
  * Do not subclass or directly modify. This MKAnnotation is a wrapper to keep the annotation static during clustering.
