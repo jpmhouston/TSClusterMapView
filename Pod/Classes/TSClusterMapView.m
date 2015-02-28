@@ -611,8 +611,8 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
         clusterAnnotation = view.annotation;
         isClusterAnnotation = clusterAnnotation.type == ADClusterAnnotationTypeCluster;
     }
-    NSLog(@"%f", mapView.camera.altitude);
-    
+//    NSLog(@"%f", mapView.camera.altitude);
+	
     //Mapview seems to have a limit on set visible map rect let's manually split if we can't zoom anymore
     if (isClusterAnnotation && mapView.camera.altitude < 500) {
         [self deselectAnnotation:view.annotation animated:NO];
@@ -629,8 +629,8 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
             zoomTo = MKMapRectInset(zoomTo, zoomTo.size.width/4, zoomTo.size.width/4);
         }
         
-        NSLog(@"%f, %f", self.region.span.latitudeDelta, self.region.span.longitudeDelta);
-        
+//        NSLog(@"%f, %f", self.region.span.latitudeDelta, self.region.span.longitudeDelta);
+		
         [self setVisibleMapRect:zoomTo animated:YES];
     }
     
