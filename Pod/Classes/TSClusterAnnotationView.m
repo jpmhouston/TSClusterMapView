@@ -99,4 +99,10 @@
 	[self.addedView setSelected:selected animated:animated];
 }
 
+- (void)setHighlighted:(BOOL)highlighted {
+    [super setHighlighted:highlighted];
+    
+    [self.addedView setHighlighted:highlighted];
+}
+
 @end
