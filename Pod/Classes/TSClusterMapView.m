@@ -63,9 +63,9 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
     
     [self setDefaults];
     
-    self.clusterOperationQueue = [[NSOperationQueue alloc] init];
-    [self.clusterOperationQueue setMaxConcurrentOperationCount:1];
-    [self.clusterOperationQueue setName:@"Clustering Queue"];
+    _clusterOperationQueue = [[NSOperationQueue alloc] init];
+    [_clusterOperationQueue setMaxConcurrentOperationCount:1];
+    [_clusterOperationQueue setName:@"Clustering Queue"];
     
     _treeOperationQueue = [[NSOperationQueue alloc] init];
     [_treeOperationQueue setMaxConcurrentOperationCount:1];
@@ -622,15 +622,45 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
     }
     
     if ([_secondaryDelegate respondsToSelector:@selector(mapView:didSelectAnnotationView:)]) {
-        [_secondaryDelegate mapView:mapView didSelectAnnotationView:view];
+        [_secondaryDelegate mapView:mapView didSelectAnnotationView:[self filterInternalView:view]];
     }
 }
 
 - (void)mapView:(MKMapView *)mapView didDeselectAnnotationView:(MKAnnotationView *)view {
     
     if ([_secondaryDelegate respondsToSelector:@selector(mapView:didDeselectAnnotationView:)]) {
-        [_secondaryDelegate mapView:mapView didDeselectAnnotationView:view];
+        [_secondaryDelegate mapView:mapView didDeselectAnnotationView:[self filterInternalView:view]];
     }
+}
+
+- (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control {
+    
+    if ([_secondaryDelegate respondsToSelector:@selector(mapView:annotationView:calloutAccessoryControlTapped:)]) {
+        [_secondaryDelegate mapView:mapView annotationView:[self filterInternalView:view] calloutAccessoryControlTapped:control];
+    }
+}
+
+- (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view didChangeDragState:(MKAnnotationViewDragState)newState fromOldState:(MKAnnotationViewDragState)oldState {
+    
+    if ([_secondaryDelegate respondsToSelector:@selector(mapView:annotationView:didChangeDragState:fromOldState:)]) {
+        [_secondaryDelegate mapView:mapView annotationView:[self filterInternalView:view] didChangeDragState:newState fromOldState:oldState];
+    }
+}
+
+- (void)selectAnnotation:(id<MKAnnotation>)annotation animated:(BOOL)animated {
+    
+    
+}
+
+- (MKAnnotationView *)filterInternalView:(MKAnnotationView *)view {
+    
+    if ([view isKindOfClass:[TSClusterAnnotationView class]]) {
+        if (((TSClusterAnnotationView *)view).addedView) {
+            return ((TSClusterAnnotationView *)view).addedView;
+        }
+    }
+    
+    return view;
 }
 
 - (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation {
@@ -712,7 +742,17 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
                     zoomTo = MKMapRectInset(zoomTo, zoomTo.size.width/4, zoomTo.size.width/4);
                 }
                 
-                [self setVisibleMapRect:zoomTo animated:YES];
+                MKCoordinateRegion region = MKCoordinateRegionForMapRect(zoomTo);
+                
+                if (zoomTo.size.width < 3000) {
+                    MKMapCamera *camera = [self.camera copy];
+                    camera.altitude = camera.altitude*.5;
+                    camera.centerCoordinate = region.center;
+                    [self setCamera:camera animated:YES];
+                }
+                else {
+                    [self setRegion:region animated:YES];
+                }
             }
         }
     }

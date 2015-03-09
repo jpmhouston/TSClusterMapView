@@ -13,7 +13,6 @@
 @interface TSClusterAnnotationView ()
 
 @property (strong, nonatomic) UIView *contentView;
-@property (weak, nonatomic) MKAnnotationView *addedView;
 
 @end
 
@@ -83,12 +82,6 @@
     if ([_addedView isKindOfClass:[TSRefreshedAnnotationView class]]) {
         [(TSRefreshedAnnotationView*)_addedView clusteringAnimation];
     }
-}
-
-#pragma mark - Getters
-
-- (id<MKAnnotation>)customAnnotation {
-	return self.addedView.annotation;
 }
 
 #pragma mark - Selection

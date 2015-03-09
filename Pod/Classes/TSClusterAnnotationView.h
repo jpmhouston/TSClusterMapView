@@ -14,13 +14,12 @@
  */
 @interface TSClusterAnnotationView : MKAnnotationView
 
-@property (nonatomic, readonly) id<MKAnnotation> customAnnotation;
-
 - (MKAnnotationView *)updateWithAnnotationView:(MKAnnotationView *)annotationView;
 
 - (instancetype)initWithAnnotation:(id<MKAnnotation>)annotation reuseIdentifier:(NSString *)reuseIdentifier containingAnnotationView:(MKAnnotationView *)contentView;
 
 - (void)animateView;
 
+@property (weak, nonatomic, readonly) MKAnnotationView *addedView;
 
 @end

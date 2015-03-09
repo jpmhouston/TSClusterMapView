@@ -381,7 +381,6 @@
                 t = CGAffineTransformTranslate(t, 0, -annotation.annotationView.frame.size.height);
                 annotation.annotationView.transform  = t;
             }
-            annotation.popInAnimation = NO;
         }
         
         //Selected if needed
@@ -399,7 +398,10 @@
                     annotation.coordinate = annotation.cluster.clusterCoordinate;
                     [annotation.annotationView animateView];
                 }
-                annotation.annotationView.transform = CGAffineTransformIdentity;
+                if (annotation.popInAnimation && _mapView.clusterAppearanceAnimated) {
+                    annotation.annotationView.transform = CGAffineTransformIdentity;
+                    annotation.popInAnimation = NO;
+                }
             }
         } completion:^(BOOL finished) {
             
