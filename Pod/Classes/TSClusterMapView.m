@@ -612,12 +612,7 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
         isClusterAnnotation = clusterAnnotation.type == ADClusterAnnotationTypeCluster;
     }
 	
-    //Mapview seems to have a limit on set visible map rect let's manually split if we can't zoom anymore
-    if (isClusterAnnotation && mapView.camera.altitude < 500) {
-        [self deselectAnnotation:view.annotation animated:NO];
-        [self splitClusterToOriginal:clusterAnnotation.cluster];
-    }
-    else if (_clusterZoomsOnTap && isClusterAnnotation){
+    if (_clusterZoomsOnTap && isClusterAnnotation){
         [self deselectAnnotation:view.annotation animated:NO];
     }
     
@@ -731,8 +726,13 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
             ADClusterAnnotation *clusterAnnotation = view.annotation;
             BOOL isClusterAnnotation = clusterAnnotation.type == ADClusterAnnotationTypeCluster;
             
-            if (isClusterAnnotation){
-                
+            //Mapview seems to have a limit on set visible map rect let's manually split if we can't zoom anymore
+            if (isClusterAnnotation) {
+                if(self.camera.altitude < 500) {
+                    [self deselectAnnotation:view.annotation animated:NO];
+                    [self splitClusterToOriginal:clusterAnnotation.cluster];
+                    return;
+                }
                 [self deselectAnnotation:view.annotation animated:NO];
                 
                 MKMapRect zoomTo = ((ADClusterAnnotation *)view.annotation).cluster.mapRect;
