@@ -749,6 +749,9 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
                     float ratio = self.camera.altitude/self.visibleMapRect.size.width;
                     
                     float altitude = ratio*zoomTo.size.width;
+                    if (altitude < 280) {
+                        altitude = 280;
+                    }
                     
                     MKMapCamera *camera = [self.camera copy];
                     camera.altitude = altitude;
