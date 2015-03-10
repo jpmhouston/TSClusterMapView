@@ -44,8 +44,10 @@
     
     annotationView.frame = annotationView.bounds;
     
-    self.frame = annotationView.bounds;
-    self.contentView.frame = annotationView.bounds;
+    if (!CGRectEqualToRect(self.bounds, annotationView.bounds)) {
+        self.frame = annotationView.bounds;
+        self.contentView.frame = annotationView.bounds;
+    }
     
     self.centerOffset = annotationView.centerOffset;
     
