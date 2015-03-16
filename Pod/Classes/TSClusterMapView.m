@@ -63,9 +63,9 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
     
     [self setDefaults];
     
-    self.clusterOperationQueue = [[NSOperationQueue alloc] init];
-    [self.clusterOperationQueue setMaxConcurrentOperationCount:1];
-    [self.clusterOperationQueue setName:@"Clustering Queue"];
+    _clusterOperationQueue = [[NSOperationQueue alloc] init];
+    [_clusterOperationQueue setMaxConcurrentOperationCount:1];
+    [_clusterOperationQueue setName:@"Clustering Queue"];
     
     _treeOperationQueue = [[NSOperationQueue alloc] init];
     [_treeOperationQueue setMaxConcurrentOperationCount:1];
@@ -611,39 +611,51 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
         clusterAnnotation = view.annotation;
         isClusterAnnotation = clusterAnnotation.type == ADClusterAnnotationTypeCluster;
     }
-    NSLog(@"%f", mapView.camera.altitude);
-    
-    //Mapview seems to have a limit on set visible map rect let's manually split if we can't zoom anymore
-    if (isClusterAnnotation && mapView.camera.altitude < 500) {
+	
+    if (_clusterZoomsOnTap && isClusterAnnotation){
         [self deselectAnnotation:view.annotation animated:NO];
-        [self splitClusterToOriginal:clusterAnnotation.cluster];
-    }
-    else if (_clusterZoomsOnTap && isClusterAnnotation){
-        
-        [self deselectAnnotation:view.annotation animated:NO];
-        
-        MKMapRect zoomTo = ((ADClusterAnnotation *)view.annotation).cluster.mapRect;
-        zoomTo = [self mapRectThatFits:zoomTo edgePadding:UIEdgeInsetsMake(0, view.frame.size.width, 0, view.frame.size.width)];
-        
-        if (MKMapRectSizeIsGreaterThanOrEqual(zoomTo, self.visibleMapRect)) {
-            zoomTo = MKMapRectInset(zoomTo, zoomTo.size.width/4, zoomTo.size.width/4);
-        }
-        
-        NSLog(@"%f, %f", self.region.span.latitudeDelta, self.region.span.longitudeDelta);
-        
-        [self setVisibleMapRect:zoomTo animated:YES];
     }
     
     if ([_secondaryDelegate respondsToSelector:@selector(mapView:didSelectAnnotationView:)]) {
-        [_secondaryDelegate mapView:mapView didSelectAnnotationView:view];
+        [_secondaryDelegate mapView:mapView didSelectAnnotationView:[self filterInternalView:view]];
     }
 }
 
 - (void)mapView:(MKMapView *)mapView didDeselectAnnotationView:(MKAnnotationView *)view {
     
     if ([_secondaryDelegate respondsToSelector:@selector(mapView:didDeselectAnnotationView:)]) {
-        [_secondaryDelegate mapView:mapView didDeselectAnnotationView:view];
+        [_secondaryDelegate mapView:mapView didDeselectAnnotationView:[self filterInternalView:view]];
     }
+}
+
+- (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control {
+    
+    if ([_secondaryDelegate respondsToSelector:@selector(mapView:annotationView:calloutAccessoryControlTapped:)]) {
+        [_secondaryDelegate mapView:mapView annotationView:[self filterInternalView:view] calloutAccessoryControlTapped:control];
+    }
+}
+
+- (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view didChangeDragState:(MKAnnotationViewDragState)newState fromOldState:(MKAnnotationViewDragState)oldState {
+    
+    if ([_secondaryDelegate respondsToSelector:@selector(mapView:annotationView:didChangeDragState:fromOldState:)]) {
+        [_secondaryDelegate mapView:mapView annotationView:[self filterInternalView:view] didChangeDragState:newState fromOldState:oldState];
+    }
+}
+
+- (void)selectAnnotation:(id<MKAnnotation>)annotation animated:(BOOL)animated {
+    
+    
+}
+
+- (MKAnnotationView *)filterInternalView:(MKAnnotationView *)view {
+    
+    if ([view isKindOfClass:[TSClusterAnnotationView class]]) {
+        if (((TSClusterAnnotationView *)view).addedView) {
+            return ((TSClusterAnnotationView *)view).addedView;
+        }
+    }
+    
+    return view;
 }
 
 - (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation {
@@ -696,6 +708,76 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
     }
     
     return delegateAnnotationView;
+}
+
+#pragma mark - Touch Event 
+
+//Annotation selection is a touch down event. This will simulate a touch up inside selection of annotation for zoomOnTap
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    [super touchesEnded:touches withEvent:event];
+    
+    
+    if (_clusterZoomsOnTap){
+    for (UITouch *touch in touches) {
+        
+        TSClusterAnnotationView *view = [self clusterAnnotationForSubview:touch.view];
+        
+        if (view) {
+            ADClusterAnnotation *clusterAnnotation = view.annotation;
+            BOOL isClusterAnnotation = clusterAnnotation.type == ADClusterAnnotationTypeCluster;
+            
+            //Mapview seems to have a limit on set visible map rect let's manually split if we can't zoom anymore
+            if (isClusterAnnotation) {
+                if(self.camera.altitude < 500) {
+                    [self deselectAnnotation:view.annotation animated:NO];
+                    [self splitClusterToOriginal:clusterAnnotation.cluster];
+                    return;
+                }
+                [self deselectAnnotation:view.annotation animated:NO];
+                
+                MKMapRect zoomTo = ((ADClusterAnnotation *)view.annotation).cluster.mapRect;
+                zoomTo = [self mapRectThatFits:zoomTo edgePadding:UIEdgeInsetsMake(0, view.frame.size.width, 0, view.frame.size.width)];
+                
+                if (MKMapRectSizeIsGreaterThanOrEqual(zoomTo, self.visibleMapRect)) {
+                    zoomTo = MKMapRectInset(zoomTo, zoomTo.size.width/4, zoomTo.size.width/4);
+                }
+                
+                MKCoordinateRegion region = MKCoordinateRegionForMapRect(zoomTo);
+                
+                if (zoomTo.size.width < 3000) {
+                    
+                    float ratio = self.camera.altitude/self.visibleMapRect.size.width;
+                    
+                    float altitude = ratio*zoomTo.size.width;
+                    if (altitude < 280) {
+                        altitude = 280;
+                    }
+                    
+                    MKMapCamera *camera = [self.camera copy];
+                    camera.altitude = altitude;
+                    camera.centerCoordinate = region.center;
+                    [self setCamera:camera animated:YES];
+                }
+                else {
+                    [self setRegion:region animated:YES];
+                }
+            }
+        }
+    }
+    }
+}
+
+- (TSClusterAnnotationView *)clusterAnnotationForSubview:(UIView *)view {
+    
+    if (!view) {
+        return nil;
+    }
+    
+    if ([view isKindOfClass:[TSClusterAnnotationView class]]) {
+        return (TSClusterAnnotationView *)view;
+    }
+    
+    return [self clusterAnnotationForSubview:view.superview];
 }
 
 #pragma mark - ADClusterMapView Delegate
