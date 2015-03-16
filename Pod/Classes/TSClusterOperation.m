@@ -107,7 +107,7 @@
         maxNumberOfClusters = [self calculateNumberByGrid:clusteredMapRect];
     }
     
-    BOOL shouldOverlap = NO;
+    BOOL shouldOverlap = (_mapView.camera.altitude <= 400);
     
     //Try and account for camera pitch which distorts clustering calculations
     if (_mapView.camera.pitch > 50) {
@@ -661,7 +661,7 @@
     
     for (ADClusterAnnotation *pin in annotations) {
         
-        if (!pin.cluster) {
+        if (!pin.cluster || pin.type == ADClusterAnnotationTypeCluster) {
             continue;
         }
         
