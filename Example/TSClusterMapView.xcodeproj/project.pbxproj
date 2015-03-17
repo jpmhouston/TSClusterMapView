@@ -565,7 +565,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F9D67889D1DFA40BFD2D1280 /* Pods-TSClusterMapView.debug.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "LaunchImage-2";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TSClusterMapView/TSClusterMapView-Prefix.pch";
 				INFOPLIST_FILE = "TSClusterMapView/TSClusterMapView-Info.plist";
@@ -579,7 +580,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B0EDD22A5932C514E96FE695 /* Pods-TSClusterMapView.release.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "LaunchImage-2";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TSClusterMapView/TSClusterMapView-Prefix.pch";
 				INFOPLIST_FILE = "TSClusterMapView/TSClusterMapView-Info.plist";

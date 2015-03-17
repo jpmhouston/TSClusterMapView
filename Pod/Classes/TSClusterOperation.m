@@ -97,6 +97,10 @@
 
 - (void)clusterInMapRect:(MKMapRect)clusteredMapRect {
     
+    if (!_rootMapCluster.clusterCount) {
+        [self resetAll];
+        return;
+    }
     
     NSUInteger maxNumberOfClusters = _numberOfClusters;
     
@@ -422,6 +426,15 @@
                 _finishedBlock(clusteredMapRect, YES, toRemove);
             }
         }];
+    }];
+}
+
+- (void)resetAll {
+    
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        for (ADClusterAnnotation *annotation in _annotationPool) {
+            [annotation reset];
+        }
     }];
 }
 
