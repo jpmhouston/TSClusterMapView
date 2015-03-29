@@ -485,7 +485,15 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
     }
 }
 
+- (BOOL)shouldNotAnimate {
+    return (!self.superview || self.layer.animationKeys);
+}
+
 - (void)splitClusterToOriginal:(ADMapCluster *)cluster {
+    
+    if ([self shouldNotAnimate]) {
+        return;
+    }
     
     [self initAnnotationPools:[self numberOfClusters]+cluster.clusterCount];
     
@@ -495,7 +503,7 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
 
 - (void)clusterVisibleMapRectForceRefresh:(BOOL)isNewCluster {
     
-    if (!self.superview) {
+    if ([self shouldNotAnimate]) {
         return;
     }
     
@@ -736,7 +744,7 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
                 [self deselectAnnotation:view.annotation animated:NO];
                 
                 MKMapRect zoomTo = ((ADClusterAnnotation *)view.annotation).cluster.mapRect;
-                zoomTo = [self mapRectThatFits:zoomTo edgePadding:UIEdgeInsetsMake(0, view.frame.size.width, 0, view.frame.size.width)];
+                zoomTo = [self mapRectThatFits:zoomTo edgePadding:UIEdgeInsetsMake(view.frame.size.height, view.frame.size.width, view.frame.size.height, view.frame.size.width)];
                 
                 if (MKMapRectSizeIsGreaterThanOrEqual(zoomTo, self.visibleMapRect)) {
                     zoomTo = MKMapRectInset(zoomTo, zoomTo.size.width/4, zoomTo.size.width/4);

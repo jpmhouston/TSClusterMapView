@@ -11,7 +11,7 @@
 #import "ADMapCluster.h"
 #import "TSClusterAnnotationView.h"
 
-#define kADCoordinate2DOffscreen CLLocationCoordinate2DMake(85.0, 179.0) // this coordinate puts the annotation on the top right corner of the map. We use this instead of kCLLocationCoordinate2DInvalid so that we don't mess with MapKit's KVO weird behaviour that removes from the map the annotations whose coordinate was set to kCLLocationCoordinate2DInvalid.
+#define kADCoordinate2DOffscreen CLLocationCoordinate2DMake(DBL_MAX, DBL_MAX) // this coordinate puts the annotation on the top right corner of the map. We use this instead of kCLLocationCoordinate2DInvalid so that we don't mess with MapKit's KVO weird behaviour that removes from the map the annotations whose coordinate was set to kCLLocationCoordinate2DInvalid.
 
 BOOL ADClusterCoordinate2DIsOffscreen(CLLocationCoordinate2D coord);
 
