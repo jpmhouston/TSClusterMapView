@@ -41,17 +41,6 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
 
 @implementation TSClusterMapView
 
-- (void)layoutSubviews {
-    
-    [super layoutSubviews];
-    
-}
-
-- (void)setFrame:(CGRect)frame {
-    [super setFrame:frame];
-    
-}
-
 - (instancetype)initWithCoder:(NSCoder *)coder
 {
     self = [super initWithCoder:coder];
