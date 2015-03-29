@@ -41,6 +41,17 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
 
 @implementation TSClusterMapView
 
+- (void)layoutSubviews {
+    
+    [super layoutSubviews];
+    
+}
+
+- (void)setFrame:(CGRect)frame {
+    [super setFrame:frame];
+    
+}
+
 - (instancetype)initWithCoder:(NSCoder *)coder
 {
     self = [super initWithCoder:coder];
@@ -485,7 +496,15 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
     }
 }
 
+- (BOOL)shouldNotAnimate {
+    return (!self.superview || self.layer.animationKeys);
+}
+
 - (void)splitClusterToOriginal:(ADMapCluster *)cluster {
+    
+    if ([self shouldNotAnimate]) {
+        return;
+    }
     
     [self initAnnotationPools:[self numberOfClusters]+cluster.clusterCount];
     
@@ -495,7 +514,7 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
 
 - (void)clusterVisibleMapRectForceRefresh:(BOOL)isNewCluster {
     
-    if (!self.superview) {
+    if ([self shouldNotAnimate]) {
         return;
     }
     

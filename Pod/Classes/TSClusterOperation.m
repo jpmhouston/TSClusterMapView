@@ -396,7 +396,7 @@
         }
         
         TSClusterAnimationOptions *options = _mapView.clusterAnimationOptions;
-        [UIView animateWithDuration:options.duration delay:0.0 usingSpringWithDamping:options.springDamping initialSpringVelocity:options.springVelocity options:options.viewAnimationOptions animations:^{
+        [UIView animateWithDuration:options.duration delay:0.0 usingSpringWithDamping:options.springDamping initialSpringVelocity:options.springVelocity options:options.viewAnimationOptions|UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState animations:^{
             for (ADClusterAnnotation * annotation in _annotationPool) {
                 if (annotation.cluster) {
                     annotation.coordinate = annotation.cluster.clusterCoordinate;
@@ -498,13 +498,15 @@
         
         TSClusterAnimationOptions *options = _mapView.clusterAnimationOptions;
         
-        [UIView animateWithDuration:options.duration delay:0.0 usingSpringWithDamping:options.springDamping initialSpringVelocity:options.springVelocity options:options.viewAnimationOptions animations:^{
+        [UIView animateWithDuration:options.duration delay:0.0 usingSpringWithDamping:options.springDamping initialSpringVelocity:options.springVelocity options:options.viewAnimationOptions|UIViewAnimationOptionAllowUserInteraction|UIViewAnimationOptionBeginFromCurrentState  animations:^{
             for (ADClusterAnnotation * annotation in matchedAnnotations) {
                 annotation.coordinate = annotation.cluster.clusterCoordinate;
                 [annotation.annotationView animateView];
                 annotation.annotationView.transform = CGAffineTransformIdentity;
             }
-        } completion:nil];
+        } completion:^(BOOL finished) {
+            
+        }];
     }];
 }
 
