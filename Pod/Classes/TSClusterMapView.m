@@ -37,6 +37,8 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
 
 @property (nonatomic, strong) NSOperationQueue *treeOperationQueue;
 
+@property (nonatomic, readonly) NSSet *clusterAnnotations;
+
 @end
 
 @implementation TSClusterMapView
@@ -145,6 +147,23 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
 }
 
 #pragma mark - Add/Remove Annotations
+
+
+- (void)addAnnotation:(id<MKAnnotation>)annotation {
+    if (![_clusterableAnnotationsAdded containsObject:annotation]) {
+        [super addAnnotation:annotation];
+    }
+}
+
+- (void)addAnnotations:(NSArray *)annotations {
+    
+    NSMutableSet *annotationsToAdd = [NSMutableSet setWithArray:annotations];
+    [annotationsToAdd minusSet:_clusterableAnnotationsAdded];
+    
+    if (annotationsToAdd.count) {
+        [super addAnnotations:annotationsToAdd.allObjects];
+    }
+}
 
 - (void)addClusteredAnnotation:(id<MKAnnotation>)annotation {
     
@@ -278,8 +297,7 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
 - (NSArray *)visibleClusterAnnotations {
     NSMutableArray * displayedAnnotations = [[NSMutableArray alloc] init];
     for (ADClusterAnnotation * annotation in [_clusterAnnotationsPool copy]) {
-        if (annotation.coordinate.latitude != kADCoordinate2DOffscreen.latitude &&
-            annotation.coordinate.longitude != kADCoordinate2DOffscreen.longitude) {
+        if (!annotation.offscreen) {
             [displayedAnnotations addObject:annotation];
         }
     }
@@ -290,9 +308,22 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
 - (NSArray *)annotations {
     
     NSMutableSet *set = [NSMutableSet setWithArray:[super annotations]];
-    [set minusSet:_clusterAnnotationsPool];
+    [set minusSet:self.clusterAnnotations];
+    [set unionSet:_clusterableAnnotationsAdded];
     
-    return [_clusterableAnnotationsAdded.allObjects arrayByAddingObjectsFromArray:set.allObjects];
+    return set.allObjects;
+}
+
+- (NSSet *)clusterAnnotations {
+    
+    NSMutableSet *mutableSet = [[NSMutableSet alloc] init];
+    for (ADClusterAnnotation *annotation in [super annotations]) {
+        if ([annotation isKindOfClass:[ADClusterAnnotation class]]) {
+            [mutableSet addObject:annotation];
+        }
+    }
+    
+    return mutableSet;
 }
 
 - (ADClusterAnnotation *)currentClusterAnnotationForAddedAnnotation:(id<MKAnnotation>)annotation {
