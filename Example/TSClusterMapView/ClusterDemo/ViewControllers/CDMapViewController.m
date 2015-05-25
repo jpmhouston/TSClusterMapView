@@ -302,10 +302,6 @@ static NSString * const kBathroomAnnotationImage = @"BathroomAnnotation";
         default:
             break;
     }
-    
-    NSArray *annotations = self.mapView.annotations;
-    
-    [self.mapView showAnnotations:annotations animated:YES];
 }
 
 - (IBAction)sliderValueChanged:(id)sender {
