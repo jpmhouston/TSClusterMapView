@@ -76,10 +76,10 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
     _clusterAnimationOptions = [TSClusterAnimationOptions defaultOptions];
     _annotationViewCache = [[NSCache alloc] init];
     
-    UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self
-                                                                                    action:@selector(didPanMap:)];
-    [panRecognizer setDelegate:self];
-    [self addGestureRecognizer:panRecognizer];
+//    UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self
+//                                                                                    action:@selector(didPanMap:)];
+//    [panRecognizer setDelegate:self];
+//    [self addGestureRecognizer:panRecognizer];
 }
 
 - (void)didMoveToSuperview {

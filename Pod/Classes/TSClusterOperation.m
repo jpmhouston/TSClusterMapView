@@ -369,6 +369,7 @@
         for (ADClusterAnnotation *annotation in _annotationPool) {
             if (CLLocationCoordinate2DIsValid(annotation.coordinatePreAnimation)) {
                 annotation.coordinate = annotation.coordinatePreAnimation;
+                annotation.coordinatePreAnimation = annotation.coordinate; // work-around spurious deslection
             }
         }
         
@@ -487,6 +488,7 @@
         for (ADClusterAnnotation *annotation in matchedAnnotations) {
             if (CLLocationCoordinate2DIsValid(annotation.coordinatePreAnimation)) {
                 annotation.coordinate = annotation.coordinatePreAnimation;
+                annotation.coordinatePreAnimation = annotation.coordinate; // work-around spurious deslection
             }
         }
         
