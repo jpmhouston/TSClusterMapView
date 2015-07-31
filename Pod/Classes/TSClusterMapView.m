@@ -393,22 +393,22 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
 }
 
 
-#pragma mark - UIGestureRecognizerDelegate methods
-
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
-    return YES;
-}
-
-- (void)didPanMap:(UIGestureRecognizer*)gestureRecognizer {
-    
-    if (gestureRecognizer.state == UIGestureRecognizerStateBegan){
-        [self userWillPanMapView:self];
-    }
-    
-    if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
-        [self userDidPanMapView:self];
-    }
-}
+// #pragma mark - UIGestureRecognizerDelegate methods
+//
+// - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+//     return YES;
+// }
+//
+// - (void)didPanMap:(UIGestureRecognizer*)gestureRecognizer {
+//
+//     if (gestureRecognizer.state == UIGestureRecognizerStateBegan){
+//         [self userWillPanMapView:self];
+//     }
+//
+//     if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
+//         [self userDidPanMapView:self];
+//     }
+// }
 
 
 #pragma mark - Objective-C Runtime and subclassing methods
@@ -876,14 +876,14 @@ NSString * const KDTreeClusteringProgress = @"KDTreeClusteringProgress";
 }
 
 - (void)userWillPanMapView:(TSClusterMapView *)mapView {
-    
+
     if ([_secondaryDelegate respondsToSelector:@selector(userWillPanMapView:)]) {
         [_secondaryDelegate userWillPanMapView:mapView];
     }
 }
 
 - (void)userDidPanMapView:(TSClusterMapView *)mapView {
-    
+
     if ([_secondaryDelegate respondsToSelector:@selector(userDidPanMapView:)]) {
         [_secondaryDelegate userDidPanMapView:mapView];
     }

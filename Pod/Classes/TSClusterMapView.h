@@ -59,12 +59,12 @@ extern NSString * const KDTreeClusteringProgress;
 - (void)mapViewDidFinishClusteringAnimation:(TSClusterMapView *)mapView;
 
 /*!
- * @discussion Convenience delegate to determine if map will pan by user gesture
+ * @discussion Convenience delegate to determine if map will pan by user gesture - CURRENTLY NEVER CALLED
  * @param mapView The map view that will begin panning.
  */
 - (void)userWillPanMapView:(TSClusterMapView *)mapView;
 /*!
- * @discussion Convenience delegate to determine if map did pan by user gesture
+ * @discussion Convenience delegate to determine if map did pan by user gesture - CURRENTLY NEVER CALLED
  * @param mapView The map view that did finish panning.
  */
 - (void)userDidPanMapView:(TSClusterMapView *)mapView;
